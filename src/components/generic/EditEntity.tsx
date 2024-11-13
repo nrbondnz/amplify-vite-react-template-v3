@@ -1,4 +1,5 @@
-﻿import FileLoader from "../../components/utils/FileLoader";
+﻿import { useSubscription } from "@context/SubscriptionContext";
+import FileLoader from "../../components/utils/FileLoader";
 //import ShowPicture from "@components/utils/ShowPicture";
 import ShowPicture from "../../components/utils/ShowPicture";
 import { useState, ChangeEvent } from "react";
@@ -22,6 +23,7 @@ interface EditEntityProps<T extends WithId> {
 const EditEntity = <T extends WithId>({ pEntity, pEntityName, onSave, onDelete, onCancel, onEntityChange }: EditEntityProps<T>) => {
 	const [updatedEntity, setUpdatedEntity] = useState<T>(pEntity);
 	const [entityName] = useState<string | null>(pEntityName);
+	const { addCustomEvent } = useSubscription();
 
 	// Fetch locations
 	const { entities: locations, loading: locationsLoading, error: locationsError } = useEntityData<ILocation>(EntityTypes.Location);
@@ -48,6 +50,7 @@ const EditEntity = <T extends WithId>({ pEntity, pEntityName, onSave, onDelete, 
 
 	const handleCancel = (): void => {
 		onCancel();
+		addCustomEvent(pEntityName, "CANCEL_REQUEST", pEntity.id);
 	}
 
 	const isBasicType = (value: unknown): value is string | number | boolean => {

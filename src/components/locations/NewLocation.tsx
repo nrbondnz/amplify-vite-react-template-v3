@@ -26,10 +26,11 @@ const NewLocation: React.FC<NewLocationProps> = ({ loading, getNextId }) => {
 			navigate('/locations'); // Navigate to /locations after saving
 		} catch (error) {
 			console.error('Failed to save the entity:', error);
+			
 		}
 	};
 
-	return <NewEntity entity={defaultLocation} entityName="Location" onSave={handleSave} onCancel={() => {navigate('/locations') }} />;
+	return <NewEntity entity={defaultLocation} entityName="locations" onSave={handleSave} onCancel={() => {navigate('/locations') }} />;
 };
 
 export default withEntityData<ILocation>(EntityTypes.Location)(NewLocation);

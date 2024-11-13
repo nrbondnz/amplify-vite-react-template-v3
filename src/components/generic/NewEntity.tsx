@@ -1,32 +1,45 @@
-﻿// src/components/generic/NewEntity.tsx
-import { useState } from 'react';
+﻿import { useState, ChangeEvent } from 'react';
+import { useSubscription } from "@context/SubscriptionContext";
+import { useEntityData } from "../../hooks/useEntityData";
+import { EntityTypes, ILocation, WithId } from '../../shared/types/types';
 
-interface NewEntityProps<T> {
+interface NewEntityProps<T extends WithId> {
 	entity: T;
 	entityName: string;
 	onSave: (entity: T) => void;
 	onCancel: () => void;
+	onEntityChange?: (updatedEntity: T) => void; // Optional prop for entity change
 }
 
-const NewEntity = <T extends object>({ entity, entityName, onSave, onCancel }: NewEntityProps<T>) => {
+const NewEntity = <T extends WithId>({ entity, entityName, onSave, onCancel, onEntityChange }: NewEntityProps<T>) => {
 	const [newEntity, setNewEntity] = useState<T>(entity);
+	const { addCustomEvent } = useSubscription();
 
-	const handleChange = (key: keyof T, value: string) => {
-		setNewEntity({
+	// Fetch locations
+	const { entities: locations, loading: locationsLoading, error: locationsError } = useEntityData<ILocation>(EntityTypes.Location);
+
+	const handleChange = (key: keyof T, value: T[keyof T]) => {
+		const updatedEntity = {
 			...newEntity,
 			[key]: value,
-		});
+		};
+		setNewEntity(updatedEntity);
+
+		if (onEntityChange) {
+			onEntityChange(updatedEntity);
+		}
 	};
 
 	const handleSave = () => {
 		onSave(newEntity);
 	};
-	
+
 	const handleCancel = () => {
 		onCancel();
-	}
+		addCustomEvent(entityName, "CANCEL_REQUEST", newEntity.id as number);
+	};
 
-	const formatValue = (value: unknown): string => {
+	/*const formatValue = (value: unknown): string => {
 		if (typeof value === 'string' || typeof value === 'number') {
 			return value.toString();
 		}
@@ -34,31 +47,71 @@ const NewEntity = <T extends object>({ entity, entityName, onSave, onCancel }: N
 			return value.join(', ');
 		}
 		return '';
+	};*/
+
+	const isBasicType = (value: unknown): value is string | number | boolean => {
+		return ['string', 'number', 'boolean'].includes(typeof value);
 	};
 
-	function isBasicType(key: string) {
-		return !(key === 'id' || key === 'createdAt' || key === 'updatedAt');
-	}
+	const renderField = (key: string, value: unknown) => {
+		if (key === "idLocation") {
+			return (
+				<tr key={key}>
+					<td><label>Location:</label></td>
+					<td>
+						<select
+							value={value !== undefined && value !== null ? String(value) : ""}
+							onChange={(e: ChangeEvent<HTMLSelectElement>) =>
+								handleChange(key as keyof T, e.target.value as unknown as T[keyof T])
+							}
+						>
+							<option value="" disabled>Select Location</option>
+							{locations.map(location => (
+								<option key={location.id} value={location.id}>
+									{location.entityName}
+								</option>
+							))}
+						</select>
+					</td>
+				</tr>
+			);
+		}
+
+		if (isBasicType(value)) {
+			return (
+				<tr key={key}>
+					<td><label>{key}:</label></td>
+					<td>
+						<input
+							type="text"
+							value={value !== undefined && value !== null ? String(value) : ""}
+							onChange={(e: ChangeEvent<HTMLInputElement>) =>
+								handleChange(key as keyof T, e.target.value as unknown as T[keyof T])
+							}
+						/>
+					</td>
+				</tr>
+			);
+		}
+
+		return null;
+	};
 
 	return (
 		<div>
 			<h2>New {entityName}</h2>
-			{Object.keys(newEntity).map((key) => {
-				const value = newEntity[key as keyof T];
-				if (isBasicType(key)) {
-					return (
-						<div key={key}>
-							<label>{key}:</label>
-							<input
-								type="text"
-								value={formatValue(value)}
-								onChange={(e) => handleChange(key as keyof T, e.target.value)}
-							/>
-						</div>
-					);
-				}
-				return null;
-			})}
+			{locationsLoading && <div>Loading locations...</div>}
+			{locationsError && <div>Error loading locations: {locationsError}</div>}
+
+			<table>
+				<tbody>
+				{Object.keys(newEntity).map((key) => {
+					const value = newEntity[key as keyof T];
+					return renderField(key, value);
+				})}
+				</tbody>
+			</table>
+
 			<button onClick={handleSave}>Save</button>
 			<button onClick={handleCancel}>Cancel</button>
 		</div>

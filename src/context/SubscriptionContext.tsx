@@ -18,14 +18,15 @@ export const SubscriptionProvider: React.FC<{ children: ReactNode }> = ({ childr
 	const subscribeToEntityEvents = () => {
 		const subscriptions: any[] = [];
 
-		const handleEvent = (entity: AppStatePage, actionType: string) => (data: any) => {
-			const entityData = data.data; // Adjust this if the structure is different
+		const handleEvent = (entity: AppStatePage, actionType: string, entityId?: number, entityData?: any) => (data: any) => {
+			entityData = data.data; // Adjust this if the structure is different
 
 			const event: AppEvent = {
 				entity,
 				actionType,
-				entityId: entityData.id,
-				entityData, // Optional: Include the full entity data if needed
+				entityId: entityId ?? 0,
+				entityData: entityData, // Optional: Include the full entity data if
+				// needed
 			};
 			setLastEvent(event);
 		};

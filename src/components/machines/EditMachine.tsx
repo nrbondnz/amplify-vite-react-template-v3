@@ -3,7 +3,7 @@ import withEntityData from '@components/generic/withEntityData';
 import { EntityTypes, IMachine, ISettingWithStatus } from '@shared/types/types';
 import { client } from '@shared/utils/client';
 import React, { useRef, useState, useEffect } from 'react';
-import { useNavigate, useParams } from 'react-router-dom';
+import { useParams } from "react-router-dom";
 import ManageSettings from './ManageSettings';
 
 interface EditMachineProps {
@@ -14,7 +14,7 @@ interface EditMachineProps {
 
 const EditMachine: React.FC<EditMachineProps> = ({ getEntityById, loading }) => {
 	const { id } = useParams<{ id: string }>();
-	const navigate = useNavigate();
+	//const navigate = useNavigate();
 
 	const entity = getEntityById(id!);
 	const manageSettingsRef = useRef<{
@@ -56,7 +56,7 @@ const EditMachine: React.FC<EditMachineProps> = ({ getEntityById, loading }) => 
 			const currentSettings = manageSettingsRef.current?.saveSettings() || [];
 			await manageSettingsRef.current?.saveSettingsToDB(currentSettings);
 
-			navigate('/appcontent');
+			//navigate('/appcontent');
 		} catch (error) {
 			console.error('Failed to save the entity:', error);
 		}
@@ -66,14 +66,14 @@ const EditMachine: React.FC<EditMachineProps> = ({ getEntityById, loading }) => 
 		try {
 			await client.models.machines.delete(updatedEntity);
 			console.log('Deleting entity:', updatedEntity);
-			navigate('/appcontent');
+			//navigate('/appcontent');
 		} catch (error) {
 			console.error('Failed to delete the entity:', error);
 		}
 	};
 
 	const handleCancel = () => {
-		navigate('/machines');
+		//navigate('/machines');
 	};
 
 	const handleEntityChange = (updatedEntity: IMachine) => {
