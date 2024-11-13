@@ -286,6 +286,12 @@ export interface IActionState extends WithId {
 	parentName?: string | null;
 }
 
+export const defaultWorkout: IWorkout = {
+	id: 0,
+	idUser: 0,
+	entityName: 'default workout',
+};
+
 export const defaultActionState: IActionState = {
 	id: 1,
 	LOADED: "",  // Default value for new field

@@ -4,6 +4,9 @@ import ListExercise from "@components/exercises/ListExercise";
 import NewExercise from "@components/exercises/NewExercise";
 import ManageSettings from "@components/machines/ManageSettings";
 import FileLoader from "@components/utils/FileLoader";
+import EditWorkout from "@components/workouts/EditWorkout";
+import ListWorkout from "@components/workouts/ListWorkout";
+import NewWorkout from "@components/workouts/NewWorkout";
 import React, { useEffect, useState } from 'react';
 import { Route, Routes, useNavigate } from 'react-router-dom';
 import { useSubscription } from "@context/SubscriptionContext";
@@ -40,6 +43,11 @@ const App: React.FC = () => {
     return (
         <Routes>
             <Route path="/" element={<HomePage />} />
+
+            <Route path="/workouts" element={<ListWorkout />} />
+            <Route path="/workouts/new" element={<NewWorkout />} />
+            <Route path="/workouts/:id" element={<EditWorkout />} />
+            
             <Route path="/locations" element={<ListLocation />} />
             <Route path="/locations/new" element={<NewLocation />} />
             <Route path="/locations/:id" element={<EditLocation />} />
