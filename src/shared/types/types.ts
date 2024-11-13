@@ -21,6 +21,14 @@
 	NO_PAGE: "NO_PAGE"
 } as const;
 
+export enum AppStatePage {
+	Machine = "Machine",
+	User = "User",
+	Exercise = "Exercise",
+	Workout = "Workout",
+	Muscle = "Muscle"
+}
+
 export type AppstatePage = typeof appstate_page[keyof typeof appstate_page];
 
 export const appstate_command = {
@@ -51,6 +59,12 @@ export const appstate_command = {
 } as const;
 
 export type AppstateCommand = typeof appstate_command[keyof typeof appstate_command];
+
+export interface AppEvent {
+	entity: AppStatePage;
+	actionType: string;// Optional field for specific entity
+	// Add other necessary fields as needed
+}
 
 export interface AppData {
 	users: IUser[];

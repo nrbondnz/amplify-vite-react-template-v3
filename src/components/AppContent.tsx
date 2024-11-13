@@ -11,9 +11,8 @@ const AppContent: React.FC = () => {
 	const { lastEvent } = useSubscription();
 	const navigate = useNavigate();
 
-	// makes all events cause a navigate to /entity which is list
 	useEffect(() => {
-		if (lastEvent) {
+		if (lastEvent?.entity && lastEvent?.actionType) {
 			console.log(`Last Event: ${lastEvent.entity} - ${lastEvent.actionType}`);
 			navigate(`/${lastEvent.entity}`);
 		}

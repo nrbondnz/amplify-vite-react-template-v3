@@ -1,119 +1,169 @@
-﻿// SubscriptionContext.tsx
-import React, { createContext, useContext, useEffect, useState, ReactNode } from 'react';
-import { client } from '@shared/utils/client';
-import { Amplify } from 'aws-amplify';
-import outputs from '../../amplify_outputs.json';
+﻿import React, { createContext, useContext, useState, useEffect } from 'react';
+import { generateClient } from 'aws-amplify/data';
+import type { Schema } from '../../amplify/data/resource';
+import { AppEvent, AppStatePage } from '@shared/types/types'; // Import your AppEvent type and AppStatePage
 
-Amplify.configure(outputs);
-
-interface LastEvent {
-	entity: string;
-	actionType: string;
-	timestamp: number;
+interface SubscriptionContextProps {
+	lastEvent: AppEvent | null;
+	// other context properties and methods
 }
 
-interface ISubscriptionContext {
-	lastEvent: LastEvent | null;
-	postEvent: (entity: string, actionType: string) => void;
-}
+const SubscriptionContext = createContext<SubscriptionContextProps | undefined>(undefined);
 
-const SubscriptionContext = createContext<ISubscriptionContext>({
-	lastEvent: null,
-	postEvent: () => {}
-});
+export const SubscriptionProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
+	const [lastEvent, setLastEvent] = useState<AppEvent | null>(null);
+	const client = generateClient<Schema>();
 
-interface SubscriptionProps {
-	children: ReactNode;
-}
+	const subscribeToEntityEvents = () => {
+		const subscriptions: any[] = [];
 
-const SubscriptionProvider: React.FC<SubscriptionProps> = ({ children }) => {
-	const [lastEvent, setLastEvent] = useState<LastEvent | null>(null);
-
-	const handleEvent = (entity: string, actionType: string) => {
-		const event: LastEvent = {
-			entity,
-			actionType,
-			timestamp: Date.now(),
+		const handleEvent = (entity: AppStatePage, actionType: string) => () => {
+			const event: AppEvent = {
+				entity,
+				actionType// Adjust based on the actual data structure
+			};
+			setLastEvent(event);
 		};
-		setLastEvent(event);
-		localStorage.setItem("lastEvent", JSON.stringify(event));
+
+		// Subscriptions for Machines
+		subscriptions.push(
+			client.models.machines.onCreate().subscribe({
+				next: handleEvent(AppStatePage.Machine, 'CREATE_MACHINE'),
+				error: (error: any) => console.warn('Create Machine subscription error:', error),
+			})
+		);
+
+		subscriptions.push(
+			client.models.machines.onUpdate().subscribe({
+				next: handleEvent(AppStatePage.Machine, 'UPDATE_MACHINE'),
+				error: (error: any) => console.warn('Update Machine subscription error:', error),
+			})
+		);
+
+		subscriptions.push(
+			client.models.machines.onDelete().subscribe({
+				next: handleEvent(AppStatePage.Machine, 'DELETE_MACHINE'),
+				error: (error: any) => console.warn('Delete Machine subscription error:', error),
+			})
+		);
+
+		// Subscriptions for Users
+		subscriptions.push(
+			client.models.user_details.onCreate().subscribe({
+				next: handleEvent(AppStatePage.User, 'CREATE_USER'),
+				error: (error: any) => console.warn('Create User subscription error:', error),
+			})
+		);
+
+		subscriptions.push(
+			client.models.user_details.onUpdate().subscribe({
+				next: handleEvent(AppStatePage.User, 'UPDATE_USER'),
+				error: (error: any) => console.warn('Update User subscription error:', error),
+			})
+		);
+
+		subscriptions.push(
+			client.models.user_details.onDelete().subscribe({
+				next: handleEvent(AppStatePage.User, 'DELETE_USER'),
+				error: (error: any) => console.warn('Delete User subscription error:', error),
+			})
+		);
+
+		// Subscriptions for Exercises
+		subscriptions.push(
+			client.models.exercises.onCreate().subscribe({
+				next: handleEvent(AppStatePage.Exercise, 'CREATE_EXERCISE'),
+				error: (error: any) => console.warn('Create Exercise subscription error:', error),
+			})
+		);
+
+		subscriptions.push(
+			client.models.exercises.onUpdate().subscribe({
+				next: handleEvent(AppStatePage.Exercise, 'UPDATE_EXERCISE'),
+				error: (error: any) => console.warn('Update Exercise subscription error:', error),
+			})
+		);
+
+		subscriptions.push(
+			client.models.exercises.onDelete().subscribe({
+				next: handleEvent(AppStatePage.Exercise, 'DELETE_EXERCISE'),
+				error: (error: any) => console.warn('Delete Exercise subscription error:', error),
+			})
+		);
+
+		// Subscriptions for Workouts
+		subscriptions.push(
+			client.models.workouts.onCreate().subscribe({
+				next: handleEvent(AppStatePage.Workout, 'CREATE_WORKOUT'),
+				error: (error: any) => console.warn('Create Workout subscription error:', error),
+			})
+		);
+
+		subscriptions.push(
+			client.models.workouts.onUpdate().subscribe({
+				next: handleEvent(AppStatePage.Workout, 'UPDATE_WORKOUT'),
+				error: (error: any) => console.warn('Update Workout subscription error:', error),
+			})
+		);
+
+		subscriptions.push(
+			client.models.workouts.onDelete().subscribe({
+				next: handleEvent(AppStatePage.Workout, 'DELETE_WORKOUT'),
+				error: (error: any) => console.warn('Delete Workout subscription error:', error),
+			})
+		);
+
+		// Subscriptions for Muscles
+		subscriptions.push(
+			client.models.muscles.onCreate().subscribe({
+				next: handleEvent(AppStatePage.Muscle, 'CREATE_MUSCLE'),
+				error: (error: any) => console.warn('Create Muscle subscription error:', error),
+			})
+		);
+
+		subscriptions.push(
+			client.models.muscles.onUpdate().subscribe({
+				next: handleEvent(AppStatePage.Muscle, 'UPDATE_MUSCLE'),
+				error: (error: any) => console.warn('Update Muscle subscription error:', error),
+			})
+		);
+
+		subscriptions.push(
+			client.models.muscles.onDelete().subscribe({
+				next: handleEvent(AppStatePage.Muscle, 'DELETE_MUSCLE'),
+				error: (error: any) => console.warn('Delete Muscle subscription error:', error),
+			})
+		);
+
+		// Cleanup function to unsubscribe from all subscriptions
+		return () => {
+			subscriptions.forEach((sub) => sub.unsubscribe());
+		};
 	};
 
-	// Expose postEvent for clients to use
-	const postEvent = (entity: string, actionType: string) => {
-		handleEvent(entity, actionType);
-	};
-
+	// Initialization or subscription logic
 	useEffect(() => {
-		console.log("Setting up subscriptions...");
-
-		const muscleCreateSub = client.models.muscles.onCreate().subscribe({
-			next: () => handleEvent("muscles", "CREATE"),
-			error: (error: Error) => console.warn("Subscription error (muscle create):", error),
-		});
-
-		const muscleUpdateSub = client.models.muscles.onUpdate().subscribe({
-			next: () => handleEvent("muscles", "UPDATE"),
-			error: (error: Error) => console.warn("Subscription error (muscle update):", error),
-		});
-
-		const muscleDeleteSub = client.models.muscles.onDelete().subscribe({
-			next: () => handleEvent("muscles", "DELETE"),
-			error: (error: Error) => console.warn("Subscription error (muscle delete):", error),
-		});
-
-		const locationCreateSub = client.models.locations.onCreate().subscribe({
-			next: () => handleEvent("locations", "CREATE"),
-			error: (error: Error) => console.warn("Subscription error (location create):", error),
-		});
-
-		const locationUpdateSub = client.models.locations.onUpdate().subscribe({
-			next: () => handleEvent("locations", "UPDATE"),
-			error: (error: Error) => console.warn("Subscription error (location update):", error),
-		});
-
-		const locationDeleteSub = client.models.locations.onDelete().subscribe({
-			next: () => handleEvent("locations", "DELETE"),
-			error: (error: Error) => console.warn("Subscription error (location delete):", error),
-		});
-
-		const machineCreateSub = client.models.machines.onCreate().subscribe({
-			next: () => handleEvent("machines", "CREATE"),
-			error: (error: Error) => console.warn("Subscription error (machine create):", error),
-		});
-
-		const machineUpdateSub = client.models.machines.onUpdate().subscribe({
-			next: () => handleEvent("machines", "UPDATE"),
-			error: (error: Error) => console.warn("Subscription error (machine update):", error),
-		});
-
-		const machineDeleteSub = client.models.machines.onDelete().subscribe({
-			next: () => handleEvent("machines", "DELETE"),
-			error: (error: Error) => console.warn("Subscription error (machine delete):", error),
-		});
+		const unsubscribe = subscribeToEntityEvents();
 
 		return () => {
-			console.log("Cleaning up subscriptions...");
-			muscleCreateSub.unsubscribe();
-			muscleUpdateSub.unsubscribe();
-			muscleDeleteSub.unsubscribe();
-			locationCreateSub.unsubscribe();
-			locationUpdateSub.unsubscribe();
-			locationDeleteSub.unsubscribe();
-			machineCreateSub.unsubscribe();
-			machineUpdateSub.unsubscribe();
-			machineDeleteSub.unsubscribe();
+			// Cleanup subscription
+			if (unsubscribe && typeof unsubscribe === 'function') {
+				unsubscribe();
+			}
 		};
 	}, []);
 
 	return (
-		<SubscriptionContext.Provider value={{ lastEvent, postEvent }}>
+		<SubscriptionContext.Provider value={{ lastEvent }}>
 			{children}
 		</SubscriptionContext.Provider>
 	);
 };
 
-// TODO understand this better
-export const useSubscription = () => useContext(SubscriptionContext);
-
-export default SubscriptionProvider;
+export const useSubscription = () => {
+	const context = useContext(SubscriptionContext);
+	if (context === undefined) {
+		throw new Error('useSubscription must be used within a SubscriptionProvider');
+	}
+	return context;
+};
