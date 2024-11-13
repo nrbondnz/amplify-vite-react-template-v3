@@ -1,0 +1,15 @@
+﻿/* src/utils/ShowPicture.module.css */
+.image {
+    width: 150px;
+    height: 150px;
+    transition: transform 0.3s ease; /* Smooth transition for transform */
+}
+
+.image:hover {
+    transform: scale(2); /* Scale the image to twice its size on hover */
+}
+
+.large {
+    width: 400px;
+    height: 400px;
+}

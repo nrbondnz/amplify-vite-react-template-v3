@@ -5,7 +5,20 @@
     "module": "ESNext",
     "moduleResolution": "bundler",
     "allowSyntheticDefaultImports": true,
-    "strict": true
+    "strict": true,
+    "baseUrl": ".", // Add baseUrl to support path mappings
+    "paths": {
+      "@*": ["src/*"],
+      "@reducers/*": ["src/reducers/*"],
+      "@components/*": ["src/components/*"],
+      "@context/*": ["src/context/*"],
+      "@hooks/*": ["src/hooks/*"],
+      "@shared/*": ["src/shared/*"],
+      "@controller/*": ["src/controller/*"],
+      "@utils/*": ["src/utils/*"],
+      "@amplify-data/*": ["amplify/data/*"],
+      "@amplify-auth/*": ["amplify/auth/*"]
+    }
   },
   "include": ["vite.config.ts"]
 }

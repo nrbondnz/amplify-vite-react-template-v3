@@ -1,0 +1,11 @@
+﻿/* FileLoader.css */
+.custom-uploader {
+    display: inline-block;
+    width: 100px;
+    height: 100px;
+}
+
+.custom-uploader > * {
+    width: 100% !important;
+    height: 100% !important;
+}

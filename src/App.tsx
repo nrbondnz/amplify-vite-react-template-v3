@@ -1,72 +1,62 @@
-import { useEffect, useState } from "react";
-import type { Schema } from "../amplify/data/resource";
-import { generateClient } from "aws-amplify/data";
+// src/App.tsx
+import EditExercise from "@components/exercises/EditExercise";
+import ListExercise from "@components/exercises/ListExercise";
+import NewExercise from "@components/exercises/NewExercise";
+import ManageSettings from "@components/machines/ManageSettings";
+import FileLoader from "@components/utils/FileLoader";
+import React, { useEffect, useState } from 'react';
+import { Route, Routes, useNavigate } from 'react-router-dom';
+import { useSubscription } from "@context/SubscriptionContext";
+import HomePage from './components/HomePage';
+import EditMachine from "@components/machines/EditMachine";
+import NewMachine from "@components/machines/NewMachine";
+import MachineList from "@components/machines/MachineList";
+import EditMuscle from "@components/muscles/EditMuscle";
+import ListMuscle from "@components/muscles/ListMuscle";
+import NewMuscle from "@components/muscles/NewMuscle";
+import NewLocation from "./components/locations/NewLocation";
+import ListLocation from "./components/locations/ListLocation";
+import EditLocation from './components/locations/EditLocation';
+import AppContent from "@components/AppContent";
 
-const client = generateClient<Schema>();
-
-function App() {
-    const [todos, setTodos] = useState<Array<Schema["Todo"]["type"]>>([]);
-    const [locations, setLocations] = useState<Array<Schema["locations"]["type"]>>([]);
-
-    useEffect(() => {
-        const fetchLocations = async () => {
-            try {
-                const locationList = await client.models.locations.list();
-                setLocations(locationList.data); // assuming locationList.items
-                // is the array of locations
-            } catch (error) {
-                console.error("Failed to fetch locations:", error);
-            }
-        };
-
-        fetchLocations();
-    }, []);
-
-    function deleteTodo(id: string) {
-        client.models.Todo.delete({ id });
-    }
+const App: React.FC = () => {
+    const { lastEvent } = useSubscription();
+    const [navigateToAppContent, setNavigateToAppContent] = useState(false);
+    const navigate = useNavigate();
 
     useEffect(() => {
-        const subscription = client.models.Todo.observeQuery().subscribe({
-            next: (data) => setTodos([...data.items]),
-        });
-
-        return () => subscription.unsubscribe();
-    }, []);
-
-    function createTodo() {
-        const content = window.prompt("Todo content");
-        if (content) {
-            client.models.Todo.create({ content });
+        if (lastEvent) {
+            setNavigateToAppContent(true);
         }
-    }
+    }, [lastEvent]);
+
+    useEffect(() => {
+        if (navigateToAppContent) {
+            navigate("/appcontent");
+            setNavigateToAppContent(false); // Reset state after navigation
+        }
+    }, [navigateToAppContent, navigate]);
 
     return (
-        <main>
-            <h1>My todos</h1>
-            <button onClick={createTodo}>+ new</button>
-            <ul>
-                {todos.map((todo) => (
-                    <li onClick={() => deleteTodo(todo.id)} key={todo.id}>
-                        {todo.content}
-                    </li>
-                ))}
-            </ul>
-            <h2>Locations</h2>
-            <ul>
-                {locations.map((location) => (
-                    <li key={location.id}>{location.entityName}</li>
-                ))}
-            </ul>
-            <div>
-                🥳 App successfully hosted. Try creating a new todo.
-                <br />
-                <a href="https://docs.amplify.aws/react/start/quickstart/#make-frontend-updates">
-                    Review next step of this tutorial.
-                </a>
-            </div>
-        </main>
+        <Routes>
+            <Route path="/" element={<HomePage />} />
+            <Route path="/locations" element={<ListLocation />} />
+            <Route path="/locations/new" element={<NewLocation />} />
+            <Route path="/locations/:id" element={<EditLocation />} />
+            <Route path="/muscles" element={<ListMuscle />} />
+            <Route path="/muscles/new" element={<NewMuscle />} />
+            <Route path="/muscles/:id" element={<EditMuscle />} />
+            <Route path="/exercises" element={<ListExercise />} />
+            <Route path="/exercises/new" element={<NewExercise />} />
+            <Route path="/exercises/:id" element={<EditExercise />} />
+            <Route path="/machines" element={<MachineList />} />
+            <Route path="/machines/new" element={<NewMachine />} />
+            <Route path="/machines/:id" element={<EditMachine />} />
+            <Route path="/settings/:entityId/:entityType" element={<ManageSettings onSaveRef={React.createRef()} />} />
+            <Route path="/appcontent" element={<AppContent />} />
+            <Route path="/fileloader" element={<FileLoader pEntityName="machines"/>} />
+        </Routes>
     );
-}
+};
 
 export default App;
