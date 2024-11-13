@@ -1,48 +1,75 @@
-﻿import React, { createContext, useContext, useState, useEffect } from 'react';
+﻿import React, { createContext, useContext, useState, useEffect, ReactNode } from 'react';
 import { generateClient } from 'aws-amplify/data';
 import type { Schema } from '../../amplify/data/resource';
-import { AppEvent, AppStatePage } from '@shared/types/types'; // Import your AppEvent type and AppStatePage
+import { AppEvent, AppStatePage } from '@shared/types/types';
 
 interface SubscriptionContextProps {
 	lastEvent: AppEvent | null;
+	addCustomEvent: (entity: string, actionType: string, entityId?: number, entityData?: any) => void;
 	// other context properties and methods
 }
 
 const SubscriptionContext = createContext<SubscriptionContextProps | undefined>(undefined);
 
-export const SubscriptionProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
+export const SubscriptionProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
 	const [lastEvent, setLastEvent] = useState<AppEvent | null>(null);
 	const client = generateClient<Schema>();
 
 	const subscribeToEntityEvents = () => {
 		const subscriptions: any[] = [];
 
-		const handleEvent = (entity: AppStatePage, actionType: string) => () => {
+		const handleEvent = (entity: AppStatePage, actionType: string) => (data: any) => {
+			const entityData = data.data; // Adjust this if the structure is different
+
 			const event: AppEvent = {
 				entity,
-				actionType// Adjust based on the actual data structure
+				actionType,
+				entityId: entityData.id,
+				entityData, // Optional: Include the full entity data if needed
 			};
 			setLastEvent(event);
 		};
 
+		// Subscriptions for Locations
+		subscriptions.push(
+			client.models.locations.onCreate().subscribe({
+				next: handleEvent(AppStatePage.Location, 'CREATE'),
+				error: (error: any) => console.warn('Create Location subscription error:', error),
+			})
+		);
+
+		subscriptions.push(
+			client.models.locations.onUpdate().subscribe({
+				next: handleEvent(AppStatePage.Location, 'UPDATE'),
+				error: (error: any) => console.warn('Update Location subscription error:', error),
+			})
+		);
+
+		subscriptions.push(
+			client.models.locations.onDelete().subscribe({
+				next: handleEvent(AppStatePage.Location, 'DELETE'),
+				error: (error: any) => console.warn('Delete Location subscription error:', error),
+			})
+		);
+
 		// Subscriptions for Machines
 		subscriptions.push(
 			client.models.machines.onCreate().subscribe({
-				next: handleEvent(AppStatePage.Machine, 'CREATE_MACHINE'),
+				next: handleEvent(AppStatePage.Machine, 'CREATE'),
 				error: (error: any) => console.warn('Create Machine subscription error:', error),
 			})
 		);
 
 		subscriptions.push(
 			client.models.machines.onUpdate().subscribe({
-				next: handleEvent(AppStatePage.Machine, 'UPDATE_MACHINE'),
+				next: handleEvent(AppStatePage.Machine, 'UPDATE'),
 				error: (error: any) => console.warn('Update Machine subscription error:', error),
 			})
 		);
 
 		subscriptions.push(
 			client.models.machines.onDelete().subscribe({
-				next: handleEvent(AppStatePage.Machine, 'DELETE_MACHINE'),
+				next: handleEvent(AppStatePage.Machine, 'DELETE'),
 				error: (error: any) => console.warn('Delete Machine subscription error:', error),
 			})
 		);
@@ -50,14 +77,14 @@ export const SubscriptionProvider: React.FC<{ children: React.ReactNode }> = ({ 
 		// Subscriptions for Users
 		subscriptions.push(
 			client.models.user_details.onCreate().subscribe({
-				next: handleEvent(AppStatePage.User, 'CREATE_USER'),
+				next: handleEvent(AppStatePage.User, 'CREATE'),
 				error: (error: any) => console.warn('Create User subscription error:', error),
 			})
 		);
 
 		subscriptions.push(
 			client.models.user_details.onUpdate().subscribe({
-				next: handleEvent(AppStatePage.User, 'UPDATE_USER'),
+				next: handleEvent(AppStatePage.User, 'UPDATE'),
 				error: (error: any) => console.warn('Update User subscription error:', error),
 			})
 		);
@@ -141,7 +168,17 @@ export const SubscriptionProvider: React.FC<{ children: React.ReactNode }> = ({ 
 		};
 	};
 
-	// Initialization or subscription logic
+	const addCustomEvent = (entity: string, actionType: string, entityId?: number, entityData?: any) => {
+		const customEvent: AppEvent = {
+			entity,
+			actionType,
+			entityId: entityId?? 0, // default to empty string if no ID is
+			// provided
+			entityData: entityData || {}, // default to empty object if no data is provided
+		};
+		setLastEvent(customEvent);
+	};
+
 	useEffect(() => {
 		const unsubscribe = subscribeToEntityEvents();
 
@@ -154,7 +191,7 @@ export const SubscriptionProvider: React.FC<{ children: React.ReactNode }> = ({ 
 	}, []);
 
 	return (
-		<SubscriptionContext.Provider value={{ lastEvent }}>
+		<SubscriptionContext.Provider value={{ lastEvent, addCustomEvent }}>
 			{children}
 		</SubscriptionContext.Provider>
 	);

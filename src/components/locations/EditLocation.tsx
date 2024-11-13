@@ -31,7 +31,7 @@ const EditLocation: React.FC<EditLocationProps> = ({ getEntityById, loading }) =
 		try {
 			await client.models.locations.update(updatedEntity);
 			console.log('Saving entity:', updatedEntity);
-			navigate('/locations'); // Navigate to /locations after saving
+			navigate('/appcontent'); // Navigate to /locations after saving
 		} catch (error) {
 			console.error('Failed to save the entity:', error);
 		}
@@ -42,7 +42,7 @@ const EditLocation: React.FC<EditLocationProps> = ({ getEntityById, loading }) =
 			client.models.locations.delete({id:updatedEntity.id})
 			console.log('Deleting entity:', updatedEntity);
 			console.log("Post delete : ", client.models.locations.list);
-			navigate('/locations'); // Navigate to /locations after saving
+			navigate('/appcontent'); // Navigate to /locations after saving
 		} catch (error) {
 			console.error('Failed to delete the entity:', error);
 		}

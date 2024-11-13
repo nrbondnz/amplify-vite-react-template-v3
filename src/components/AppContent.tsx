@@ -10,10 +10,17 @@ Amplify.configure(outputs);
 const AppContent: React.FC = () => {
 	const { lastEvent } = useSubscription();
 	const navigate = useNavigate();
-
+	console.log('AppContent', lastEvent);
 	useEffect(() => {
+		console.log("AppContent useEffect")
 		if (lastEvent?.entity && lastEvent?.actionType) {
 			console.log(`Last Event: ${lastEvent.entity} - ${lastEvent.actionType}`);
+			if (lastEvent.actionType === "EDIT_REQUEST"){
+				navigate('${lastEvent.entity}/edit/${lastEvent.id}');
+			} else if (lastEvent.actionType = "NEW_REQUEST"){
+				navigate('${lastEvent.entity}/new');
+			}
+			// otherwise for now goto entity list
 			navigate(`/${lastEvent.entity}`);
 		}
 	}, [lastEvent, navigate]);

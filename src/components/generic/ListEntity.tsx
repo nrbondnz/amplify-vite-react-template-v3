@@ -1,8 +1,5 @@
-﻿// src/components/generic/ListEntity.tsx
+﻿import { useSubscription } from "@context/SubscriptionContext";
 import { WithId } from "@shared/types/types";
-//import { client } from "@shared/utils/client";
-//import React from 'react';
-import { useNavigate } from 'react-router-dom';
 
 interface ListEntityProps<T extends WithId> {
 	title: string;
@@ -11,23 +8,29 @@ interface ListEntityProps<T extends WithId> {
 }
 
 const ListEntity = <T extends WithId>({
-												title,
-												entities,
-												entityDBName
-											}: ListEntityProps<T>) => {
+										  title,
+										  entities,
+										  entityDBName
+									  }: ListEntityProps<T>) => {
+	const { addCustomEvent } = useSubscription();
 
-	const navigate = useNavigate();
+	const handleEditClick = (id: number) => {
+		addCustomEvent(entityDBName, "EDIT_REQUEST", id)
+	}
+	const handleNewClick = () => {
+		addCustomEvent(entityDBName, "NEW_REQUEST")
+	}
+
+	//const navigate = useNavigate();
 	//const fred = client.models["locations"].list();
 	//console.log("getResponseByModel, fred: ", fred)
 	return (
 		<div>
 			<h1>{title}</h1>
-			<button onClick={() => navigate(`/${entityDBName}/new`)}>Add
-				New {title.slice(0, -1)}</button>
+			<button onClick={handleNewClick}>New</button>
 			<ul>
 				{entities.map((entity) => (
-					<li key={entity.id}
-						onClick={() => navigate(`/${entityDBName}/${entity.id}`)}>
+					<li key={entity.id} onClick={() => handleEditClick(entity.id)}>
 						{entity.entityName}
 					</li>
 				))}

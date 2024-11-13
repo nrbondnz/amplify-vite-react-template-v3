@@ -22,11 +22,12 @@
 } as const;
 
 export enum AppStatePage {
-	Machine = "Machine",
-	User = "User",
-	Exercise = "Exercise",
-	Workout = "Workout",
-	Muscle = "Muscle"
+	Machine = "machines",
+	User = "user_details",
+	Exercise = "exercises",
+	Workout = "workouts",
+	Muscle = "muscle",
+	Location = "locations",
 }
 
 export type AppstatePage = typeof appstate_page[keyof typeof appstate_page];
@@ -61,8 +62,11 @@ export const appstate_command = {
 export type AppstateCommand = typeof appstate_command[keyof typeof appstate_command];
 
 export interface AppEvent {
-	entity: AppStatePage;
-	actionType: string;// Optional field for specific entity
+	entity: string;
+	actionType: string;
+	entityId: number;
+	entityData: any;
+	// Optional field for specific entity
 	// Add other necessary fields as needed
 }
 
