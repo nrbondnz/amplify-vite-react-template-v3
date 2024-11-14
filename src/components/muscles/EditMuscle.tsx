@@ -51,7 +51,7 @@ const EditMuscle: React.FC<EditMuscleProps> = ({ getEntityById, loading }) => {
 		navigate('/muscles');
 	}
 
-	return <EditEntity pEntity={entity} pEntityName="Muscle" onSave={handleSave} onDelete={handleDelete} onCancel={handleCancel}/>;
+	return <EditEntity pEntity={entity} pEntityName="muscles" onSave={handleSave} onDelete={handleDelete} onCancel={handleCancel}/>;
 };
 
 export default withEntityData<IMuscle>(EntityTypes.Muscle)(EditMuscle);

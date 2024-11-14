@@ -27,7 +27,7 @@ const NewMuscle: React.FC<NewMuscleProps> = ({ loading, getNextId }) => {
 			console.log("newList", newList);
 			// TODO workout if we can remove appcontent navigate.
 			//  AppContent will fire to update its settings but display?
-			navigate('/appcontent'); // Navigate to /muscles after saving
+			//navigate('/appcontent'); // Navigate to /muscles after saving
 		} catch (error) {
 			console.error('Failed to save the entity:', error);
 		}
@@ -37,7 +37,7 @@ const NewMuscle: React.FC<NewMuscleProps> = ({ loading, getNextId }) => {
 		navigate('/muscles');
 	}
 
-	return <NewEntity entity={defaultMuscle} entityName="Muscle" onSave={handleSave} onCancel={handleCancel} />;
+	return <NewEntity entity={defaultMuscle} entityName="muscles" onSave={handleSave} onCancel={handleCancel} />;
 };
 
 export default withEntityData<IMuscle>(EntityTypes.Muscle)(NewMuscle);

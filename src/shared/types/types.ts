@@ -26,8 +26,11 @@ export enum AppStatePage {
 	User = "user_details",
 	Exercise = "exercises",
 	Workout = "workouts",
-	Muscle = "muscle",
+	Muscle = "muscles",
 	Location = "locations",
+	WorkoutExercise = "workout_exercises",
+	Settings = "settings"
+	
 }
 
 export type AppstatePage = typeof appstate_page[keyof typeof appstate_page];
