@@ -1,9 +1,7 @@
 ﻿import { useSubscription } from "@context/SubscriptionContext";
 import FileLoader from "../../components/utils/FileLoader";
-//import ShowPicture from "@components/utils/ShowPicture";
 import ShowPicture from "../../components/utils/ShowPicture";
 import { useState, ChangeEvent } from "react";
-//import { useEntityData } from '@hooks/useEntityData';
 import { useEntityData } from './../../hooks/useEntityData';
 import {
 	EntityTypes,
@@ -20,6 +18,19 @@ interface EditEntityProps<T extends WithId> {
 	onEntityChange?: (updatedEntity: T) => void; // Optional prop for entity change
 }
 
+const requiredDisplayNamesMap: {
+	[key in EntityTypes]?: { [field: string]: string }
+} = {
+	[EntityTypes.User]: { email: 'Email', entityName: 'Name', idLocation: 'Location ID' },
+	[EntityTypes.Machine]: { entityName: 'Name', displayNum: 'Display Number', idLocation: 'Location ID' },
+	[EntityTypes.Exercise]: { entityName: 'Name', idMachine: 'Machine ID', description: 'Description' },
+	[EntityTypes.Workout]: { entityName: 'Name', idUser: 'User ID' },
+	[EntityTypes.Location]: { entityName: 'Location Town' },
+	[EntityTypes.Muscle]: { entityName: 'Name', description: 'Description' },
+	[EntityTypes.Setting]: { entityName: 'Name', value: 'Value' },
+	[EntityTypes.WorkoutExercise]: { entityName: 'Name', idUser: 'User ID', idWorkout: 'Workout ID', idExercise: 'Exercise ID' }
+};
+
 const EditEntity = <T extends WithId>({ pEntity, pEntityName, onSave, onDelete, onCancel, onEntityChange }: EditEntityProps<T>) => {
 	const [updatedEntity, setUpdatedEntity] = useState<T>(pEntity);
 	const [entityName] = useState<string | null>(pEntityName);
@@ -34,34 +45,34 @@ const EditEntity = <T extends WithId>({ pEntity, pEntityName, onSave, onDelete, 
 			[key]: value,
 		};
 		setUpdatedEntity(newEntity);
-
 		if (onEntityChange) {
 			onEntityChange(newEntity);
 		}
 	};
 
-	const handleSave = () => {
-		onSave(updatedEntity);
-	};
+	const handleSave = () => onSave(updatedEntity);
 
-	const handleDelete = (): void => {
-		onDelete(updatedEntity);
-	}
+	const handleDelete = () => onDelete(updatedEntity);
 
-	const handleCancel = (): void => {
+	const handleCancel = () => {
 		onCancel();
-		addCustomEvent(pEntityName, "CANCEL_REQUEST", pEntity.id);
-	}
+		addCustomEvent(pEntityName, "CANCEL_REQUEST", updatedEntity.id);
+	};
 
 	const isBasicType = (value: unknown): value is string | number | boolean => {
 		return ['string', 'number', 'boolean'].includes(typeof value);
 	};
 
+	const entityType = pEntityName as EntityTypes;
+	const requiredFieldsMap = requiredDisplayNamesMap[entityType] || {};
+
 	const renderField = (key: string, value: unknown) => {
+		const displayName = requiredFieldsMap[key] || key; // Get display name or fallback to key if not found
+
 		if (key === "idLocation") {
 			return (
 				<tr key={key}>
-					<td><label>Location:</label></td>
+					<td><label>{displayName}:</label></td>
 					<td>
 						<select
 							value={value !== undefined && value !== null ? String(value) : ""}
@@ -82,9 +93,18 @@ const EditEntity = <T extends WithId>({ pEntity, pEntityName, onSave, onDelete, 
 		}
 
 		if (isBasicType(value)) {
+			if (key === 'id') {
+				return (
+					<tr key={key}>
+						<td><label>{displayName}:</label></td>
+						<td>{value !== undefined && value !== null ? String(value) : ""}</td>
+					</tr>
+				);
+			}
+
 			return (
 				<tr key={key}>
-					<td><label>{key}:</label></td>
+					<td><label>{displayName}:</label></td>
 					<td>
 						<input
 							type="text"

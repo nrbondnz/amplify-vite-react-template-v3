@@ -114,6 +114,17 @@ export interface IWorkoutExercise extends WithId {
 	// Removed ordinal field
 }
 
+export const defaultWorkoutExercise: IWorkoutExercise = {
+	id: 0,
+	entityName: 'default workout exercise',
+	idUser: 0,
+	idWorkout: 0,
+	idMachine: 0,
+	idExercise: 0,
+	max: 'Max not set',
+	settings: {},
+};
+
 export interface IEntity {
 	id: number;
 	name: string;
@@ -223,6 +234,53 @@ export const defaultSetting: ISetting = {
 	entityType: "machine"
 }
 
+export const getEntityDefault = <T>(entityType: EntityTypes): T => {
+	switch (entityType) {
+		case EntityTypes.Machine:
+			return defaultMachine as T;
+		case EntityTypes.Exercise:
+			return defaultExercise as T;
+		case EntityTypes.Setting:
+			return defaultSetting as T;
+		case EntityTypes.User:
+			return defaultUser as T;
+		case EntityTypes.Workout:
+			return defaultWorkout as T;
+		case EntityTypes.WorkoutExercise:
+			return defaultWorkoutExercise as T;
+		case EntityTypes.Muscle:
+			return defaultMuscle as T;
+		case EntityTypes.Location:
+			return defaultLocation as T;
+		default:
+			throw new Error(`Unhandled entity type: ${entityType}`);
+	}
+};
+
+export const requiredFieldsMap: { [key in EntityTypes]?: (keyof any)[] } = {
+	[EntityTypes.User]: ['email', 'entityName', 'idLocation'],
+	[EntityTypes.Machine]: ['entityName', 'displayNum', 'idLocation'],
+	[EntityTypes.Exercise]: ['entityName', 'idMachine', 'description'],
+	[EntityTypes.Workout]: ['entityName', 'idUser'],
+	[EntityTypes.Location]: ['entityName'],
+	[EntityTypes.Muscle]: ['entityName', 'description'],
+	[EntityTypes.Setting]: ['entityName', 'value'],
+	[EntityTypes.WorkoutExercise]: ['entityName', 'idUser', 'idWorkout', 'idExercise']
+};
+
+// Define required fields and their display names for each entity type
+export const requiredDisplayNamesMap: {
+	[key in EntityTypes]?: { [field: string]: string }
+} = {
+	[EntityTypes.User]: { email: 'Email', entityName: 'Name', idLocation: 'Location ID' },
+	[EntityTypes.Machine]: { entityName: 'Name', displayNum: 'Display Number', idLocation: 'Location ID' },
+	[EntityTypes.Exercise]: { entityName: 'Name', idMachine: 'Machine ID', description: 'Description' },
+	[EntityTypes.Workout]: { entityName: 'Name', idUser: 'User ID' },
+	[EntityTypes.Location]: { entityName: 'Location Town' },
+	[EntityTypes.Muscle]: { entityName: 'Name', description: 'Description' },
+	[EntityTypes.Setting]: { entityName: 'Name', value: 'Value' },
+	[EntityTypes.WorkoutExercise]: { entityName: 'Name', idUser: 'User ID', idWorkout: 'Workout ID', idExercise: 'Exercise ID' }
+};
 export interface ILocation extends WithId {
 	id: number;
 	entityName: string;
@@ -231,6 +289,19 @@ export interface ILocation extends WithId {
 export const defaultLocation: ILocation = {
 	id: 0,
 	entityName: 'default Location'
+};
+
+// amplify/data/types.ts
+export type CreateEntityInput = {
+	id?: number;
+	content?: string;
+	isDone?: boolean;
+};
+
+export type Entity = {
+	id: number;
+	content: string;
+	isDone: boolean;
 };
 
 export interface IWorkout extends WithId {

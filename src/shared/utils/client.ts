@@ -6,7 +6,7 @@ import outputs from "../../../amplify_outputs.json";
 
 Amplify.configure(outputs);
 
-export const client = generateClient<Schema>();
+ const client = generateClient<Schema>();
 
 const clientModels = client.models;
 
@@ -40,6 +40,6 @@ export const getModelNameByEntity = (entityName: string): ModelNames | undefined
 	return entityToModelMap[entityName];
 };
 
-// Example usage
-console.log(getModelNameByEntity("locations")); // Should log "locations"
-console.log(getModelNameByEntity("user_details")); // Should log "user_details"
+
+
+export { client };

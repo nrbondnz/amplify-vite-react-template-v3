@@ -76,6 +76,8 @@ export const useEntityData = <T extends WithId>(entityType: EntityTypes, options
 		const numericId = (typeof id === 'string') ? Number(id) : id;
 		return entities.find(entity => entity.id === numericId) || null;
 	}, [entities]);
+	
+	
 
 	useEffect(() => {
 		const fetchEntities = async () => {
@@ -106,5 +108,5 @@ export const useEntityData = <T extends WithId>(entityType: EntityTypes, options
 		fetchEntities();
 	}, [entityType, options]);
 
-	return { entities, setEntities, error, getEntityById, getNextId, loading, filterById };
+	return { entities, setEntities, error, getEntityById, getNextId, loading, filterById};
 };
