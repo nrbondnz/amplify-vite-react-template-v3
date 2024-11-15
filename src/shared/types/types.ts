@@ -227,7 +227,7 @@ export interface ISetting extends WithId {
 	entityType: string | null;  // Updated to match schema
 }
 
-export interface IEntityRelationship extends WithIdAndDisplayNum {
+export interface IEntityRelationship extends WithId {
 	exerciseId: number | null;
 	muscleId: number | null;
 	machineId: number | null;
@@ -236,7 +236,6 @@ export interface IEntityRelationship extends WithIdAndDisplayNum {
 export const defaultEntityRelationship: IEntityRelationship = {
 	id: 0,
 	entityName: 'default exercise',
-	displayNum: 0,
 	exerciseId: null,
 	muscleId: null,
 	machineId: null

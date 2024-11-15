@@ -121,14 +121,6 @@ export const schema = configure({
     }).identifier([
         "id"
     ]),
-    "entity_relationships": a.model({
-        id: a.integer().required(),
-        exerciseId: a.integer(),
-        muscleId: a.integer(),
-        machineId: a.integer()
-    }).identifier([
-        "id"
-    ]),
     "muscles": a.model({
         id: a.integer().required(),
         entityName: a.string().required(),
@@ -137,6 +129,15 @@ export const schema = configure({
         muscleFunction: a.string(),
         idParent: a.integer(),
         parentName: a.string()
+    }).identifier([
+        "id"
+    ]),
+    "entity_relationships": a.model({
+        id: a.integer().required(),
+        exerciseId: a.integer(),
+        muscleId: a.integer(),
+        machineId: a.integer(),
+        entityName: a.string()
     }).identifier([
         "id"
     ])

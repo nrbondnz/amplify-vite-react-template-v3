@@ -50,6 +50,9 @@ export const useEntityData = <T extends WithId>(entityType: EntityTypes, options
 				case EntityTypes.SessionWorkoutExercise:
 					data = (await client.models.session_workout_exercises.list()).data  as unknown as T[];
 					break;
+				case EntityTypes.EntityRelationship:
+					data = (await client.models.entity_relationships.list()).data  as unknown as T[];
+					break;
 				default:
 					throw new Error(`Unknown entity type: ${entity}`);
 			}
