@@ -1,20 +1,22 @@
-﻿
+﻿import React, { useRef } from 'react';
 import { client } from "@shared/utils/client";
-import React from 'react';
-import {  useParams } from 'react-router-dom';
-import EditEntity from '@components/generic/EditEntity';
-import withEntityData from '@components/generic/withEntityData';
-import { EntityTypes, ILocation, IMuscle } from '@shared/types/types';
+import { useParams } from 'react-router-dom';
 import { useNavigate } from 'react-router-dom';
+import EditEntity from '@components/generic/EditEntity';
+import ManageRelationships from '@components/generic/ManageRelationships';
+import withEntityData from '@components/generic/withEntityData';
+import { EntityTypes, IMuscle } from '@shared/types/types';
 
 interface EditMuscleProps {
 	entities: IMuscle[];
 	getEntityById: (id: string) => IMuscle | null;
 	loading: boolean;
 }
+
 const EditMuscle: React.FC<EditMuscleProps> = ({ getEntityById, loading }) => {
 	const { id } = useParams<{ id: string }>();
-	const navigate = useNavigate(); // Use the useNavigate hook
+	const navigate = useNavigate();
+	const manageRelationshipsRef = useRef<{ saveRelationships: () => void; cancelRelationships: () => void }>(null);
 
 	if (loading) {
 		return <div>Loading...</div>;
@@ -26,32 +28,43 @@ const EditMuscle: React.FC<EditMuscleProps> = ({ getEntityById, loading }) => {
 		return <div>Entity not found</div>;
 	}
 
-	const handleSave = async (updatedEntity: IMuscle) => {
+	const handleSaveEntity = async (updatedEntity: IMuscle) => {
 		try {
 			await client.models.muscles.update(updatedEntity);
+			manageRelationshipsRef.current?.saveRelationships();
 			console.log('Saving entity:', updatedEntity);
-			navigate('/appcontent'); // Navigate to /muscles after saving
+			navigate('/appcontent');
 		} catch (error) {
 			console.error('Failed to save the entity:', error);
 		}
 	};
-	
 
-	const handleDelete = async (updatedEntity: ILocation) => {
+	const handleDelete = async (updatedEntity: IMuscle) => {
 		try {
 			await client.models.muscles.delete(updatedEntity);
 			console.log('Deleting entity:', updatedEntity);
-			navigate('/appcontent'); // Navigate to /locations after saving
+			navigate('/appcontent');
 		} catch (error) {
-			console.error('Failed to save the entity:', error);
+			console.error('Failed to delete the entity:', error);
 		}
 	};
 
 	const handleCancel = () => {
-		navigate('/muscles');
-	}
+		manageRelationshipsRef.current?.cancelRelationships();
+		console.log('Canceling changes');
+	};
 
-	return <EditEntity pEntity={entity} pEntityName="muscles" onSave={handleSave} onDelete={handleDelete} onCancel={handleCancel}/>;
+	return (
+		<>
+			<EditEntity pEntity={entity!} pEntityName="muscles" onSave={handleSaveEntity} onDelete={handleDelete} onCancel={handleCancel} />
+			<ManageRelationships
+				ref={manageRelationshipsRef}
+				keyId={entity.id}
+				keyType={EntityTypes.Muscle}
+				partnerType={EntityTypes.Exercise}
+			/>
+		</>
+	);
 };
 
 export default withEntityData<IMuscle>(EntityTypes.Muscle)(EditMuscle);

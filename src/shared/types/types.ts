@@ -147,7 +147,11 @@ export enum EntityTypes {
 	WorkoutExercise = "workout_exercises",
 	Exercise = "exercises",
 	SessionWorkout = "session_workouts",
-	SessionWorkoutExercise = "session_workout_exercises"
+	SessionWorkoutExercise = "session_workout_exercises",
+	ActionState = "action_states",
+	Session = "sessions",
+	SessionExercise = "session_exercises",
+	EntityRelationship = "entity_relationships",
 	
 }
 
@@ -167,6 +171,26 @@ export interface ISessionWorkout extends WithId {
 	idUser: number;
 	idWorkout: number;
 	complete: boolean;
+}
+
+export const defaultSesionWorkout = {
+	id: 0,
+	idUser: 0,
+	idWorkout: 0,
+	complete: false
+}
+
+export const defaultSessionWorkoutExercise = {
+	id: 0,
+	idSessionWorkout: 0,
+	idExercise: 0,
+	notes: '',
+}
+
+export const defaultSessionExercise = {
+	id: 0,
+	idSession: 0,
+	idExercise: 0,
 }
 
 export interface ISessionWorkoutExercise extends WithId {
@@ -201,6 +225,22 @@ export interface ISetting extends WithId {
 	value: string | null;
 	entityId: number | null;
 	entityType: string | null;  // Updated to match schema
+}
+
+export interface IEntityRelationship extends WithIdAndDisplayNum {
+	exerciseId: number | null;
+	muscleId: number | null;
+	machineId: number | null;
+}
+
+export const defaultEntityRelationship: IEntityRelationship = {
+	id: 0,
+	entityName: 'default exercise',
+	displayNum: 0,
+	exerciseId: null,
+	muscleId: null,
+	machineId: null
+
 }
 
 export interface ISettingWithStatus extends ISetting {
@@ -255,6 +295,15 @@ export const getEntityDefault = <T>(entityType: EntityTypes): T => {
 			return defaultMuscle as T;
 		case EntityTypes.Location:
 			return defaultLocation as T;
+		case EntityTypes.SessionWorkout:
+			return defaultSesionWorkout as T;
+		case EntityTypes.SessionWorkoutExercise as T:
+			return defaultSessionWorkoutExercise as T;
+		case EntityTypes.SessionExercise:
+			return defaultSessionExercise as T;
+		case EntityTypes.EntityRelationship:
+			return defaultEntityRelationship as T;
+					
 		default:
 			throw new Error(`Unhandled entity type: ${entityType}`);
 	}
@@ -339,16 +388,21 @@ export const defaultUserInfo: IUser = {
 };
 
 export interface IMuscle extends WithIdAndDisplayNum {
+	entityName: string;
 	description: string;
+	muscleFunction?: string | null;  // Made optional or nullable as per the updated DB schema
 	idParent?: number | null;
-	parentName?: string;  // For convenience
+	parentName?: string | null;  // Additional type-nullable check for consistency
 }
 
 export const defaultMuscle: IMuscle = {
 	id: 0,
 	entityName: 'default Muscle',
 	displayNum: 0,
-	description: 'default muscle description'
+	description: 'default muscle description',
+	idParent: null,
+	parentName: "",
+	muscleFunction: ""
 };
 
 export interface IActionState extends WithId {

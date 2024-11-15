@@ -37,7 +37,9 @@ const NewMuscle: React.FC<NewMuscleProps> = ({ loading, getNextId }) => {
 		navigate('/muscles');
 	}
 
-	return <NewEntity entity={defaultMuscle} entityName="muscles" onSave={handleSave} onCancel={handleCancel} />;
+	return 
+				<NewEntity entity={defaultMuscle} entityName="muscles" onSave={handleSave} onCancel={handleCancel} />
+			
 };
 
 export default withEntityData<IMuscle>(EntityTypes.Muscle)(NewMuscle);
