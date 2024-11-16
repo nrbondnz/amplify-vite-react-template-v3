@@ -5,7 +5,7 @@ import { useState, ChangeEvent } from "react";
 import { useEntityData } from './../../hooks/useEntityData';
 import {
 	EntityTypes,
-	ILocation, WithId,
+	ILocation, requiredDisplayNamesMap, WithId,
 	WithIdAndDisplayNum
 } from '../../shared/types/types';
 
@@ -18,18 +18,7 @@ interface EditEntityProps<T extends WithId> {
 	onEntityChange?: (updatedEntity: T) => void; // Optional prop for entity change
 }
 
-const requiredDisplayNamesMap: {
-	[key in EntityTypes]?: { [field: string]: string }
-} = {
-	[EntityTypes.User]: { email: 'Email', entityName: 'Name', idLocation: 'Location ID' },
-	[EntityTypes.Machine]: { entityName: 'Name', displayNum: 'Display Number', idLocation: 'Location ID' },
-	[EntityTypes.Exercise]: { entityName: 'Name', idMachine: 'Machine ID', description: 'Description' },
-	[EntityTypes.Workout]: { entityName: 'Name', idUser: 'User ID' },
-	[EntityTypes.Location]: { entityName: 'Location Town' },
-	[EntityTypes.Muscle]: { entityName: 'Name', description: 'Description' },
-	[EntityTypes.Setting]: { entityName: 'Name', value: 'Value' },
-	[EntityTypes.WorkoutExercise]: { entityName: 'Name', idUser: 'User ID', idWorkout: 'Workout ID', idExercise: 'Exercise ID' }
-};
+
 
 const EditEntity = <T extends WithId>({ pEntity, pEntityName, onSave, onDelete, onCancel, onEntityChange }: EditEntityProps<T>) => {
 	const [updatedEntity, setUpdatedEntity] = useState<T>(pEntity);

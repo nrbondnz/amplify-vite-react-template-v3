@@ -55,8 +55,7 @@ const EditMachine: React.FC<EditMachineProps> = ({ getEntityById, loading }) => 
 
 			const currentSettings = manageSettingsRef.current?.saveSettings() || [];
 			await manageSettingsRef.current?.saveSettingsToDB(currentSettings);
-
-			//navigate('/appcontent');
+			
 		} catch (error) {
 			console.error('Failed to save the entity:', error);
 		}
@@ -66,7 +65,7 @@ const EditMachine: React.FC<EditMachineProps> = ({ getEntityById, loading }) => 
 		try {
 			await client.models.machines.delete(updatedEntity);
 			console.log('Deleting entity:', updatedEntity);
-			//navigate('/appcontent');
+			
 		} catch (error) {
 			console.error('Failed to delete the entity:', error);
 		}
