@@ -26,9 +26,18 @@ const AppContent: React.FC = () => {
 				console.log(`Path: ${path}`);
 				navigate(path);
 				return;
+			} else if (lastEvent.actionType === "LIST_REQUEST") {
+				const path = `/${lastEvent.entity}`;
+				console.log(`Path: ${path}`);
+				navigate(path);
+				return;
 			} else if (lastEvent.actionType === "CANCEL_REQUEST") {
-				// just list gor now
-				navigate(`/${lastEvent.entity}`);
+				if (lastEvent.pageType && lastEvent.pageType === "LIST") {
+					navigate(`/`);
+				} else {
+					// just list as on sub page
+					navigate(`/${lastEvent.entity}`);
+				}
 			}
 			// otherwise for now go to entity list
 			const path = `/${lastEvent.entity}`;

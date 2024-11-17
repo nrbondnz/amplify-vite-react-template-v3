@@ -1,5 +1,5 @@
 ﻿import { useSubscription } from "@context/SubscriptionContext";
-import { EntityTypes } from "@shared/types/types";
+import { AppEvent, EntityTypes } from "@shared/types/types";
 import { Amplify } from "aws-amplify";
 import { getUrl } from 'aws-amplify/storage';
 import React, { useState, useEffect } from "react";
@@ -44,7 +44,12 @@ const HomePage: React.FC = () => {
 
 	const handleGotoPage = (page: EntityTypes): React.MouseEventHandler<HTMLDivElement> => {
 		return () => {
-			addCustomEvent(page, "CANCEL_REQUEST");
+			const event: AppEvent = {
+				entity: page,
+				actionType: 'LIST_REQUEST',
+				pageType: 'HOME'
+			};
+			addCustomEvent(event);
 		};
 	};
 

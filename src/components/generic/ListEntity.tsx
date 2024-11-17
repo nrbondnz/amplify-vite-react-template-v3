@@ -1,5 +1,6 @@
-﻿import { useSubscription } from "@context/SubscriptionContext";
-import { WithId } from "@shared/types/types";
+﻿
+import { useSubscription } from "@context/SubscriptionContext";
+import { WithId, AppEvent } from "@shared/types/types";
 
 interface ListEntityProps<T extends WithId> {
 	title: string;
@@ -12,14 +13,34 @@ const ListEntity = <T extends WithId>({
 										  entities,
 										  entityDBName
 									  }: ListEntityProps<T>) => {
-	const { addCustomEvent } = useSubscription();
+const { addCustomEvent } = useSubscription();
 
-	const handleEditClick = (id: number) => {
-		addCustomEvent(entityDBName, "EDIT_REQUEST", id)
-	}
-	const handleNewClick = () => {
-		addCustomEvent(entityDBName, "NEW_REQUEST")
-	}
+const handleEditClick = (id: number) => {
+	const event: AppEvent = {
+		entity: entityDBName,
+		actionType: "EDIT_REQUEST",
+		entityId: id,
+		pageType: "LIST"
+	};
+	addCustomEvent(event);
+}
+const handleNewClick = () => {
+	const event: AppEvent = {
+		entity: entityDBName,
+		actionType: "NEW_REQUEST",
+		pageType: "LIST"
+	};
+	addCustomEvent(event);
+}
+	
+const handleCancelClick = () => {
+	const event: AppEvent = {
+		entity: entityDBName,
+		actionType: "CANCEL_REQUEST",
+		pageType: "LIST"
+	};
+	addCustomEvent(event);
+}
 
 	//const navigate = useNavigate();
 	//const fred = client.models["locations"].list();
@@ -28,9 +49,11 @@ const ListEntity = <T extends WithId>({
 		<div>
 			<h1>{title}</h1>
 			<button onClick={handleNewClick}>New</button>
+			<button onClick={handleCancelClick}>Cancel</button>
 			<ul>
 				{entities.map((entity) => (
-					<li key={entity.id} onClick={() => handleEditClick(entity.id)}>
+					<li key={entity.id}
+						onClick={() => handleEditClick(entity.id)}>
 						{entity.entityName}
 					</li>
 				))}

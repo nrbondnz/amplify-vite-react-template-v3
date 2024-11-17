@@ -51,7 +51,7 @@ const NewMachine: React.FC<NewMachineProps> = ({ loading, getNextId }) => {
 
 	return (
 		<>
-			<NewEntity entity={defaultMachine} entityName="machine" onSave={handleSave}  onCancel={() => { console.log("Cancel in New Machine") }} />
+			<NewEntity entity={defaultMachine} entityName="machine" onSave={handleSave}  onCancel={() => "NEW"} />
 			<ManageSettings entityType={EntityTypes.Machine} entityId={-1} onSaveRef={()=>{}}/>
 		</>
 	);

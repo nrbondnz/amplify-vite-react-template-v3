@@ -30,7 +30,7 @@ export const NewLocation: React.FC<NewLocationProps> = ({ loading}) => {
 		}
 	};
 
-	return <NewEntity entity={defaultLocation} entityName="locations" onSave={handleSave} onCancel={() => { console.log("In New Location cancel") }} />;
+	return <NewEntity entity={defaultLocation} entityName="locations" onSave={handleSave} onCancel={() => "NEW"} />;
 };
 
 // @ts-ignore

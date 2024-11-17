@@ -30,7 +30,7 @@ const NewWorkout: React.FC<NewWorkoutProps> = ({ loading, getNextId }) => {
 		}
 	};
 
-	return <NewEntity entity={defaultWorkout} entityName="workouts" onSave={handleSave} onCancel={() => {navigate('/workouts') }} />;
+	return <NewEntity entity={defaultWorkout} entityName="workouts" onSave={handleSave} onCancel={() => "NEW" } />;
 };
 
 export default withEntityData<IWorkout>(EntityTypes.Workout)(NewWorkout);

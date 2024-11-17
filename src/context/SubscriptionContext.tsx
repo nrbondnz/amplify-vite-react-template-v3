@@ -5,7 +5,7 @@ import { AppEvent, AppStatePage } from '@shared/types/types';
 
 interface SubscriptionContextProps {
 	lastEvent: AppEvent | null;
-	addCustomEvent: (entity: string, actionType: string, entityId?: number, entityData?: any) => void;
+	addCustomEvent: (event: AppEvent) => void;
 	// other context properties and methods
 }
 
@@ -18,15 +18,15 @@ export const SubscriptionProvider: React.FC<{ children: ReactNode }> = ({ childr
 	const subscribeToEntityEvents = () => {
 		const subscriptions: any[] = [];
 
-		const handleEvent = (entity: AppStatePage, actionType: string, entityId?: number, entityData?: any) => (data: any) => {
+		const handleEvent = (entity: AppStatePage, actionType: string, entityId?: number, pageType?: string, entityData?: any) => (data: any) => {
 			entityData = data.data; // Adjust this if the structure is different
 
 			const event: AppEvent = {
 				entity,
 				actionType,
 				entityId: entityId ?? 0,
-				entityData: entityData, // Optional: Include the full entity data if
-				// needed
+				pageType: pageType ?? '',
+				entityData: entityData, // Optional: Include the full entity data if needed
 			};
 			setLastEvent(event);
 		};
@@ -169,15 +169,8 @@ export const SubscriptionProvider: React.FC<{ children: ReactNode }> = ({ childr
 		};
 	};
 
-	const addCustomEvent = (entity: string, actionType: string, entityId?: number, entityData?: any) => {
-		const customEvent: AppEvent = {
-			entity,
-			actionType,
-			entityId: entityId?? 0, // default to empty string if no ID is
-			// provided
-			entityData: entityData || {}, // default to empty object if no data is provided
-		};
-		setLastEvent(customEvent);
+	const addCustomEvent = (event: AppEvent) => {
+		setLastEvent(event);
 	};
 
 	useEffect(() => {

@@ -1,10 +1,10 @@
-﻿// src/components/muscles/NewMuscle.tsx
-import NewEntity from "@components/generic/NewEntity";
+﻿import NewEntity from "@components/generic/NewEntity";
+//import { useSubscription } from "@context/SubscriptionContext";
 import { client } from "@shared/utils/client";
 import React from 'react';
 import withEntityData from '@components/generic/withEntityData';
 import { defaultMuscle, EntityTypes, IMuscle } from '@shared/types/types';
-import { useNavigate } from 'react-router-dom';
+//import { useNavigate } from 'react-router-dom';
 
 interface NewMuscleProps {
 	loading: boolean;
@@ -12,7 +12,8 @@ interface NewMuscleProps {
 }
 
 const NewMuscle: React.FC<NewMuscleProps> = ({ loading, getNextId }) => {
-	const navigate = useNavigate();
+	//const navigate = useNavigate();
+	//const { addCustomEvent } = useSubscription();
 
 	if (loading) {
 		return <div>Loading...</div>;
@@ -25,21 +26,24 @@ const NewMuscle: React.FC<NewMuscleProps> = ({ loading, getNextId }) => {
 			console.log('Saving entity: ', newEntity);
 			const newList = await client.models.muscles.list();
 			console.log("newList", newList);
-			// TODO workout if we can remove appcontent navigate.
-			//  AppContent will fire to update its settings but display?
-			//navigate('/appcontent'); // Navigate to /muscles after saving
+
 		} catch (error) {
 			console.error('Failed to save the entity:', error);
 		}
 	};
-	
-	const handleCancel = () => {
-		navigate('/muscles');
-	}
 
-	return 
-				<NewEntity entity={defaultMuscle} entityName="muscles" onSave={handleSave} onCancel={handleCancel} />
-			
+	const handleCancel = () => {
+		return "NEW";
+		/*const event: AppEvent = {
+			entity: EntityTypes.Muscle,
+			actionType: 'CANCEL_REQUEST',
+			pageType: 'LIST'
+		};
+		addCustomEvent(event);
+		return true;*/
+	};
+
+	return <NewEntity entity={defaultMuscle} entityName="muscles" onSave={handleSave} onCancel={handleCancel} />
 };
 
 export default withEntityData<IMuscle>(EntityTypes.Muscle)(NewMuscle);

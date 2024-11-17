@@ -29,7 +29,7 @@ const NewExercise: React.FC<NewExerciseProps> = ({ loading, getNextId }) => {
 		}
 	};
 
-	return <NewEntity entity={defaultExercise} entityName="Exercise" onSave={handleSave} onCancel={() => {navigate('/exercises') }} />;
+	return <NewEntity entity={defaultExercise} entityName="Exercise" onSave={handleSave} onCancel={() => "NEW"} />;
 };
 
 export default withEntityData<IExercise>(EntityTypes.Exercise)(NewExercise);

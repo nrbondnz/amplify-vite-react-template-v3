@@ -2,6 +2,7 @@
 import { useSubscription } from "@context/SubscriptionContext";
 import { useEntityData } from "../../hooks/useEntityData";
 import {
+	AppEvent,
 	EntityTypes,
 	ILocation,
 	WithId
@@ -11,7 +12,7 @@ interface NewEntityProps<T extends WithId> {
 	entity: T;
 	entityName: string;
 	onSave: (entity: T) => void;
-	onCancel: () => void;
+	onCancel: () => string;
 	onEntityChange?: (updatedEntity: T) => void; // Optional prop for entity change
 }
 
@@ -66,8 +67,15 @@ const NewEntity = <T extends WithId>({ entity, entityName, onSave, onCancel, onE
 	};
 
 	const handleCancel = () => {
-		onCancel();
-		addCustomEvent(entityName, "CANCEL_REQUEST", newEntity.id as number);
+		const done = onCancel();
+		if ( !done || done.length === 0) {
+			const event: AppEvent = {
+				entity: entityName ,
+				actionType: 'CANCEL_REQUEST',
+				pageType: done// not top level
+			};
+			addCustomEvent(event);
+		}
 	};
 
 	const isBasicType = (value: unknown): value is string | number | boolean => {

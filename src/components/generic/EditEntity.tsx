@@ -1,7 +1,13 @@
 ﻿import FileLoader from "@components/utils/FileLoader";
 import { useState, ChangeEvent } from 'react';
 import { useSubscription } from '@context/SubscriptionContext';
-import { EntityTypes, ILocation, WithId, WithIdAndDisplayNum } from '@shared/types/types';
+import {
+	AppEvent,
+	EntityTypes,
+	ILocation,
+	WithId,
+	WithIdAndDisplayNum
+} from '@shared/types/types';
 import { requiredDisplayNamesMap } from '@shared/types/types';
 import { useEntityData } from '@hooks/useEntityData';
 import ShowPicture from '@components/utils/ShowPicture';
@@ -37,7 +43,13 @@ const EditEntity = <T extends WithId>({ pEntity, pEntityName, onSave, onDelete, 
 
 	const handleCancel = () => {
 		onCancel();
-		addCustomEvent(pEntityName, "CANCEL_REQUEST", updatedEntity.id);
+		const event: AppEvent = {
+			entity: pEntityName,
+			entityId: updatedEntity.id,
+			actionType: 'CANCEL_REQUEST',
+			pageType: 'EDIT'
+		};
+		addCustomEvent(event);;
 	};
 
 	const isBasicType = (value: unknown): value is string | number | boolean => {

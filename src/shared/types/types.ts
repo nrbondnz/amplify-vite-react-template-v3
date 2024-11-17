@@ -67,8 +67,9 @@ export type AppstateCommand = typeof appstate_command[keyof typeof appstate_comm
 export interface AppEvent {
 	entity: string;
 	actionType: string;
-	entityId: number;
-	entityData: any;
+	entityId?: number;
+	pageType?: string;
+	entityData?: any;
 	// Optional field for specific entity
 	// Add other necessary fields as needed
 }
