@@ -38,11 +38,14 @@ const AppContent: React.FC = () => {
 					// just list as on sub page
 					navigate(`/${lastEvent.entity}`);
 				}
+			} else {
+				console.error(`Unknown action type: ${lastEvent.actionType}`);
+				navigate('/');
 			}
 			// otherwise for now go to entity list
-			const path = `/${lastEvent.entity}`;
-			console.log(`Path: ${path}`);
-			navigate(path);
+			//const path = `/${lastEvent.entity}`;
+			//console.log(`Path: ${path}`);
+			//navigate(path);
 		}
 	}, [lastEvent, navigate]);
 
