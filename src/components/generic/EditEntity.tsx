@@ -1,24 +1,19 @@
-﻿import { useSubscription } from "@context/SubscriptionContext";
-import FileLoader from "../../components/utils/FileLoader";
-import ShowPicture from "../../components/utils/ShowPicture";
-import { useState, ChangeEvent } from "react";
-import { useEntityData } from './../../hooks/useEntityData';
-import {
-	EntityTypes,
-	ILocation, requiredDisplayNamesMap, WithId,
-	WithIdAndDisplayNum
-} from '../../shared/types/types';
+﻿import FileLoader from "@components/utils/FileLoader";
+import { useState, ChangeEvent } from 'react';
+import { useSubscription } from '@context/SubscriptionContext';
+import { EntityTypes, ILocation, WithId, WithIdAndDisplayNum } from '@shared/types/types';
+import { requiredDisplayNamesMap } from '@shared/types/types';
+import { useEntityData } from '@hooks/useEntityData';
+import ShowPicture from '@components/utils/ShowPicture';
 
-interface EditEntityProps<T extends WithId> {
+interface EditEntityProps<T> {
 	pEntity: T;
 	pEntityName: string;
 	onSave: (entity: T) => void;
 	onDelete: (entity: T) => void;
 	onCancel: () => void;
-	onEntityChange?: (updatedEntity: T) => void; // Optional prop for entity change
+	onEntityChange?: (entity: T) => void;
 }
-
-
 
 const EditEntity = <T extends WithId>({ pEntity, pEntityName, onSave, onDelete, onCancel, onEntityChange }: EditEntityProps<T>) => {
 	const [updatedEntity, setUpdatedEntity] = useState<T>(pEntity);
@@ -29,10 +24,7 @@ const EditEntity = <T extends WithId>({ pEntity, pEntityName, onSave, onDelete, 
 	const { entities: locations, loading: locationsLoading, error: locationsError } = useEntityData<ILocation>(EntityTypes.Location);
 
 	const handleChange = (key: keyof T, value: T[keyof T]) => {
-		const newEntity = {
-			...updatedEntity,
-			[key]: value,
-		};
+		const newEntity = { ...updatedEntity, [key]: value };
 		setUpdatedEntity(newEntity);
 		if (onEntityChange) {
 			onEntityChange(newEntity);
@@ -56,7 +48,13 @@ const EditEntity = <T extends WithId>({ pEntity, pEntityName, onSave, onDelete, 
 	const requiredFieldsMap = requiredDisplayNamesMap[entityType] || {};
 
 	const renderField = (key: string, value: unknown) => {
-		const displayName = requiredFieldsMap[key] || key; // Get display name or fallback to key if not found
+		const fieldInfo = requiredFieldsMap[key];
+
+		if (!fieldInfo) {
+			return null;
+		}
+
+		const { displayName, type } = fieldInfo;
 
 		if (key === "idLocation") {
 			return (
@@ -82,6 +80,24 @@ const EditEntity = <T extends WithId>({ pEntity, pEntityName, onSave, onDelete, 
 		}
 
 		if (isBasicType(value)) {
+			if (type === 'textarea') {
+				return (
+					<tr key={key}>
+						<td><label>{displayName}:</label></td>
+						<td>
+							<textarea
+								value={value !== undefined && value !== null ? String(value) : ""}
+								onChange={(e: ChangeEvent<HTMLTextAreaElement>) =>
+									handleChange(key as keyof T, e.target.value as unknown as T[keyof T])
+								}
+								rows={3}
+								cols={100}
+							/>
+						</td>
+					</tr>
+				);
+			}
+
 			if (key === 'id') {
 				return (
 					<tr key={key}>

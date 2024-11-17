@@ -15,9 +15,7 @@ interface NewEntityProps<T extends WithId> {
 	onEntityChange?: (updatedEntity: T) => void; // Optional prop for entity change
 }
 
-const requiredDisplayNamesMap: {
-	[key in EntityTypes]?: { [field: string]: string }
-} = {
+const requiredDisplayNamesMap: { [key in EntityTypes]?: { [field: string]: string } } = {
 	[EntityTypes.User]: { email: 'Email', entityName: 'Name', idLocation: 'Location ID' },
 	[EntityTypes.Machine]: { entityName: 'Name', displayNum: 'Display Number', idLocation: 'Location ID' },
 	[EntityTypes.Exercise]: { entityName: 'Name', idMachine: 'Machine ID', description: 'Description' },
@@ -36,10 +34,7 @@ const NewEntity = <T extends WithId>({ entity, entityName, onSave, onCancel, onE
 	const { entities: locations, loading: locationsLoading, error: locationsError } = useEntityData<ILocation>(EntityTypes.Location);
 
 	const handleChange = (key: keyof T, value: T[keyof T]) => {
-		const updatedEntity = {
-			...newEntity,
-			[key]: value,
-		};
+		const updatedEntity = { ...newEntity, [key]: value };
 		setNewEntity(updatedEntity);
 
 		if (onEntityChange) {
@@ -106,6 +101,24 @@ const NewEntity = <T extends WithId>({ entity, entityName, onSave, onCancel, onE
 		}
 
 		if (isBasicType(value)) {
+			if (key === 'description') {
+				return (
+					<tr key={key}>
+						<td><label>{displayName}:</label></td>
+						<td>
+							<textarea
+								value={value !== undefined && value !== null ? String(value) : ""}
+								onChange={(e: ChangeEvent<HTMLTextAreaElement>) =>
+									handleChange(key as keyof T, e.target.value as unknown as T[keyof T])
+								}
+								rows={3}
+								cols={100}
+							/>
+						</td>
+					</tr>
+				);
+			}
+
 			return (
 				<tr key={key}>
 					<td><label>{displayName}:</label></td>

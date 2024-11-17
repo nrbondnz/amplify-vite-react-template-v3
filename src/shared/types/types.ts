@@ -321,16 +321,16 @@ export const requiredFieldsMap: { [key in EntityTypes]?: (keyof any)[] } = {
 
 // Define required fields and their display names for each entity type
 export const requiredDisplayNamesMap: {
-	[key in EntityTypes]?: { [field: string]: string }
+    [key in EntityTypes]?: { [field: string]: { displayName : string, type?: string} }
 } = {
-	[EntityTypes.User]: { email: 'Email', entityName: 'Name', idLocation: 'Location ID' },
-	[EntityTypes.Machine]: { entityName: 'Name', displayNum: 'Display Number', idLocation: 'Location ID' },
-	[EntityTypes.Exercise]: { entityName: 'Name', idMachine: 'Machine ID', description: 'Description' },
-	[EntityTypes.Workout]: { entityName: 'Name', idUser: 'User ID' },
-	[EntityTypes.Location]: { entityName: 'Location Town' },
-	[EntityTypes.Muscle]: { entityName: 'Name', description: 'Description' },
-	[EntityTypes.Setting]: { entityName: 'Name', value: 'Value' },
-	[EntityTypes.WorkoutExercise]: { entityName: 'Name', idUser: 'User ID', idWorkout: 'Workout ID', idExercise: 'Exercise ID' }
+    [EntityTypes.User]: { email: { displayName: 'Email' }, entityName: { displayName: 'Name' }, idLocation: { displayName: 'Location ID' } },
+    [EntityTypes.Machine]: { entityName: { displayName: 'Name' }, displayNum: { displayName: 'Display Number' }, idLocation: { displayName: 'Location ID' } },
+    [EntityTypes.Exercise]: { entityName: { displayName: 'Name' }, idMachine: { displayName: 'Machine ID' }, description: { displayName: 'Description', type: 'textarea' } },
+    [EntityTypes.Workout]: { entityName: { displayName: 'Name' }, idUser: { displayName: 'User ID' } },
+    [EntityTypes.Location]: { entityName: { displayName: 'Location Town' } },
+    [EntityTypes.Muscle]: { entityName: { displayName: 'Name' }, description: { displayName: 'Description', type: 'textarea' }, muscleFunction: { displayName: 'Muscle Function', type: 'textarea' }, idParent: { displayName: 'Parent ID' } },
+    [EntityTypes.Setting]: { entityName: { displayName: 'Name' }, value: { displayName: 'Value' } },
+    [EntityTypes.WorkoutExercise]: { entityName: { displayName: 'Name' }, idUser: { displayName: 'User ID' }, idWorkout: { displayName: 'Workout ID' }, idExercise: { displayName: 'Exercise ID' } }
 };
 export interface ILocation extends WithId {
 	id: number;
