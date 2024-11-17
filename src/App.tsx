@@ -4,6 +4,12 @@ import ListExercise from "@components/exercises/ListExercise";
 import NewExercise from "@components/exercises/NewExercise";
 import ManageSettings from "@components/machines/ManageSettings";
 import FileLoader from "@components/utils/FileLoader";
+import EditWorkoutExercise
+    from "@components/workoutExercises/EditWorkoutExercise";
+import ListWorkoutExercise
+    from "@components/workoutExercises/ListWorkoutExercise";
+import NewWorkoutExercise
+    from "@components/workoutExercises/NewWorkoutExercise";
 import EditWorkout from "@components/workouts/EditWorkout";
 import ListWorkout from "@components/workouts/ListWorkout";
 import NewWorkout from "@components/workouts/NewWorkout";
@@ -47,6 +53,9 @@ const App: React.FC = () => {
             <Route path="/workouts" element={<ListWorkout />} />
             <Route path="/workouts/new" element={<NewWorkout />} />
             <Route path="/workouts/:id" element={<EditWorkout />} />
+            <Route path="/workout_exercises" element={<ListWorkoutExercise />} />
+            <Route path="/workout_exercises/new" element={<NewWorkoutExercise />} />
+            <Route path="/workout_exercises/:id" element={<EditWorkoutExercise />} />
             
             <Route path="/locations" element={<ListLocation />} />
             <Route path="/locations/new" element={<NewLocation />} />

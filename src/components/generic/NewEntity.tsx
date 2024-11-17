@@ -68,13 +68,15 @@ const NewEntity = <T extends WithId>({ entity, entityName, onSave, onCancel, onE
 
 	const handleCancel = () => {
 		const done = onCancel();
-		if ( !done || done.length === 0) {
+		if ( done && done.length > 0) {
 			const event: AppEvent = {
 				entity: entityName ,
 				actionType: 'CANCEL_REQUEST',
 				pageType: done// not top level
 			};
 			addCustomEvent(event);
+		} else {
+			console.error("onCancel() returned an invalid string:", done);
 		}
 	};
 
