@@ -1,4 +1,5 @@
 // src/App.tsx
+import AppHomePage from "@components/AppHomePage";
 import EditExercise from "@components/exercises/EditExercise";
 import ListExercise from "@components/exercises/ListExercise";
 import NewExercise from "@components/exercises/NewExercise";
@@ -49,6 +50,7 @@ const App: React.FC = () => {
     return (
         <Routes>
             <Route path="/" element={<HomePage />} />
+            <Route path="/app" element={<AppHomePage />} />
 
             <Route path="/workouts" element={<ListWorkout />} />
             <Route path="/workouts/new" element={<NewWorkout />} />
