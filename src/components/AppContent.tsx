@@ -38,6 +38,8 @@ const AppContent: React.FC = () => {
 					// just list as on sub page
 					navigate(`/${lastEvent.entity}`);
 				}
+			} else if (lastEvent.actionType === "UPDATE" || lastEvent.actionType === "DELETE" || lastEvent.actionType === "CREATE") {
+				navigate(`/${lastEvent.entity}`);
 			} else {
 				console.error(`Unknown action type: ${lastEvent.actionType}`);
 				navigate('/');

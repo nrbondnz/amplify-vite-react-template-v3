@@ -45,15 +45,6 @@ export const schema = configure({
     }).identifier([
         "id"
     ]),
-    "settings": a.model({
-        id: a.integer().required(),
-        value: a.string(),
-        entityId: a.integer(),
-        entityType: a.string(),
-        name: a.string()
-    }).identifier([
-        "id"
-    ]),
     "user_details": a.model({
         id: a.integer().required(),
         name: a.string().required(),
@@ -137,6 +128,15 @@ export const schema = configure({
         exerciseId: a.integer(),
         muscleId: a.integer(),
         machineId: a.integer(),
+        entityName: a.string()
+    }).identifier([
+        "id"
+    ]),
+    "settings": a.model({
+        id: a.integer().required(),
+        value: a.string(),
+        entityId: a.integer(),
+        entityType: a.string(),
         entityName: a.string()
     }).identifier([
         "id"

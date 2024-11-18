@@ -1,6 +1,6 @@
 #root {
   max-width: 1280px;
-  margin: 0 auto;
+  margin: 2px auto;
   padding: 2rem;
   text-align: center;
 }
@@ -46,6 +46,7 @@
 @media (max-width: 768px) {
   #root {
     padding: 1rem;
+    align-content: center;
   }
 
   .logo {
@@ -60,6 +61,7 @@
 @media (max-width: 480px) {
   #root {
     padding: 0.5rem;
+    align-content: center;
   }
 
   .logo {

@@ -10,7 +10,6 @@ import {
 import { useEntityData } from '@hooks/useEntityData';
 import { client } from '@shared/utils/client';
 
-// Define a type that allows omitting specific fields for sanitization
 type SettingSanitizable = Omit<ISettingWithStatus, 'status'> & Partial<ISettingWithStatus>;
 
 const sanitizeObject = (obj: SettingSanitizable, fields: (keyof SettingSanitizable)[]): SettingSanitizable => {
@@ -32,38 +31,43 @@ interface ManageSettingsProps {
 
 const ManageSettings: React.FC<ManageSettingsProps> = forwardRef(({ entityId, entityNum, entityType, onSaveRef }, _ref) => {
 	const params = useParams<{ entityId: string; entityType: EntityTypes }>();
-	const displaySaveButton = params.entityId !== undefined;
-	// Use entityId and entityType from params if available, otherwise fallback to props
 	const finalEntityId = entityId ?? parseInt(params.entityId!);
 	const finalEntityType = entityType ?? params.entityType;
-	//const { getEntityById } = useEntityData<IMachine>(EntityTypes.Machine);
 	const { entities: settings, setEntities: setSettings, getNextId: getNextSettingId } = useEntityData<ISettingWithStatus>(EntityTypes.Setting);
 	const [originalSettings, setOriginalSettings] = useState<ISettingWithStatus[]>([]);
 	const [filteredSettings, setFilteredSettings] = useState<ISettingWithStatus[]>([]);
-	//const displayId = getEntityById(finalEntityId.toString())?.displayNum;
+	const [settingsStatus, setSettingsStatus] = useState<{ [key: number]: string }>({});
+
 	useImperativeHandle(onSaveRef, () => ({
 		saveSettings: () => settings,
 		saveSettingsToDB,
 		settingsChanged: () => settings.some((setting, index) => (
 			setting.entityName !== originalSettings[index]?.entityName ||
 			setting.value !== originalSettings[index]?.value ||
-			setting.status !== originalSettings[index]?.status
+			settingsStatus[setting.id] !== (originalSettings[index]?.status ?? '')
 		))
 	}));
 
 	useEffect(() => {
-		const settingsForEntity = settings.filter(setting => setting.entityId === finalEntityId && setting.entityType === finalEntityType && setting.status !== 'delete');
+		const settingsForEntity = settings.filter(setting => setting.entityId === finalEntityId && setting.entityType === finalEntityType);
 		setFilteredSettings(settingsForEntity);
 		setOriginalSettings([...settingsForEntity]);
+
+		const statusMap: { [key: number]: string } = {};
+		settingsForEntity.forEach(setting => {
+			statusMap[setting.id] = setting.status ?? '';
+		});
+		setSettingsStatus(statusMap);
 	}, [entityId, settings, finalEntityId, finalEntityType, entityNum]);
 
-	const handleSettingsChange = (action: SettingKeys, mySetting?: ISettingWithStatus, name?: string, value?: string) =>
+	const handleSettingsChange = (action: SettingKeys, mySetting?: ISettingWithStatus, name?: string, value?: string) => {
 		setSettings((prevSettings: ISettingWithStatus[]) => {
 			let updatedSettings = [...prevSettings];
-			let newSetting: ISettingWithStatus;
+			const updatedStatus = { ...settingsStatus };
+
 			switch (action) {
 				case SettingKeys.add:
-					newSetting = {
+					const newSetting: ISettingWithStatus = {
 						id: getNextSettingId(),
 						entityName: '',
 						value: '',
@@ -73,6 +77,7 @@ const ManageSettings: React.FC<ManageSettingsProps> = forwardRef(({ entityId, en
 					};
 					console.log('Adding new setting:', newSetting);
 					updatedSettings.push(newSetting);
+					updatedStatus[newSetting.id] = 'new';
 					break;
 				case SettingKeys.remove:
 					updatedSettings = updatedSettings.map(setting =>
@@ -80,27 +85,33 @@ const ManageSettings: React.FC<ManageSettingsProps> = forwardRef(({ entityId, en
 							? { ...setting, status: 'delete' }
 							: setting
 					);
+					updatedStatus[mySetting!.id] = 'delete';
 					break;
 				case SettingKeys.changeKey:
 					updatedSettings = updatedSettings.map(setting =>
 						setting.id === mySetting!.id
-							? { ...setting, name: name || setting.entityName, status: setting.status === 'new' ? 'new' : 'update' }
+							? { ...setting, entityName: name ?? '', status: updatedStatus[setting.id] === 'new' ? 'new' : 'update' }
 							: setting
 					);
+					updatedStatus[mySetting!.id] = updatedStatus[mySetting!.id] === 'new' ? 'new' : 'update';
 					break;
 				case SettingKeys.change:
 					updatedSettings = updatedSettings.map(setting =>
 						setting.id === mySetting!.id
-							? { ...setting, value: value !== undefined ? value : setting.value, status: setting.status === 'new' ? 'new' : 'update' }
+							? { ...setting, value: value ?? '', status: updatedStatus[setting.id] === 'new' ? 'new' : 'update' }
 							: setting
 					);
+					updatedStatus[mySetting!.id] = updatedStatus[mySetting!.id] === 'new' ? 'new' : 'update';
 					break;
 				default:
 					break;
 			}
+
 			console.log('Updated settings after change:', updatedSettings);
+			setSettingsStatus(updatedStatus);
 			return updatedSettings;
 		});
+	};
 
 	const handleKeyChange = (setting: ISettingWithStatus, newName: string) => {
 		console.log(`Changing key for setting ID ${setting.id} to ${newName}`);
@@ -126,47 +137,54 @@ const ManageSettings: React.FC<ManageSettingsProps> = forwardRef(({ entityId, en
 		for (const setting of settings) {
 			const sanitizedSetting = sanitizeObject(setting, ['status']);
 			try {
-				if (setting.status === 'new') {
-					await client.models.settings.create(sanitizedSetting);
-				} else if (setting.status === 'update') {
+				if (settingsStatus[setting.id] === 'new') {
+					console.log('Attempting to create new setting with:', sanitizedSetting);
+					const result = await client.models.settings.create(sanitizedSetting);
+					console.log('Created new setting:', result);
+				} else if (settingsStatus[setting.id] === 'update') {
+					console.log('Attempting to update setting with:', sanitizedSetting);
 					await client.models.settings.update(sanitizedSetting);
-				} else if (setting.status === 'delete') {
+				} else if (settingsStatus[setting.id] === 'delete') {
+					console.log('Attempting to delete setting with id:', setting.id);
 					await client.models.settings.delete({ id: setting.id });
 				}
 			} catch (error) {
 				console.error(`Failed to save setting ${setting.id}:`, error);
+				console.error('Sanitized setting content:', JSON.stringify(sanitizedSetting, null, 2));
 			}
 		}
 	};
 
 	console.log('ManageSettings: Current settings', settings);
+	console.log('ManageSettings: setting status', settingsStatus);
 
 	return (
 		<div>
 			<h3>Settings</h3>
-			{filteredSettings.map(setting => (
-				<div key={setting.id}>
-					<input
-						type="text"
-						value={setting.entityName || ''}
-						onChange={(e) => handleKeyChange(setting, e.target.value)}
-					/>
-					<input
-						type="text"
-						value={setting.value ?? ''}
-						onChange={(e) => handleValueChange(setting, e.target.value)}
-					/>
-					<ShowPicture entityDisplayNum={entityNum!} name={entityType!.valueOf()} details={setting.entityName!}/>
-					<FileLoader pEntityName={entityType!.valueOf()} pDisplayNum={entityNum} pDetails={setting.entityName!} />
-					<button type="button" onClick={() => removeSetting(setting)}>Remove</button>
-				</div>
-			))}
+			{filteredSettings
+				.filter(setting => settingsStatus[setting.id] !== 'delete')
+				.map(setting => (
+					<div key={setting.id}>
+						<input
+							type="text"
+							value={setting.entityName || ''}
+							placeholder="Enter name"
+							onChange={(e) => handleKeyChange(setting, e.target.value)}
+						/>
+						<input
+							type="text"
+							value={setting.value ?? ''}
+							placeholder="Enter value"
+							onChange={(e) => handleValueChange(setting, e.target.value)}
+						/>
+						<ShowPicture entityDisplayNum={entityNum!} name={entityType!.valueOf()} details={setting.entityName!}/>
+						<FileLoader pEntityName={entityType!.valueOf()} pDisplayNum={entityNum} pDetails={setting.entityName!} />
+						<button type="button" onClick={() => removeSetting(setting)}>Remove</button>
+					</div>
+				))}
 			<button type="button" onClick={addNewSetting}>Add Setting</button>
-			{displaySaveButton && (
-				<button type="button" onClick={() => saveSettingsToDB(settings)}>
-					Save Settings
-				</button>
-			)}
+			{/* If needed, uncomment the Save Settings button */}
+			{/* <button type="button" onClick={() => saveSettingsToDB(settings)}>Save Settings</button> */}
 		</div>
 	);
 });
