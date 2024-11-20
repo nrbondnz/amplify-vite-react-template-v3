@@ -14,8 +14,24 @@ const AppContent: React.FC = () => {
 
 	useEffect(() => {
 		console.log("AppContent useEffect");
-		if (lastEvent?.entity && lastEvent?.actionType) {
+		if (lastEvent?.actionType) {
 			console.log(`Last Event: ${lastEvent.entity} - ${lastEvent.actionType}`);
+			if ( lastEvent.pageType === "APPHOME" ) {
+				if (lastEvent.actionType === "FIND_REQUEST") {
+					const path = `/app/find`;
+					console.log(`Path: ${path}`);
+					navigate(path);
+					return;
+				}
+			}
+			if (lastEvent.pageType === "CONTROL") {
+				if (lastEvent.actionType === "APP_REQUEST") {
+					const path = `/app`;
+					console.log(`Path: ${path}`);
+					navigate(path);
+					return;
+				}
+			}
 			if (lastEvent.actionType === "EDIT_REQUEST") {
 				const path = `/${lastEvent.entity}/${lastEvent.entityId}`;
 				console.log(`Path: ${path}`);
@@ -38,20 +54,27 @@ const AppContent: React.FC = () => {
 					// just list as on sub page
 					navigate(`/${lastEvent.entity}`);
 				}
+				return;
+
 			} else if (lastEvent.actionType === "UPDATE" || lastEvent.actionType === "DELETE" || lastEvent.actionType === "CREATE") {
 				navigate(`/${lastEvent.entity}`);
+				return;
 			} else {
 				console.error(`Unknown action type: ${lastEvent.actionType}`);
 				navigate('/');
+				return;
 			}
 			// otherwise for now go to entity list
 			//const path = `/${lastEvent.entity}`;
 			//console.log(`Path: ${path}`);
 			//navigate(path);
+		} else {
+			navigate('/');
+			return;
 		}
 	}, [lastEvent, navigate]);
 
-	return <div>App Content Component</div>;
+	return <div></div>;
 };
 
 export default AppContent;

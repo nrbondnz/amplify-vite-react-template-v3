@@ -9,6 +9,8 @@ Amplify.configure(outputs);
 const AppHomePage: React.FC = () => {
 	const { addCustomEvent } = useSubscription();
 
+	console.log("AppHomePage component is rendering");
+
 	const handleWorkout = () => {
 		const event: AppEvent = {
 			entity: "workouts",
@@ -29,18 +31,28 @@ const AppHomePage: React.FC = () => {
 
 	const handleFindExercises = () => {
 		const event: AppEvent = {
-			entity: "exercises",
+			entity: "not set",
 			actionType: 'FIND_REQUEST',
 			pageType: 'APPHOME'
 		};
 		addCustomEvent(event);
 	};
 
+	function handleHome() {
+		const event: AppEvent = {
+			entity: "not set",
+			actionType: 'LIST_REQUEST',
+			pageType: 'APPHOME'
+		};
+		addCustomEvent(event);
+	}
+
 	return (
 		<div>
 			<h1>MyGym</h1>
 			<div>
-				<button onClick={handleWorkout}>Workouts</button>
+				<button onClick={handleHome}>Home</button>
+				<button onClick={handleWorkout}>My Workouts</button>
 				<button onClick={handleTodaysWorkout}>Lets do it</button>
 				<button onClick={handleFindExercises}>Lookup exercises</button>
 			</div>

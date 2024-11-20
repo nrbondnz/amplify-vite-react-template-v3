@@ -1,51 +1,48 @@
-﻿import { useSubscription } from "@context/SubscriptionContext";
-import { AppEvent } from "@shared/types/types";
+﻿import AppContent from "@components/AppContent";
+import { useSubscription } from "@context/SubscriptionContext";
+import { AppEvent, EntityTypes } from "@shared/types/types";
 import { Amplify } from "aws-amplify";
+//import { AppConfig } from "aws-sdk";
 import React from "react";
 import outputs from '../../amplify_outputs.json';
+//import { getUrl } from 'aws-amplify/storage';
 
 Amplify.configure(outputs);
 
-const AppHomePage: React.FC = () => {
-	const { addCustomEvent } = useSubscription();
+const HomePage: React.FC = () => {
+	const { addCustomEvent, lastEvent } = useSubscription();
 
-	const handleWorkout = () => {
+	const handleGotoPage = (page: EntityTypes) => () => {
 		const event: AppEvent = {
-			entity: "workouts",
+			entity: page,
 			actionType: 'LIST_REQUEST',
-			pageType: 'APPHOME'
+			pageType: ''
 		};
 		addCustomEvent(event);
 	};
 
-	const handleTodaysWorkout = () => {
+	const handleGotoApp = () => {
 		const event: AppEvent = {
-			entity: "todaysWorkout",
-			actionType: 'START_WORKOUT',
-			pageType: 'APPHOME'
-		};
-		addCustomEvent(event);
-	};
-
-	const handleFindExercises = () => {
-		const event: AppEvent = {
-			entity: "exercises",
-			actionType: 'FIND_REQUEST',
-			pageType: 'APPHOME'
+			entity: 'not set2',
+			actionType: 'APP_REQUEST',
+			pageType: 'CONTROL'
 		};
 		addCustomEvent(event);
 	};
 
 	return (
+
 		<div>
-			<h1>MyGym</h1>
-			<div>
-				<button onClick={handleWorkout}>Workouts</button>
-				<button onClick={handleTodaysWorkout}>Lets do it</button>
-				<button onClick={handleFindExercises}>Lookup exercises</button>
-			</div>
+			<h1>Home Page 2</h1>
+			{!lastEvent && <AppContent/>}
+			{Object.values(EntityTypes).map((entityType) => (
+				<div key={entityType} onClick={handleGotoPage(entityType as EntityTypes)} style={{ cursor: 'pointer', margin: '5px 0' }}>
+					{entityType}
+				</div>
+			))}
+			<button onClick={handleGotoApp}>App Home</button>
 		</div>
 	);
 };
 
-export default AppHomePage;
+export default HomePage;

@@ -28,6 +28,7 @@ export const SubscriptionProvider: React.FC<{ children: ReactNode }> = ({ childr
 				pageType: pageType ?? '',
 				entityData: entityData, // Optional: Include the full entity data if needed
 			};
+			console.log('Setting lastEvent:', event)
 			setLastEvent(event);
 		};
 
@@ -170,6 +171,7 @@ export const SubscriptionProvider: React.FC<{ children: ReactNode }> = ({ childr
 	};
 
 	const addCustomEvent = (event: AppEvent) => {
+		console.log('Adding custom event:', event);
 		setLastEvent(event);
 	};
 
