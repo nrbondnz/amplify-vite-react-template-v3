@@ -6,7 +6,6 @@ import { data } from './data/resource';
 const backend = defineBackend({
   auth,
   data,
-  storage,
 });
 
 backend.addOutput({
