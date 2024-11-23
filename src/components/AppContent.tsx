@@ -69,7 +69,8 @@ const AppContent: React.FC = () => {
 			//console.log(`Path: ${path}`);
 			//navigate(path);
 		} else {
-			navigate('/');
+			console.error("No last event");
+			//navigate('/');
 			return;
 		}
 	}, [lastEvent, navigate]);

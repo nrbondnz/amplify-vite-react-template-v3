@@ -34,12 +34,14 @@ const ShowPicture: React.FC<ShowPictureProps> = ({ name, entityDisplayNum, detai
 			try {
 				const result = await getUrl({
 					path,
-					options: {
-						bucket: 'amplifyTeamDrive'
-					}
+					options: { bucket: 'amplifyTeamDrive' }
 				});
 
-				setImageUrl(result.url.toString());
+				if (result && result.url && result.url.origin) {
+					setImageUrl(result.url.href);
+				} else {
+					throw new Error('Invalid URL result');
+				}
 				setImageExists(true);
 			} catch (error) {
 				setImageExists(false);

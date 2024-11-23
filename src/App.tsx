@@ -15,6 +15,7 @@ import EditMuscle from "@components/muscles/EditMuscle";
 import ListMuscle from "@components/muscles/ListMuscle";
 import NewMuscle from "@components/muscles/NewMuscle";
 import FileLoader from "@components/utils/FileLoader";
+import ImageSelector from "@components/utils/ImageSelector";
 import EditWorkoutExercise
     from "@components/workoutExercises/EditWorkoutExercise";
 import ListWorkoutExercise
@@ -46,6 +47,7 @@ const App: React.FC = () => {
                 <Route path="/app" element={<AppHomePage />} />
                 <Route path="/app/find" element={<FindExerciseCombo />} />
                 <Route path="/settings/:entityId/:entityType" element={<ManageSettings onSaveRef={React.createRef()} />} />
+                <Route path="/imageselector" element={<ImageSelector alt="machines" />} />
 
                 <Route path="/workouts" element={<ListWorkout />} />
                 <Route path="/workouts/new" element={<NewWorkout />} />

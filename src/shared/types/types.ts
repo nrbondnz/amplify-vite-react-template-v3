@@ -255,9 +255,6 @@ export enum SettingKeys {
 }
 
 export interface IMachine extends WithIdAndDisplayNum {
-	id: number;           // Reflects the auto-incremented primary key
-	entityName: string;
-	displayNum: number;
 	idLocation: number;
 
 }
