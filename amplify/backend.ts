@@ -12,6 +12,5 @@ const backend = defineBackend({
 
 backend.addOutput({
   storage: {
-    aws_region: "ap-southeast-2",
     bucket_name: "my-app-bucket007"
   }});

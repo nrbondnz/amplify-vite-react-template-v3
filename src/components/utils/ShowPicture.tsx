@@ -34,7 +34,7 @@ const ShowPicture: React.FC<ShowPictureProps> = ({ name, entityDisplayNum, detai
 			try {
 				const result = await getUrl({
 					path,
-					options: { bucket: 'my-app-bucket007' }
+					options: { bucket: 'amplifyTeamDrive' }
 				});
 
 				if (result && result.url && result.url.origin) {
