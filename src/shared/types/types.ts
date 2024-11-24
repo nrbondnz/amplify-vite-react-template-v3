@@ -274,36 +274,44 @@ export const defaultSetting: ISetting = {
 	entityType: "machine"
 }
 
-export const getEntityDefault = <T>(entityType: EntityTypes): T => {
+
+
+export const getEntityDefault = <T>(entityType: EntityTypes): {defaultEntity: T, entityDBName: string} => {
+	let defaultEntity;
 	switch (entityType) {
 		case EntityTypes.Machine:
-			return defaultMachine as T;
+			defaultEntity = defaultMachine as T;
+
+			return { defaultEntity: defaultMachine as T, entityDBName: entityType.toString() };
 		case EntityTypes.Exercise:
-			return defaultExercise as T;
+			return { defaultEntity: defaultExercise as T, entityDBName: entityType.toString() };
 		case EntityTypes.Setting:
-			return defaultSetting as T;
+			return { defaultEntity: defaultSetting as T, entityDBName: entityType.toString() };
 		case EntityTypes.User:
-			return defaultUser as T;
+			return { defaultEntity: defaultUser as T, entityDBName: entityType.toString() };
 		case EntityTypes.Workout:
-			return defaultWorkout as T;
+			return { defaultEntity: defaultWorkout as T, entityDBName: entityType.toString() };
 		case EntityTypes.WorkoutExercise:
-			return defaultWorkoutExercise as T;
+			return { defaultEntity: defaultWorkoutExercise as T, entityDBName: entityType.toString() };
 		case EntityTypes.Muscle:
-			return defaultMuscle as T;
+			return { defaultEntity: defaultMuscle as T, entityDBName: entityType.toString() };
 		case EntityTypes.Location:
-			return defaultLocation as T;
+			return { defaultEntity: defaultLocation as T, entityDBName: entityType.toString() };
 		case EntityTypes.SessionWorkout:
-			return defaultSesionWorkout as T;
+			return { defaultEntity: defaultSesionWorkout as T, entityDBName: entityType.toString() };
 		case EntityTypes.SessionWorkoutExercise as T:
-			return defaultSessionWorkoutExercise as T;
+			return { defaultEntity: defaultSessionWorkoutExercise as T, entityDBName: entityType.toString() };
 		case EntityTypes.SessionExercise:
-			return defaultSessionExercise as T;
+			return { defaultEntity: defaultSessionExercise as T, entityDBName: entityType.toString() };
 		case EntityTypes.EntityRelationship:
-			return defaultEntityRelationship as T;
+			return { defaultEntity: defaultEntityRelationship as T, entityDBName: entityType.toString() };
 					
 		default:
 			throw new Error(`Unhandled entity type: ${entityType}`);
 	}
+	return { defaultEntity: defaultEntity as T, entityDBName: entityType.toString() };
+
+
 };
 
 export const requiredFieldsMap: { [key in EntityTypes]?: (keyof any)[] } = {

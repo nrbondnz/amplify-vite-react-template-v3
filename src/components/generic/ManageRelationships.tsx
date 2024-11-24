@@ -7,11 +7,11 @@ import {
 } from "@shared/types/types";
 import { client } from "@shared/utils/client";
 import React, {
+	ForwardedRef,
 	forwardRef,
 	useEffect,
 	useImperativeHandle,
 	useState,
-	ForwardedRef,
 } from "react";
 
 // Utility functions to get key field and partner field based on entity type
@@ -163,7 +163,7 @@ const ManageRelationships: React.ForwardRefRenderFunction<
 		}
 
 		const newRelationship: NewRelationship = {
-			...getEntityDefault(EntityTypes.EntityRelationship),
+			...getEntityDefault<IEntityRelationship>(EntityTypes.EntityRelationship).defaultEntity,
 			[keyField]: keyId,
 			[partnerField]: partnerId,
 			id: getNextId(),

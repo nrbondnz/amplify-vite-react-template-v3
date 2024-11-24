@@ -1,4 +1,4 @@
-﻿import { useState, ChangeEvent } from 'react';
+﻿import { useState, ChangeEvent, useEffect } from 'react';
 import { useSubscription } from "@context/SubscriptionContext";
 import { useEntityData } from "../../hooks/useEntityData";
 import {
@@ -34,6 +34,21 @@ const NewEntity = <T extends WithId>({ entity, entityName, onSave, onCancel, onE
 	// Fetch locations
 	const { entities: locations, loading: locationsLoading, error: locationsError } = useEntityData<ILocation>(EntityTypes.Location);
 
+	// Check if the object has a specified field
+	const hasField = (obj: any, field: string): boolean => {
+		return obj.hasOwnProperty(field);
+	};
+
+	useEffect(() => {
+		if (hasField(newEntity, 'idLocation') && locations.length > 0) {
+			const updatedEntity = { ...newEntity, idLocation: locations[0].id };
+			setNewEntity(updatedEntity);
+			if (onEntityChange) {
+				onEntityChange(updatedEntity);
+			}
+		}
+	}, [locations, newEntity, onEntityChange]);
+
 	const handleChange = (key: keyof T, value: T[keyof T]) => {
 		const updatedEntity = { ...newEntity, [key]: value };
 		setNewEntity(updatedEntity);
@@ -47,13 +62,10 @@ const NewEntity = <T extends WithId>({ entity, entityName, onSave, onCancel, onE
 	const entityType = entityName as EntityTypes;
 	const requiredFieldsMap = requiredDisplayNamesMap[entityType];
 
-	// Debugging: Log requiredFieldsMap
-	console.log(`entityType: ${entityType}`, requiredFieldsMap);
-
 	const requiredFields = requiredFieldsMap ? Object.keys(requiredFieldsMap) : [];
 
 	const hasAllRequiredFields = (entity: T): boolean => {
-		return requiredFields.every(field => entity[field as keyof T] !== undefined && entity[field as keyof T] !== null);
+		return requiredFields.every(field => entity[field as keyof T] !== undefined && entity[field as keyof T] !== null && entity[field as keyof T] !== 0);
 	};
 
 	const handleSave = () => {

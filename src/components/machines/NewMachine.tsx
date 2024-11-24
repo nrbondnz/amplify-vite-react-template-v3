@@ -1,13 +1,9 @@
 ﻿//import { useEntityData } from "@hooks/useEntityData";
-import React from 'react';
 import NewEntity from "@components/generic/NewEntity";
-import { client } from "@shared/utils/client";
 import withEntityData from '@components/generic/withEntityData';
-import {
-	defaultMachine,
-	EntityTypes,
-	IMachine,
-} from '@shared/types/types';
+import { EntityTypes, getEntityDefault, IMachine, } from '@shared/types/types';
+import { client } from "@shared/utils/client";
+import React from 'react';
 import { useNavigate } from 'react-router-dom';
 import ManageSettings from './ManageSettings';
 
@@ -47,11 +43,15 @@ const NewMachine: React.FC<NewMachineProps> = ({ loading, getNextId }) => {
 		}
 	};
 
-	
+
+	function handleCancel():string {
+		navigate('/appcontent');
+		return "NEW";
+	}
 
 	return (
 		<>
-			<NewEntity entity={defaultMachine} entityName="machine" onSave={handleSave}  onCancel={() => "NEW"} />
+			<NewEntity entity={getEntityDefault<IMachine>(EntityTypes.Machine).defaultEntity} entityName="machines" onSave={handleSave}  onCancel={handleCancel} />
 			<ManageSettings entityType={EntityTypes.Machine} entityId={-1} onSaveRef={()=>{}}/>
 		</>
 	);
