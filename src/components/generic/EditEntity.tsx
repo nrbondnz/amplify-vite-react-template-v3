@@ -24,20 +24,25 @@ const EditEntity = <T extends WithId>({ pEntity, pEntityName, onSave, onDelete, 
 	// Fetch locations
 	const { entities: locations, loading: locationsLoading, error: locationsError } = useEntityData<ILocation>(EntityTypes.Location);
 
-	// Check if the object has a specified field
-	const hasField = (obj: any, field: string): boolean => {
-		return obj.hasOwnProperty(field);
+	// Type guard to check if entity has the idLocation field
+	const isEntityWithLocation = (entity: any): entity is T & { idLocation: number } => {
+		return 'idLocation' in entity;
 	};
 
 	useEffect(() => {
-		if (hasField(updatedEntity, 'idLocation') && locations.length > 0) {
-			const updatedEntityWithLocation = { ...updatedEntity, idLocation: locations[0].id };
-			setUpdatedEntity(updatedEntityWithLocation);
-			if (onEntityChange) {
-				onEntityChange(updatedEntityWithLocation);
+		if (isEntityWithLocation(updatedEntity) && locations.length > 0) {
+			const currentIdLocation = updatedEntity.idLocation;
+			const newIdLocation = locations[0].id;
+
+			if (currentIdLocation !== newIdLocation) {
+				const updatedEntityWithLocation = { ...updatedEntity, idLocation: newIdLocation };
+				setUpdatedEntity(updatedEntityWithLocation);
+				if (onEntityChange) {
+					onEntityChange(updatedEntityWithLocation);
+				}
 			}
 		}
-	}, [locations, updatedEntity, onEntityChange]);
+	}, [locations]);
 
 	const handleChange = (key: keyof T, value: T[keyof T]) => {
 		const newEntity = { ...updatedEntity, [key]: value };
@@ -107,14 +112,14 @@ const EditEntity = <T extends WithId>({ pEntity, pEntityName, onSave, onDelete, 
 					<tr key={key}>
 						<td><label>{displayName}:</label></td>
 						<td>
-              <textarea
-				  value={value !== undefined && value !== null ? String(value) : ""}
-				  onChange={(e: ChangeEvent<HTMLTextAreaElement>) =>
-					  handleChange(key as keyof T, e.target.value as unknown as T[keyof T])
-				  }
-				  rows={3}
-				  cols={100}
-			  />
+							<textarea
+								value={value !== undefined && value !== null ? String(value) : ""}
+								onChange={(e: ChangeEvent<HTMLTextAreaElement>) =>
+									handleChange(key as keyof T, e.target.value as unknown as T[keyof T])
+								}
+								rows={3}
+								cols={100}
+							/>
 						</td>
 					</tr>
 				);

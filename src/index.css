@@ -8,6 +8,8 @@
   --table-row-color: #b0b2fe;  /* Slightly lighter than background color */
   --highlight-color: #d3d4fe;  /* Highlight color */
   --highlight-text-color: #fff;  /* Text color for highlighted areas */
+  --input-background-color: #e6e6ff; /* Very light purple for input fields */
+  --input-border-color: #ccc;  /* Light grey for input border */
 }
 
 /* Global styles */
@@ -22,9 +24,9 @@ body {
   margin: 0;
 }
 
-/* Adding a container for content with a 10% left margin */
+/* Adding a container for content with a 5% left and right margin */
 .container {
-  margin-left: 10% !important;  /* Add 10% margin to the left */
+  margin: 0 5% !important;  /* Add 5% margin to left and right sides */
 }
 
 /* Universal button styling */
@@ -54,7 +56,7 @@ table {
 }
 
 th, td {
-  padding: 12px !important;
+  padding: 24px !important;
   border: 1px solid #ddd !important;
   text-align: left !important;
 }
@@ -76,9 +78,9 @@ td.file-upload-cell {
 
 /* Input styling adjustments */
 input[type="file"], input[type="text"], input[type="number"] {
-  background-color: var(--base-color) !important;
-  color: #fff !important;
-  border: 2px solid #7cb342 !important;
+  background-color: var(--input-background-color) !important;
+  color: var(--primary-text-color) !important;
+  border: 2px solid var(--input-border-color) !important;
   padding: 4px !important;
   border-radius: 8px !important;
   cursor: pointer !important;
@@ -86,6 +88,16 @@ input[type="file"], input[type="text"], input[type="number"] {
 
 input[type="file"]:hover, input[type="text"]:hover, input[type="number"]:hover {
   background-color: var(--base-hover-color) !important;
+}
+
+/* Make text input fields at least 20 characters wide */
+input[type="text"], input[type="number"], input[type="file"] {
+  min-width: 20ch !important; /* Ensures the field is at least 20 characters wide */
+}
+
+/* Making input fields width span the full width of the row */
+td.file-upload-cell input[type="text"], td.file-upload-cell input[type="number"], td.file-upload-cell input[type="file"] {
+  width: calc(100% - 20px) !important; /* Adjusting for padding/border */
 }
 
 /* Select dropdown styling */
@@ -102,12 +114,23 @@ option {
   color: var(--primary-text-color) !important;
 }
 
-/* Specific styling for "File not found" message */
-.file-not-found {
-  color: red !important;
+/* Custom styles for file loader */
+.file-loader-container {
+  margin: 0 5% !important;  /* Adjusting to the same 5% left and right margin */
 }
 
-/* Increase specificity for table button styling */
+/* Table for file upload components */
+.file-upload-table {
+  width: 100%; /* Full width table */
+  border-collapse: collapse;
+}
+
+.file-upload-table .file-upload-cell {
+  padding: 10px;
+  border: 1px solid #ddd;
+}
+
+/* Specific styling for file upload buttons and file name span */
 .file-upload-cell .button {
   padding: 6px 12px !important;
   font-size: 1em !important;
@@ -117,11 +140,23 @@ option {
   border-radius: 8px !important;
   cursor: pointer !important;
   transition: background-color 0.3s ease !important;
-  height: 50% !important; /* Set button height to 50% */
+  height: 100%; /* Full height button */
 }
 
 .file-upload-cell .button:hover {
   background-color: var(--base-hover-color) !important;
+}
+
+.file-upload-cell .file-name {
+  font-size: 1em !important;
+  color: var(--primary-text-color) !important;
+  padding-left: 10px; /* Space between button and file name */
+}
+
+/* Specific styling for "File not found" message */
+.file-not-found {
+  color: red !important;
+  margin-left: 10px; /* Space between button and message */
 }
 
 /* Media queries for different devices */

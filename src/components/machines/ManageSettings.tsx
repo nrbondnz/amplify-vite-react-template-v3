@@ -1,14 +1,11 @@
-﻿import FileLoader from "@components/utils/FileLoader";
-import ShowPicture from "@components/utils/ShowPicture";
-import React, { useImperativeHandle, forwardRef, useEffect, useState } from 'react';
+﻿import React, { useImperativeHandle, forwardRef, useEffect, useState } from 'react';
 import { useParams } from 'react-router-dom';
-import {
-	EntityTypes,
-	ISettingWithStatus,
-	SettingKeys
-} from '@shared/types/types';
+import FileLoader from "@components/utils/FileLoader";
+import ShowPicture from "@components/utils/ShowPicture";
+import { EntityTypes, ISettingWithStatus, SettingKeys } from '@shared/types/types';
 import { useEntityData } from '@hooks/useEntityData';
 import { client } from '@shared/utils/client';
+import './ManageSettings.css'; // Ensure you import the CSS file
 
 type SettingSanitizable = Omit<ISettingWithStatus, 'status'> & Partial<ISettingWithStatus>;
 
@@ -29,9 +26,13 @@ interface ManageSettingsProps {
 	}>;
 }
 
+const areObjectsEqual = (obj1: object, obj2: object) => {
+	return JSON.stringify(obj1) === JSON.stringify(obj2);
+};
+
 const ManageSettings: React.FC<ManageSettingsProps> = forwardRef(({ entityId, entityNum, entityType, onSaveRef }, _ref) => {
 	const params = useParams<{ entityId: string; entityType: EntityTypes }>();
-	const finalEntityId = entityId ?? parseInt(params.entityId!);
+	const finalEntityId = entityId ?? parseInt(params.entityId!, 10);
 	const finalEntityType = entityType ?? params.entityType;
 	const { entities: settings, setEntities: setSettings, getNextId: getNextSettingId } = useEntityData<ISettingWithStatus>(EntityTypes.Setting);
 	const [originalSettings, setOriginalSettings] = useState<ISettingWithStatus[]>([]);
@@ -57,8 +58,12 @@ const ManageSettings: React.FC<ManageSettingsProps> = forwardRef(({ entityId, en
 		settingsForEntity.forEach(setting => {
 			statusMap[setting.id] = setting.status ?? '';
 		});
-		setSettingsStatus(statusMap);
-	}, [entityId, settings, finalEntityId, finalEntityType, entityNum]);
+
+		if (!areObjectsEqual(statusMap, settingsStatus)) {
+			setSettingsStatus(statusMap);
+		}
+
+	}, [settings, finalEntityId, finalEntityType]);
 
 	const handleSettingsChange = (action: SettingKeys, mySetting?: ISettingWithStatus, name?: string, value?: string) => {
 		setSettings((prevSettings: ISettingWithStatus[]) => {
@@ -75,10 +80,10 @@ const ManageSettings: React.FC<ManageSettingsProps> = forwardRef(({ entityId, en
 						entityType: finalEntityType!,
 						status: 'new'
 					};
-					console.log('Adding new setting:', newSetting);
 					updatedSettings.push(newSetting);
 					updatedStatus[newSetting.id] = 'new';
 					break;
+
 				case SettingKeys.remove:
 					updatedSettings = updatedSettings.map(setting =>
 						setting.id === mySetting!.id
@@ -87,49 +92,53 @@ const ManageSettings: React.FC<ManageSettingsProps> = forwardRef(({ entityId, en
 					);
 					updatedStatus[mySetting!.id] = 'delete';
 					break;
+
 				case SettingKeys.changeKey:
 					updatedSettings = updatedSettings.map(setting =>
-						setting.id === mySetting!.id
+						setting.id === mySetting!.id && setting.entityName !== name
 							? { ...setting, entityName: name ?? '', status: updatedStatus[setting.id] === 'new' ? 'new' : 'update' }
 							: setting
 					);
-					updatedStatus[mySetting!.id] = updatedStatus[mySetting!.id] === 'new' ? 'new' : 'update';
+					if (mySetting!.id && updatedStatus[mySetting!.id] !== settingsStatus[mySetting!.id]) {
+						updatedStatus[mySetting!.id] = updatedStatus[mySetting!.id] === 'new' ? 'new' : 'update';
+					}
 					break;
+
 				case SettingKeys.change:
 					updatedSettings = updatedSettings.map(setting =>
-						setting.id === mySetting!.id
+						setting.id === mySetting!.id && setting.value !== value
 							? { ...setting, value: value ?? '', status: updatedStatus[setting.id] === 'new' ? 'new' : 'update' }
 							: setting
 					);
-					updatedStatus[mySetting!.id] = updatedStatus[mySetting!.id] === 'new' ? 'new' : 'update';
+					if (mySetting!.id && updatedStatus[mySetting!.id] !== settingsStatus[mySetting!.id]) {
+						updatedStatus[mySetting!.id] = updatedStatus[mySetting!.id] === 'new' ? 'new' : 'update';
+					}
 					break;
+
 				default:
 					break;
 			}
 
-			console.log('Updated settings after change:', updatedSettings);
-			setSettingsStatus(updatedStatus);
+			if (!areObjectsEqual(updatedStatus, settingsStatus)) {
+				setSettingsStatus(updatedStatus);
+			}
 			return updatedSettings;
 		});
 	};
 
 	const handleKeyChange = (setting: ISettingWithStatus, newName: string) => {
-		console.log(`Changing key for setting ID ${setting.id} to ${newName}`);
 		handleSettingsChange(SettingKeys.changeKey, setting, newName);
 	};
 
 	const handleValueChange = (setting: ISettingWithStatus, newValue: string) => {
-		console.log(`Changing value for setting ID ${setting.id} to ${newValue}`);
 		handleSettingsChange(SettingKeys.change, setting, undefined, newValue);
 	};
 
 	const addNewSetting = () => {
-		console.log('Triggering Add New Setting');
 		handleSettingsChange(SettingKeys.add);
 	};
 
 	const removeSetting = (mySetting: ISettingWithStatus) => {
-		console.log(`Removing setting ID ${mySetting.id}`);
 		handleSettingsChange(SettingKeys.remove, mySetting);
 	};
 
@@ -138,14 +147,10 @@ const ManageSettings: React.FC<ManageSettingsProps> = forwardRef(({ entityId, en
 			const sanitizedSetting = sanitizeObject(setting, ['status']);
 			try {
 				if (settingsStatus[setting.id] === 'new') {
-					console.log('Attempting to create new setting with:', sanitizedSetting);
 					const result = await client.models.settings.create(sanitizedSetting);
-					console.log('Created new setting:', result);
 				} else if (settingsStatus[setting.id] === 'update') {
-					console.log('Attempting to update setting with:', sanitizedSetting);
 					await client.models.settings.update(sanitizedSetting);
 				} else if (settingsStatus[setting.id] === 'delete') {
-					console.log('Attempting to delete setting with id:', setting.id);
 					await client.models.settings.delete({ id: setting.id });
 				}
 			} catch (error) {
@@ -155,16 +160,13 @@ const ManageSettings: React.FC<ManageSettingsProps> = forwardRef(({ entityId, en
 		}
 	};
 
-	console.log('ManageSettings: Current settings', settings);
-	console.log('ManageSettings: setting status', settingsStatus);
-
 	return (
-		<div>
+		<div className="settings-container">
 			<h3>Settings</h3>
 			{filteredSettings
 				.filter(setting => settingsStatus[setting.id] !== 'delete')
 				.map(setting => (
-					<div key={setting.id}>
+					<div key={setting.id} className="settings-item">
 						<input
 							type="text"
 							value={setting.entityName || ''}
@@ -179,14 +181,22 @@ const ManageSettings: React.FC<ManageSettingsProps> = forwardRef(({ entityId, en
 							onChange={(e) => handleValueChange(setting, e.target.value)}
 							className="input-field"
 						/>
-						<ShowPicture entityDisplayNum={entityNum!} name={entityType!.valueOf()} details={setting.entityName!}/>
-						<FileLoader pEntityName={entityType!.valueOf()} pDisplayNum={entityNum} pDetails={setting.entityName!} />
+						<table className="settings-table">
+							<tbody>
+							<tr>
+								<td className="settings-cell">
+									<ShowPicture entityDisplayNum={entityNum!} name={entityType!.valueOf()} details={setting.entityName!} />
+								</td>
+								<td className="settings-cell file-loader-cell">
+									<FileLoader pEntityName={entityType!.valueOf()} pDisplayNum={entityNum} pDetails={setting.entityName!} />
+								</td>
+							</tr>
+							</tbody>
+						</table>
 						<button type="button" onClick={() => removeSetting(setting)} className="button">Remove</button>
 					</div>
 				))}
 			<button type="button" onClick={addNewSetting} className="button">Add Setting</button>
-			{/* If needed, uncomment the Save Settings button */}
-			{/* <button type="button" onClick={() => saveSettingsToDB(settings)} className="button">Save Settings</button> */}
 		</div>
 	);
 });

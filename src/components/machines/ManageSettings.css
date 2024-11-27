@@ -1,0 +1,38 @@
+﻿.settings-container {
+    padding: 16px;
+}
+
+.settings-item {
+    margin-bottom: 16px;
+}
+
+.input-field {
+    width: calc(100% / 3 - 20px) !important;
+    margin-right: 20px !important;
+}
+
+.settings-table {
+    width: 100%; /* Ensure table takes the full width */
+    border-collapse: collapse;
+    margin-top: 10px;
+}
+
+.settings-cell {
+    padding: 10px;
+    border: 1px solid #ddd;
+}
+
+.file-loader-cell .button {
+    display: inline-block;      /* Ensuring button stays inline */
+    height: auto;               /* Maintain original button height */
+    margin-right: 10px;         /* Spacing between button and text */
+}
+
+.file-loader-cell .file-controls {
+    display: flex;              /* Flex for horizontal alignment */
+    align-items: center;        /* Center items vertically */
+}
+
+.file-loader-cell .file-controls .file-name, .file-loader-cell .file-controls .file-not-found {
+    margin-left: 20px;          /* Spacing between elements */
+}
