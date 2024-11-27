@@ -56,7 +56,7 @@ table {
 }
 
 th, td {
-  padding: 24px !important;
+  padding: 12px !important; /* Reduced padding to half */
   border: 1px solid #ddd !important;
   text-align: left !important;
 }
@@ -68,6 +68,16 @@ th {
 
 tr:nth-child(even) {
   background-color: var(--table-row-color) !important;
+}
+
+tr:nth-child(odd) {
+  background-color: #e7e7e7; /* Custom shade for odd rows */
+}
+
+/* Add hover effect for all rows */
+tr:hover {
+  background-color: var(--highlight-color) !important;
+  cursor: pointer !important;
 }
 
 /* Custom styling for specific table cells */
@@ -194,7 +204,7 @@ and (max-device-height: 900px) {
 
   body {
     font-size: 18px !important;
-    padding: 20px !important;
+    padding: 10px !important;
   }
 
   .responsive-container {
@@ -215,7 +225,7 @@ and (max-device-width: 767px) {
 
   body {
     font-size: 16px !important;
-    padding: 10px !important;
+    padding: 8px !important;
   }
 
   .responsive-container {
@@ -238,7 +248,7 @@ and (max-device-height: 1366px) {
 
   body {
     font-size: 18px !important;
-    padding: 15px !important;
+    padding: 10px !important;
   }
 
   .responsive-container {

@@ -1,0 +1,50 @@
+﻿.button-green {
+    background-color: #4CAF50; /* Green shade */
+    border: none;
+    color: white;
+    padding: 5px 10px;
+    text-align: center;
+    text-decoration: none;
+    display: inline-block;
+    font-size: 16px;
+    margin: 4px 2px;
+    cursor: pointer;
+    transition: background-color 0.3s;
+}
+
+.button-green:hover {
+    background-color: #45a049; /* Slightly darker green on hover */
+}
+
+.styled-table {
+    width: 100%;
+    border-collapse: collapse;
+    margin: 25px 0;
+    font-size: 1.2em;
+    min-width: 400px;
+}
+
+.styled-table th, .styled-table td {
+    padding: 9px 12px;
+    text-align: left;
+}
+
+.styled-table thead tr {
+    background-color: #009879; /* Table header color */
+    color: white;
+    text-align: left;
+    font-weight: bold;
+}
+
+.entity-row.even {
+    background-color: #f3f3f3; /* Shade 1 */
+}
+
+.entity-row.odd {
+    background-color: #e7e7e7; /* Shade 2 */
+}
+
+.entity-row:hover {
+    background-color: #cccccc; /* Hover background color */
+    cursor: pointer;
+}
