@@ -1,13 +1,8 @@
-﻿import FileLoader from "@components/utils/FileLoader";
-import { useState, ChangeEvent, useEffect } from 'react';
+﻿import { useState, ChangeEvent, useEffect } from 'react';
+import '../../index.css';
+import FileLoader from "@components/utils/FileLoader";
 import { useSubscription } from '@context/SubscriptionContext';
-import {
-	AppEvent,
-	EntityTypes,
-	ILocation,
-	WithId,
-	WithIdAndDisplayNum
-} from '@shared/types/types';
+import { AppEvent, EntityTypes, ILocation, WithId, WithIdAndDisplayNum } from '@shared/types/types';
 import { requiredDisplayNamesMap } from '@shared/types/types';
 import { useEntityData } from '@hooks/useEntityData';
 import ShowPicture from '@components/utils/ShowPicture';
@@ -35,7 +30,7 @@ const EditEntity = <T extends WithId>({ pEntity, pEntityName, onSave, onDelete, 
 	};
 
 	useEffect(() => {
-		if (hasField(updatedEntity, 'idLocation')  && locations.length > 0) {
+		if (hasField(updatedEntity, 'idLocation') && locations.length > 0) {
 			const updatedEntityWithLocation = { ...updatedEntity, idLocation: locations[0].id };
 			setUpdatedEntity(updatedEntityWithLocation);
 			if (onEntityChange) {
@@ -65,7 +60,6 @@ const EditEntity = <T extends WithId>({ pEntity, pEntityName, onSave, onDelete, 
 			pageType: 'EDIT'
 		};
 		addCustomEvent(event);
-		;
 	};
 
 	const isBasicType = (value: unknown): value is string | number | boolean => {
@@ -113,14 +107,14 @@ const EditEntity = <T extends WithId>({ pEntity, pEntityName, onSave, onDelete, 
 					<tr key={key}>
 						<td><label>{displayName}:</label></td>
 						<td>
-                            <textarea
-								value={value !== undefined && value !== null ? String(value) : ""}
-								onChange={(e: ChangeEvent<HTMLTextAreaElement>) =>
-									handleChange(key as keyof T, e.target.value as unknown as T[keyof T])
-								}
-								rows={3}
-								cols={100}
-							/>
+              <textarea
+				  value={value !== undefined && value !== null ? String(value) : ""}
+				  onChange={(e: ChangeEvent<HTMLTextAreaElement>) =>
+					  handleChange(key as keyof T, e.target.value as unknown as T[keyof T])
+				  }
+				  rows={3}
+				  cols={100}
+			  />
 						</td>
 					</tr>
 				);
@@ -145,6 +139,7 @@ const EditEntity = <T extends WithId>({ pEntity, pEntityName, onSave, onDelete, 
 							onChange={(e: ChangeEvent<HTMLInputElement>) =>
 								handleChange(key as keyof T, e.target.value as unknown as T[keyof T])
 							}
+							className="input-field"
 						/>
 					</td>
 				</tr>
@@ -172,7 +167,7 @@ const EditEntity = <T extends WithId>({ pEntity, pEntityName, onSave, onDelete, 
 			{locationsLoading && <div>Loading locations...</div>}
 			{locationsError && <div>Error loading locations: {locationsError}</div>}
 
-			<table>
+			<table className="styled-table">
 				<tbody>
 				{isWithIdAndDisplayNum(updatedEntity) && (
 					<tr>
@@ -197,9 +192,9 @@ const EditEntity = <T extends WithId>({ pEntity, pEntityName, onSave, onDelete, 
 				</tbody>
 			</table>
 
-			<button onClick={handleSave}>Save</button>
-			<button onClick={handleDelete}>Delete</button>
-			<button onClick={handleCancel}>Cancel</button>
+			<button className="button button--small" onClick={handleSave}>Save</button>
+			<button className="button button--small" onClick={handleDelete}>Delete</button>
+			<button className="button button--small" onClick={handleCancel}>Cancel</button>
 		</div>
 	);
 };

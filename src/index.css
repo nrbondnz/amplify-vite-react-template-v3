@@ -1,65 +1,180 @@
+/* Color palette */
+:root {
+  --base-color: #8bc34a; /* Light green */
+  --base-hover-color: #7cb342; /* Slightly darker green for hover */
+  --primary-text-color: #333;
+  --background-color: #9f9ffa; /* Very light purple background */
+  --table-header-color: #dcedc8; /* Light green for table headers */
+  --table-row-color: #b0b2fe; /* Slightly lighter than background color */
+}
+
+/* Global styles */
+html, body {
+  height: 100%;  /* Ensure the background covers full height */
+}
+
 body {
+  font-family: Arial, sans-serif;
+  background-color: var(--background-color) !important;
+  color: var(--primary-text-color) !important;
   margin: 0;
-  background: linear-gradient(180deg, rgb(117, 81, 194), rgb(255, 255, 255));
-  display: flex;
-  font-family: Inter, system-ui, Avenir, Helvetica, Arial, sans-serif;
-  height: 100vh;
-  width: 100vw;
-  justify-content: center;
-  align-items: center;
 }
 
-main {
-  display: flex;
-  flex-direction: column;
-  align-items: stretch;
+/* Universal button styling */
+.button, table .button {
+  padding: 6px 12px !important;
+  font-size: 1em !important;
+  background-color: var(--base-color) !important;
+  color: #fff !important;
+  border: 2px solid #7cb342 !important;
+  border-radius: 8px !important;
+  cursor: pointer !important;
+  transition: background-color 0.3s ease !important;
 }
 
-button {
-  border-radius: 8px;
-  border: 1px solid transparent;
-  padding: 0.6em 1.2em;
-  font-size: 1em;
-  font-weight: 500;
-  font-family: inherit;
-  background-color: #1a1a1a;
-  cursor: pointer;
-  transition: border-color 0.25s;
-  color: white;
-}
-button:hover {
-  border-color: #646cff;
-}
-button:focus,
-button:focus-visible {
-  outline: 4px auto -webkit-focus-ring-color;
+.button:hover, table .button:hover {
+  background-color: var(--base-hover-color) !important;
 }
 
-ul {
-  padding-inline-start: 0;
-  margin-block-start: 0;
-  margin-block-end: 0;
-  list-style-type: none;
-  display: flex;
-  flex-direction: column;
-  margin: 8px 0;
-  border: 1px solid black;
-  gap: 1px;
-  background-color: black;
-  border-radius: 8px;
-  overflow: auto;
+/* Table styling */
+table {
+  width: 50% !important;
+  max-width: 80% !important;
+  min-width: 30% !important;
+  border-collapse: collapse;
+  margin: 20px auto !important;
+  background-color: var(--table-row-color) !important;
 }
 
-li {
-  background-color: white;
-  padding: 8px;
+td {
+  background-color: var(--table-row-color) !important;
 }
 
-li:hover {
-  background: #dadbf9;
+th, td {
+  padding: 12px !important;
+  border: 1px solid #ddd !important;
+  text-align: left !important;
 }
 
-a {
-  font-weight: 800;
-  text-decoration: none;
+th {
+  background-color: var(--table-header-color) !important;
+  color: var(--primary-text-color) !important;
+}
+
+tr:nth-child(even) {
+  background-color: var(--table-row-color) !important;
+}
+
+/* Select dropdown styling */
+select {
+  background-color: rgba(159, 159, 250, 0.8) !important;
+  color: var(--primary-text-color) !important;
+  border: 1px solid #ddd !important;
+  padding: 4px !important;
+  font-size: 1em !important;
+}
+
+option {
+  background-color: rgba(159, 159, 250, 0.8) !important;
+  color: var(--primary-text-color) !important;
+}
+
+/* File input and related elements styling */
+input[type="file"], input[type="text"] {
+  background-color: rgba(159, 159, 250, 0.8) !important;
+  color: var(--primary-text-color) !important;
+}
+
+/* Media queries for different devices */
+
+/* iPhone 12 Max */
+@media only screen
+and (min-device-width: 428px)
+and (max-device-width: 428px)
+and (min-device-height: 926px)
+and (max-device-height: 926px)
+and (-webkit-min-device-pixel-ratio: 3) {
+
+  body {
+    font-size: 16px !important;
+    padding: 10px !important;
+  }
+
+  .responsive-container {
+    width: 100% !important;
+    height: auto !important;
+  }
+
+  .button {
+    padding: 5px 10px !important;
+    font-size: 0.9em !important;
+  }
+}
+
+/* Standard laptop (1366x768) */
+@media only screen
+and (min-device-width: 1280px)
+and (max-device-width: 1440px)
+and (min-device-height: 720px)
+and (max-device-height: 900px) {
+
+  body {
+    font-size: 18px !important;
+    padding: 20px !important;
+  }
+
+  .responsive-container {
+    width: 80% !important;
+    margin: 0 auto !important;
+    height: auto !important;
+  }
+
+  .button {
+    padding: 7px 14px !important;
+    font-size: 1.1em !important;
+  }
+}
+
+/* General mobile devices */
+@media only screen
+and (max-device-width: 767px) {
+
+  body {
+    font-size: 16px !important;
+    padding: 10px !important;
+  }
+
+  .responsive-container {
+    width: 100% !important;
+    height: auto !important;
+  }
+
+  .button {
+    padding: 5px 10px !important;
+    font-size: 0.9em !important;
+  }
+}
+
+/* Tablets and iPads */
+@media only screen
+and (min-device-width: 768px)
+and (max-device-width: 1024px)
+and (min-device-height: 1024px)
+and (max-device-height: 1366px) {
+
+  body {
+    font-size: 18px !important;
+    padding: 15px !important;
+  }
+
+  .responsive-container {
+    width: 90% !important;
+    margin: 0 auto !important;
+    height: auto !important;
+  }
+
+  .button {
+    padding: 6px 12px !important;
+    font-size: 1em !important;
+  }
 }

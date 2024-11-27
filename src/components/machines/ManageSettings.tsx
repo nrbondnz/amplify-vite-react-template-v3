@@ -170,21 +170,23 @@ const ManageSettings: React.FC<ManageSettingsProps> = forwardRef(({ entityId, en
 							value={setting.entityName || ''}
 							placeholder="Enter name"
 							onChange={(e) => handleKeyChange(setting, e.target.value)}
+							className="input-field"
 						/>
 						<input
 							type="text"
 							value={setting.value ?? ''}
 							placeholder="Enter value"
 							onChange={(e) => handleValueChange(setting, e.target.value)}
+							className="input-field"
 						/>
 						<ShowPicture entityDisplayNum={entityNum!} name={entityType!.valueOf()} details={setting.entityName!}/>
 						<FileLoader pEntityName={entityType!.valueOf()} pDisplayNum={entityNum} pDetails={setting.entityName!} />
-						<button type="button" onClick={() => removeSetting(setting)}>Remove</button>
+						<button type="button" onClick={() => removeSetting(setting)} className="button">Remove</button>
 					</div>
 				))}
-			<button type="button" onClick={addNewSetting}>Add Setting</button>
+			<button type="button" onClick={addNewSetting} className="button">Add Setting</button>
 			{/* If needed, uncomment the Save Settings button */}
-			{/* <button type="button" onClick={() => saveSettingsToDB(settings)}>Save Settings</button> */}
+			{/* <button type="button" onClick={() => saveSettingsToDB(settings)} className="button">Save Settings</button> */}
 		</div>
 	);
 });

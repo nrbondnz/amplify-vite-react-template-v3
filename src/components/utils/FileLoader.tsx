@@ -71,33 +71,33 @@ const FileLoader: React.FC<FileLoaderProps> = ({ pEntityName, pDisplayNum = 0, p
 		console.log('File load error', e);
 	};
 
-	return (
-		<div>
-			{!justFileChoice && (
-				<>
-					<input
-						type="number"
-						placeholder="Display Number"
-						value={entityDisplayNum || ''}
-						onChange={(e) => setEntityDisplayNum(Number(e.target.value))}
-					/>
-					<input
-						type="text"
-						placeholder="Details"
-						value={details || ''}
-						onChange={(e) => setDetails(e.target.value)}
-					/>
-				</>
-			)}
-			<input
-				type="file"
-				onChange={(e) => {
-					if (e.target.files && e.target.files.length > 0) {
-						setFile(e.target.files[0]);
-					}
-				}}
-			/>
-			<button onClick={uploadFile}>Upload File</button>
+ return (
+    <div style={{backgroundColor: 'lightblue'}}>
+        {!justFileChoice && (
+            <>
+                <input
+                    type="number"
+                    placeholder="Display Number"
+                    value={entityDisplayNum || ''}
+                    onChange={(e) => setEntityDisplayNum(Number(e.target.value))}
+                />
+                <input
+                    type="text"
+                    placeholder="Details"
+                    value={details || ''}
+                    onChange={(e) => setDetails(e.target.value)}
+                />
+            </>
+        )}
+        <input
+            type="file"
+            onChange={(e) => {
+                if (e.target.files && e.target.files.length > 0) {
+                    setFile(e.target.files[0]);
+                }
+            }}
+        />
+        <button onClick={uploadFile}>Upload File</button>
 			{uploadedFileUrl && fileExists && !justFileChoice ? (
 				<img
 					src={uploadedFileUrl}
