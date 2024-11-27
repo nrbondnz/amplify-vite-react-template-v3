@@ -71,44 +71,48 @@ const FileLoader: React.FC<FileLoaderProps> = ({ pEntityName, pDisplayNum = 0, p
 		console.log('File load error', e);
 	};
 
- return (
-    <div style={{backgroundColor: 'lightblue'}}>
-        {!justFileChoice && (
-            <>
-                <input
-                    type="number"
-                    placeholder="Display Number"
-                    value={entityDisplayNum || ''}
-                    onChange={(e) => setEntityDisplayNum(Number(e.target.value))}
-                />
-                <input
-                    type="text"
-                    placeholder="Details"
-                    value={details || ''}
-                    onChange={(e) => setDetails(e.target.value)}
-                />
-            </>
-        )}
-        <input
-            type="file"
-            onChange={(e) => {
-                if (e.target.files && e.target.files.length > 0) {
-                    setFile(e.target.files[0]);
-                }
-            }}
-        />
-        <button onClick={uploadFile}>Upload File</button>
-			{uploadedFileUrl && fileExists && !justFileChoice ? (
-				<img
-					src={uploadedFileUrl}
-					alt={`${entityName} image`}
-					onError={handleFileLoadError}
-					height="150"
-					width="150"
-				/>
-			) : (
-				<div>File not found</div>
+	return (
+		<div>
+			{!justFileChoice && (
+				<>
+					<input
+						type="number"
+						placeholder="Display Number"
+						value={entityDisplayNum || ''}
+						onChange={(e) => setEntityDisplayNum(Number(e.target.value))}
+						className="input-field"
+					/>
+					<input
+						type="text"
+						placeholder="Details"
+						value={details || ''}
+						onChange={(e) => setDetails(e.target.value)}
+						className="input-field"
+					/>
+				</>
 			)}
+			<td className="file-upload-cell">
+				<input
+					type="file"
+					onChange={(e) => {
+						if (e.target.files && e.target.files.length > 0) {
+							setFile(e.target.files[0]);
+						}
+					}}
+				/>
+				<button onClick={uploadFile} className="button">Upload File</button>
+				{uploadedFileUrl && fileExists && !justFileChoice ? (
+					<img
+						src={uploadedFileUrl}
+						alt={`${entityName} image`}
+						onError={handleFileLoadError}
+						height="150"
+						width="150"
+					/>
+				) : (
+					<div className="file-not-found">File not found</div>
+				)}
+			</td>
 		</div>
 	);
 };

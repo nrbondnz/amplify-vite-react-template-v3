@@ -1,11 +1,13 @@
-/* Color palette */
+/* Color palette variables */
 :root {
-  --base-color: #8bc34a; /* Light green */
-  --base-hover-color: #7cb342; /* Slightly darker green for hover */
+  --base-color: #8bc34a;  /* Light green */
+  --base-hover-color: #7cb342;  /* Slightly darker green for hover */
   --primary-text-color: #333;
-  --background-color: #9f9ffa; /* Very light purple background */
-  --table-header-color: #dcedc8; /* Light green for table headers */
-  --table-row-color: #b0b2fe; /* Slightly lighter than background color */
+  --background-color: #9f9ffa;  /* Very light purple background */
+  --table-header-color: #dcedc8;  /* Light green for table headers */
+  --table-row-color: #b0b2fe;  /* Slightly lighter than background color */
+  --highlight-color: #d3d4fe;  /* Highlight color */
+  --highlight-text-color: #fff;  /* Text color for highlighted areas */
 }
 
 /* Global styles */
@@ -20,8 +22,13 @@ body {
   margin: 0;
 }
 
+/* Adding a container for content with a 10% left margin */
+.container {
+  margin-left: 10% !important;  /* Add 10% margin to the left */
+}
+
 /* Universal button styling */
-.button, table .button {
+.button {
   padding: 6px 12px !important;
   font-size: 1em !important;
   background-color: var(--base-color) !important;
@@ -32,7 +39,7 @@ body {
   transition: background-color 0.3s ease !important;
 }
 
-.button:hover, table .button:hover {
+.button:hover {
   background-color: var(--base-hover-color) !important;
 }
 
@@ -43,10 +50,6 @@ table {
   min-width: 30% !important;
   border-collapse: collapse;
   margin: 20px auto !important;
-  background-color: var(--table-row-color) !important;
-}
-
-td {
   background-color: var(--table-row-color) !important;
 }
 
@@ -65,6 +68,26 @@ tr:nth-child(even) {
   background-color: var(--table-row-color) !important;
 }
 
+/* Custom styling for specific table cells */
+td.file-upload-cell {
+  background-color: var(--highlight-color) !important;
+  color: var(--highlight-text-color) !important;
+}
+
+/* Input styling adjustments */
+input[type="file"], input[type="text"], input[type="number"] {
+  background-color: var(--base-color) !important;
+  color: #fff !important;
+  border: 2px solid #7cb342 !important;
+  padding: 4px !important;
+  border-radius: 8px !important;
+  cursor: pointer !important;
+}
+
+input[type="file"]:hover, input[type="text"]:hover, input[type="number"]:hover {
+  background-color: var(--base-hover-color) !important;
+}
+
 /* Select dropdown styling */
 select {
   background-color: rgba(159, 159, 250, 0.8) !important;
@@ -79,10 +102,26 @@ option {
   color: var(--primary-text-color) !important;
 }
 
-/* File input and related elements styling */
-input[type="file"], input[type="text"] {
-  background-color: rgba(159, 159, 250, 0.8) !important;
-  color: var(--primary-text-color) !important;
+/* Specific styling for "File not found" message */
+.file-not-found {
+  color: red !important;
+}
+
+/* Increase specificity for table button styling */
+.file-upload-cell .button {
+  padding: 6px 12px !important;
+  font-size: 1em !important;
+  background-color: var(--base-color) !important;
+  color: #fff !important;
+  border: 2px solid #7cb342 !important;
+  border-radius: 8px !important;
+  cursor: pointer !important;
+  transition: background-color 0.3s ease !important;
+  height: 50% !important; /* Set button height to 50% */
+}
+
+.file-upload-cell .button:hover {
+  background-color: var(--base-hover-color) !important;
 }
 
 /* Media queries for different devices */
