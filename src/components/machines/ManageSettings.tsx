@@ -147,7 +147,7 @@ const ManageSettings: React.FC<ManageSettingsProps> = forwardRef(({ entityId, en
 			const sanitizedSetting = sanitizeObject(setting, ['status']);
 			try {
 				if (settingsStatus[setting.id] === 'new') {
-					const result = await client.models.settings.create(sanitizedSetting);
+					await client.models.settings.create(sanitizedSetting);
 				} else if (settingsStatus[setting.id] === 'update') {
 					await client.models.settings.update(sanitizedSetting);
 				} else if (settingsStatus[setting.id] === 'delete') {
