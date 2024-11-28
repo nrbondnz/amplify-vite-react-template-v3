@@ -1,38 +1,53 @@
 ﻿.settings-container {
-    padding: 16px;
+    padding: 1em; /* Use em for scalable padding */
 }
 
 .settings-item {
-    margin-bottom: 16px;
+    margin-bottom: 1em; /* Use em for consistent margin */
 }
 
 .input-field {
-    width: calc(100% / 3 - 20px) !important;
-    margin-right: 20px !important;
+    width: calc(33.33% - 2%) !important; /* Adjust to use percentages */
+    margin-right: 2% !important; /* Use % for margins */
+    box-sizing: border-box; /* Ensure padding and border are included in width */
 }
 
 .settings-table {
-    width: 100%; /* Ensure table takes the full width */
+    width: 100%; /* Full width to fill the container */
     border-collapse: collapse;
-    margin-top: 10px;
+    margin-top: 2% !important; /* Use % for margin */
 }
 
 .settings-cell {
-    padding: 10px;
+    padding: 1% !important; /* Use % for responsive padding */
     border: 1px solid #ddd;
 }
 
 .file-loader-cell .button {
-    display: inline-block;      /* Ensuring button stays inline */
-    height: auto;               /* Maintain original button height */
-    margin-right: 10px;         /* Spacing between button and text */
+    display: inline-block;
+    width: auto; /* Adjust width based on content if needed */
+    margin-right: 2%; /* Use % for margins */
 }
 
 .file-loader-cell .file-controls {
-    display: flex;              /* Flex for horizontal alignment */
-    align-items: center;        /* Center items vertically */
+    display: flex;
+    align-items: center;
 }
 
-.file-loader-cell .file-controls .file-name, .file-loader-cell .file-controls .file-not-found {
-    margin-left: 20px;          /* Spacing between elements */
+.file-loader-cell .file-controls .file-name,
+.file-loader-cell .file-controls .file-not-found {
+    margin-left: 2%; /* Use % for spacing */
+}
+
+/* Media Queries for Mobile */
+@media only screen and (max-width: 767px) {
+    .input-field {
+        width: 100% !important; /* Full width on mobile */
+        margin: 0 0 1em 0 !important; /* Adjust margins for better fit */
+    }
+
+    .file-loader-cell .file-controls {
+        flex-wrap: wrap; /* Allow wrapping on smaller screens */
+        margin-bottom: 1em; /* Add bottom space for better layout */
+    }
 }

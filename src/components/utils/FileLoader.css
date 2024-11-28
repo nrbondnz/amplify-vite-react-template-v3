@@ -1,30 +1,47 @@
-﻿.table {
-    width: 100% !important;  /* Ensuring the table takes the full width of its container */
-    max-width: 100% !important;  /* Adding a max-width constraint */
+﻿/* Responsive Table and Input Field in Settings */
+.settings-table, .table {
+    width: 100% !important;  /* Full width to fill the container */
+    border-collapse: collapse;
+    margin-top: 2% !important; /* Use % for consistent spacing */
 }
 
-th, td {
-    padding: 24px !important;  /* Keeping the padding as defined */
+.settings-cell, th, td {
+    padding: 1% !important; /* Use % for responsive padding */
     border: 1px solid #ddd !important;
     text-align: left !important;
 }
 
 .input-field {
-    width: calc(100% / 3 - 20px) !important;
-    margin-right: 20px !important;
+    width: calc(33.33% - 2%) !important; /* Divide evenly, reduce margin */
+    margin-right: 2% !important; /* Use % for margins */
 }
 
-.file-upload-cell .button {
-    display: inline-block;      /* Ensuring button stays inline */
-    height: auto;               /* Original button height */
-    margin-right: 10px;         /* Spacing between button and text */
+.file-upload-cell .button, .file-loader-cell .button {
+    display: inline-block;
+    width: auto; /* Adjust width based on content if needed */
+    margin-right: 2%; /* Use % for margins */
 }
 
-.file-controls {
-    display: flex;              /* Flex for horizontal alignment */
-    align-items: center;        /* Center items vertically */
+.file-controls, .file-loader-cell .file-controls {
+    display: flex;
+    align-items: center;
 }
 
-.file-controls .file-name, .file-controls .file-not-found {
-    margin-left: 20px;          /* Spacing between elements */
+.file-controls .file-name, .file-controls .file-not-found,
+.file-loader-cell .file-controls .file-name, .file-loader-cell .file-controls .file-not-found {
+    margin-left: 2%; /* Use % for spacing */
+}
+
+/* Media Queries for Mobile */
+@media only screen and (max-width: 767px) {
+    .input-field {
+        width: 100% !important; /* Full width on mobile */
+        margin: 0 0 1em 0 !important; /* Margin adjustments */
+    }
+
+    .file-controls,
+    .file-loader-cell .file-controls {
+        flex-wrap: wrap; /* Allow wrapping on smaller screens */
+        margin-bottom: 1em; /* Add bottom spacing */
+    }
 }

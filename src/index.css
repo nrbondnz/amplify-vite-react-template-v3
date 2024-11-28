@@ -24,18 +24,20 @@ body {
   margin: 0;
 }
 
-/* Adding a container for content with a 5% left and right margin */
+/* Responsive container */
 .container {
-  margin: 0 5% !important;  /* Add 5% margin to left and right sides */
+  margin: 0 5% !important;
+  width: 90% !important; /* Use full container width */
 }
 
 /* Universal button styling */
 .button {
-  padding: 6px 12px !important;
+  width: 100% !important; /* Full width for responsiveness */
+  padding: 0.6em 1.2em !important; /* Use em for scalable padding */
   font-size: 1em !important;
   background-color: var(--base-color) !important;
   color: #fff !important;
-  border: 2px solid #7cb342 !important;
+  border: 0.2em solid #7cb342 !important;
   border-radius: 8px !important;
   cursor: pointer !important;
   transition: background-color 0.3s ease !important;
@@ -47,16 +49,14 @@ body {
 
 /* Table styling */
 table {
-  width: 50% !important;
-  max-width: 80% !important;
-  min-width: 30% !important;
+  width: 100% !important; /* Full width tables for responsiveness */
   border-collapse: collapse;
-  margin: 20px auto !important;
+  margin: 2% auto !important; /* Use % for margin */
   background-color: var(--table-row-color) !important;
 }
 
 th, td {
-  padding: 12px !important; /* Reduced padding to half */
+  padding: 1% !important; /* Use % for padding */
   border: 1px solid #ddd !important;
   text-align: left !important;
 }
@@ -74,7 +74,7 @@ tr:nth-child(odd) {
   background-color: #e7e7e7; /* Custom shade for odd rows */
 }
 
-/* Add hover effect for all rows */
+/* Hover effect for all rows */
 tr:hover {
   background-color: var(--highlight-color) !important;
   cursor: pointer !important;
@@ -84,72 +84,35 @@ tr:hover {
 td.file-upload-cell {
   background-color: var(--highlight-color) !important;
   color: var(--highlight-text-color) !important;
+  display: flex;
+  flex-direction: column;
 }
 
 /* Input styling adjustments */
 input[type="file"], input[type="text"], input[type="number"] {
   background-color: var(--input-background-color) !important;
   color: var(--primary-text-color) !important;
-  border: 2px solid var(--input-border-color) !important;
-  padding: 4px !important;
+  border: 0.2em solid var(--input-border-color) !important;
+  padding: 0.4em !important;
   border-radius: 8px !important;
   cursor: pointer !important;
+  width: 100% !important; /* Full width for better responsiveness */
+  box-sizing: border-box;
 }
 
 input[type="file"]:hover, input[type="text"]:hover, input[type="number"]:hover {
   background-color: var(--base-hover-color) !important;
 }
 
-/* Make text input fields at least 20 characters wide */
-input[type="text"], input[type="number"], input[type="file"] {
-  min-width: 20ch !important; /* Ensures the field is at least 20 characters wide */
-}
-
-/* Making input fields width span the full width of the row */
-td.file-upload-cell input[type="text"], td.file-upload-cell input[type="number"], td.file-upload-cell input[type="file"] {
-  width: calc(100% - 20px) !important; /* Adjusting for padding/border */
-}
-
-/* Select dropdown styling */
-select {
-  background-color: rgba(159, 159, 250, 0.8) !important;
-  color: var(--primary-text-color) !important;
-  border: 1px solid #ddd !important;
-  padding: 4px !important;
-  font-size: 1em !important;
-}
-
-option {
-  background-color: rgba(159, 159, 250, 0.8) !important;
-  color: var(--primary-text-color) !important;
-}
-
-/* Custom styles for file loader */
-.file-loader-container {
-  margin: 0 5% !important;  /* Adjusting to the same 5% left and right margin */
-}
-
-/* Table for file upload components */
-.file-upload-table {
-  width: 100%; /* Full width table */
-  border-collapse: collapse;
-}
-
-.file-upload-table .file-upload-cell {
-  padding: 10px;
-  border: 1px solid #ddd;
-}
-
-/* Specific styling for file upload buttons and file name span */
 .file-upload-cell .button {
-  padding: 6px 12px !important;
+  width: 100% !important; /* Full width button for responsiveness */
+  box-sizing: border-box;
+  padding: 0.6em 1.2em !important;
   font-size: 1em !important;
   background-color: var(--base-color) !important;
   color: #fff !important;
-  border: 2px solid #7cb342 !important;
+  border: 0.2em solid #7cb342 !important;
   border-radius: 8px !important;
-  cursor: pointer !important;
-  transition: background-color 0.3s ease !important;
   height: 100%; /* Full height button */
 }
 
@@ -160,105 +123,33 @@ option {
 .file-upload-cell .file-name {
   font-size: 1em !important;
   color: var(--primary-text-color) !important;
-  padding-left: 10px; /* Space between button and file name */
+  padding-left: 1em; /* Space between button and file name */
 }
 
 /* Specific styling for "File not found" message */
 .file-not-found {
   color: red !important;
-  margin-left: 10px; /* Space between button and message */
+  margin-left: 1em; /* Space between button and message */
 }
 
-/* Media queries for different devices */
-
-/* iPhone 12 Max */
-@media only screen
-and (min-device-width: 428px)
-and (max-device-width: 428px)
-and (min-device-height: 926px)
-and (max-device-height: 926px)
-and (-webkit-min-device-pixel-ratio: 3) {
-
+/* Media queries for mobile devices */
+@media only screen and (max-width: 767px) {
   body {
     font-size: 16px !important;
-    padding: 10px !important;
+    padding: 0.8em !important; /* Use em for padding */
   }
 
-  .responsive-container {
+  .container {
+    margin: 0 !important; /* Remove margin for better fit */
     width: 100% !important;
-    height: auto !important;
   }
 
   .button {
-    padding: 5px 10px !important;
+    padding: 0.5em 1em !important;
     font-size: 0.9em !important;
   }
-}
 
-/* Standard laptop (1366x768) */
-@media only screen
-and (min-device-width: 1280px)
-and (max-device-width: 1440px)
-and (min-device-height: 720px)
-and (max-device-height: 900px) {
-
-  body {
-    font-size: 18px !important;
-    padding: 10px !important;
-  }
-
-  .responsive-container {
-    width: 80% !important;
-    margin: 0 auto !important;
-    height: auto !important;
-  }
-
-  .button {
-    padding: 7px 14px !important;
-    font-size: 1.1em !important;
-  }
-}
-
-/* General mobile devices */
-@media only screen
-and (max-device-width: 767px) {
-
-  body {
-    font-size: 16px !important;
-    padding: 8px !important;
-  }
-
-  .responsive-container {
+  .file-upload-cell {
     width: 100% !important;
-    height: auto !important;
-  }
-
-  .button {
-    padding: 5px 10px !important;
-    font-size: 0.9em !important;
-  }
-}
-
-/* Tablets and iPads */
-@media only screen
-and (min-device-width: 768px)
-and (max-device-width: 1024px)
-and (min-device-height: 1024px)
-and (max-device-height: 1366px) {
-
-  body {
-    font-size: 18px !important;
-    padding: 10px !important;
-  }
-
-  .responsive-container {
-    width: 90% !important;
-    margin: 0 auto !important;
-    height: auto !important;
-  }
-
-  .button {
-    padding: 6px 12px !important;
-    font-size: 1em !important;
   }
 }

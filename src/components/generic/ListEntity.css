@@ -2,12 +2,12 @@
     background-color: #4CAF50; /* Green shade */
     border: none;
     color: white;
-    padding: 5px 10px;
+    padding: 0.5em 1em; /* Use em for scalable padding */
     text-align: center;
     text-decoration: none;
     display: inline-block;
-    font-size: 16px;
-    margin: 4px 2px;
+    font-size: 1em; /* Use em for font size */
+    margin: 0.4em 0.2em; /* Use em for margins */
     cursor: pointer;
     transition: background-color 0.3s;
 }
@@ -17,15 +17,15 @@
 }
 
 .styled-table {
-    width: 100%;
+    width: 100%; /* Full width to fill the container */
     border-collapse: collapse;
-    margin: 25px 0;
+    margin: 2.5% 0; /* Use % for margin to ensure consistency */
     font-size: 1.2em;
-    min-width: 400px;
+    min-width: 400px; /* Keeping min-width for table structure */
 }
 
 .styled-table th, .styled-table td {
-    padding: 9px 12px;
+    padding: 0.9em 1.2em; /* Use em for padding */
     text-align: left;
 }
 

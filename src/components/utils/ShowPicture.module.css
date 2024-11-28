@@ -1,7 +1,7 @@
 ﻿/* src/utils/ShowPicture.module.css */
 .image {
-    width: 150px;
-    height: 150px;
+    width: 10vw; /* Use vw for responsive width */
+    height: 10vw; /* Use vw for responsive height */
     transition: transform 0.3s ease; /* Smooth transition for transform */
 }
 
@@ -10,6 +10,6 @@
 }
 
 .large {
-    width: 400px;
-    height: 400px;
+    width: 25vw; /* Use vw for responsive large width */
+    height: 25vw; /* Use vw for responsive large height */
 }
