@@ -30,7 +30,7 @@ export enum AppStatePage {
 	Location = "locations",
 	WorkoutExercise = "workout_exercises",
 	Settings = "settings"
-	
+
 }
 
 export type AppstatePage = typeof appstate_page[keyof typeof appstate_page];
@@ -153,7 +153,7 @@ export enum EntityTypes {
 	Session = "sessions",
 	SessionExercise = "session_exercises",
 	EntityRelationship = "entity_relationships",
-	
+
 }
 
 export const defaultUserWorkEx: IWorkoutExercise = {
@@ -208,7 +208,8 @@ export interface IExercise extends WithIdAndDisplayNum {
 	idMachine: number;
 	displayNum: number;
 	description: string;
-	idUser: number | null;  // Nullable field
+	idUser: number | null;
+	fame: number;
 }
 
 export const defaultExercise: IExercise = {
@@ -217,7 +218,8 @@ export const defaultExercise: IExercise = {
 	idMachine: 0,
 	displayNum: 0,
 	description: 'default exercise description',
-	idUser: null
+	idUser: null,
+	fame: 10
 };
 
 export interface ISetting extends WithId {
@@ -232,6 +234,7 @@ export interface IEntityRelationship extends WithId {
 	exerciseId: number | null;
 	muscleId: number | null;
 	machineId: number | null;
+	extraDetails: string | null;
 }
 
 export const defaultEntityRelationship: IEntityRelationship = {
@@ -239,7 +242,9 @@ export const defaultEntityRelationship: IEntityRelationship = {
 	entityName: 'default exercise',
 	exerciseId: null,
 	muscleId: null,
-	machineId: null
+	machineId: null,
+	extraDetails: null
+
 
 }
 
@@ -305,7 +310,7 @@ export const getEntityDefault = <T>(entityType: EntityTypes): {defaultEntity: T,
 			return { defaultEntity: defaultSessionExercise as T, entityDBName: entityType.toString() };
 		case EntityTypes.EntityRelationship:
 			return { defaultEntity: defaultEntityRelationship as T, entityDBName: entityType.toString() };
-					
+
 		default:
 			throw new Error(`Unhandled entity type: ${entityType}`);
 	}
