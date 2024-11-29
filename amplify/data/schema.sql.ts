@@ -102,16 +102,6 @@ export const schema = configure({
     }).identifier([
         "id"
     ]),
-    "exercises": a.model({
-        id: a.integer().required(),
-        entityName: a.string().required(),
-        idMachine: a.integer().required(),
-        displayNum: a.integer().required(),
-        description: a.string().required(),
-        idUser: a.integer()
-    }).identifier([
-        "id"
-    ]),
     "muscles": a.model({
         id: a.integer().required(),
         entityName: a.string().required(),
@@ -123,21 +113,33 @@ export const schema = configure({
     }).identifier([
         "id"
     ]),
-    "entity_relationships": a.model({
-        id: a.integer().required(),
-        exerciseId: a.integer(),
-        muscleId: a.integer(),
-        machineId: a.integer(),
-        entityName: a.string()
-    }).identifier([
-        "id"
-    ]),
     "settings": a.model({
         id: a.integer().required(),
         value: a.string(),
         entityId: a.integer(),
         entityType: a.string(),
         entityName: a.string()
+    }).identifier([
+        "id"
+    ]),
+    "entity_relationships": a.model({
+        id: a.integer().required(),
+        exerciseId: a.integer(),
+        muscleId: a.integer(),
+        machineId: a.integer(),
+        entityName: a.string(),
+        extraDetails: a.string().required()
+    }).identifier([
+        "id"
+    ]),
+    "exercises": a.model({
+        id: a.integer().required(),
+        entityName: a.string().required(),
+        idMachine: a.integer(),
+        displayNum: a.integer(),
+        description: a.string().required(),
+        idUser: a.integer(),
+        fame: a.integer()
     }).identifier([
         "id"
     ])
