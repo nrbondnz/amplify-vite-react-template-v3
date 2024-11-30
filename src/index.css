@@ -47,11 +47,17 @@ body {
   background-color: var(--base-hover-color) !important;
 }
 
-/* Table styling */
-table {
-  width: 100% !important; /* Full width tables for responsiveness */
-  border-collapse: collapse;
+/* Scrollable container for tables */
+.table-container {
+  overflow-x: auto; /* Enable horizontal scrolling */
   margin: 2% auto !important; /* Use % for margin */
+}
+
+/* Table styling within the scrollable container */
+.table-container table {
+  width: 100% !important; /* Maintain full width within the scrollable container */
+  max-width: 100vw; /* Max width to fit within the viewport */
+  border-collapse: collapse;
   background-color: var(--table-row-color) !important;
 }
 
@@ -151,5 +157,17 @@ input[type="file"]:hover, input[type="text"]:hover, input[type="number"]:hover {
 
   .file-upload-cell {
     width: 100% !important;
+  }
+
+  .table-container {
+    overflow-x: auto; /* Ensure horizontal scrolling is enabled */
+    margin: 4% auto !important; /* Add more margin for smaller screens */
+  }
+
+  /* Adjustments for very small screens */
+  @media only screen and (max-width: 429px) {
+    .table-container {
+      padding: 0 5%; /* Add padding to ensure content doesn't hit edges */
+    }
   }
 }

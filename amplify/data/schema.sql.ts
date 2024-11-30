@@ -122,16 +122,6 @@ export const schema = configure({
     }).identifier([
         "id"
     ]),
-    "entity_relationships": a.model({
-        id: a.integer().required(),
-        exerciseId: a.integer(),
-        muscleId: a.integer(),
-        machineId: a.integer(),
-        entityName: a.string(),
-        extraDetails: a.string().required()
-    }).identifier([
-        "id"
-    ]),
     "exercises": a.model({
         id: a.integer().required(),
         entityName: a.string().required(),
@@ -140,6 +130,16 @@ export const schema = configure({
         description: a.string().required(),
         idUser: a.integer(),
         fame: a.integer()
+    }).identifier([
+        "id"
+    ]),
+    "entity_relationships": a.model({
+        id: a.integer().required(),
+        exerciseId: a.integer(),
+        muscleId: a.integer(),
+        machineId: a.integer(),
+        entityName: a.string(),
+        extraDetails: a.string()
     }).identifier([
         "id"
     ])
