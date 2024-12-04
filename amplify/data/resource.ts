@@ -1,5 +1,5 @@
 import { type ClientSchema, a, defineData } from "@aws-amplify/backend";
-import { schema as generatedSqlSchema } from './schema.sql';
+import { schema as generatedSqlSchema } from './schema-simple.sql';
 
 // Update to include authorization rules
 const sqlSchema = generatedSqlSchema.authorization(allow => [
