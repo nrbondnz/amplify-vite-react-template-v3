@@ -9,26 +9,7 @@ export const schema = configure({
         identifier: "IDKqHBfCxHbSCsl0OIO7GcFg",
         engine: "mysql",
         connectionUri: secret("SQL_CONNECTION_STRING"),
-        vpcConfig: {
-            vpcId: "vpc-720a3e15",
-            securityGroupIds: [
-                "sg-86ef94f9"
-            ],
-            subnetAvailabilityZones: [
-                {
-                    subnetId: "subnet-7428a72c",
-                    availabilityZone: "ap-southeast-2c"
-                },
-                {
-                    subnetId: "subnet-7a1b1233",
-                    availabilityZone: "ap-southeast-2a"
-                },
-                {
-                    subnetId: "subnet-6ac3df0d",
-                    availabilityZone: "ap-southeast-2b"
-                }
-            ]
-        }
+
     }
 }).schema({
     "locations": a.model({

@@ -48,6 +48,7 @@ const App: React.FC = () => {
                 <Route path="/app/find" element={<FindExerciseCombo />} />
                 <Route path="/settings/:entityId/:entityType" element={<ManageSettings onSaveRef={React.createRef()} />} />
                 <Route path="/imageselector" element={<ImageSelector alt="machines" />} />
+                <Route path="/findExerciseCombo" element={<FindExerciseCombo />} />
 
                 <Route path="/workouts" element={<ListWorkout />} />
                 <Route path="/workouts/new" element={<NewWorkout />} />
