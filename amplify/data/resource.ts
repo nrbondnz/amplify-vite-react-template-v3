@@ -110,7 +110,7 @@ const localSchema = a.schema({
     }).identifier(["id"]),
 
 
-});
+}).authorization(allow => [allow.authenticated()]);
 
 // Define the combined schema with authorization
 //const combinedSchema = a.combine([localSchema]);
