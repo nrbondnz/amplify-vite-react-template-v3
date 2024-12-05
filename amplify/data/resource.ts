@@ -9,7 +9,7 @@ import { type ClientSchema, a, defineData } from "@aws-amplify/backend";
 
 // Local schema extended with integration of the provided models
 const localSchema = a.schema({
-    "action_states": a.model({
+    "actionStates": a.model({
         id: a.integer().required(),
         LOADED: a.string().required(),
         appPage: a.string(),
@@ -20,7 +20,7 @@ const localSchema = a.schema({
         parentName: a.string()
     }).identifier(["id"]),
 
-    "entity_relationships": a.model({
+    "entityRelationships": a.model({
         id: a.integer().required(),
         exerciseId: a.integer(),
         muscleId: a.integer(),
@@ -61,14 +61,14 @@ const localSchema = a.schema({
         parentName: a.string()
     }).identifier(["id"]),
 
-    "session_workout_exercises": a.model({
+    "sessionWorkoutExercises": a.model({
         id: a.integer().required(),
         idSessionWorkout: a.integer().required(),
         idExercise: a.integer(),
         entityName: a.string()
     }).identifier(["id"]),
 
-    "session_workouts": a.model({
+    "sessionWorkouts": a.model({
         id: a.integer().required(),
         idUser: a.integer().required(),
         idWorkout: a.integer().required(),
@@ -84,7 +84,7 @@ const localSchema = a.schema({
         entityName: a.string()
     }).identifier(["id"]),
 
-    "user_details": a.model({
+    "userDetails": a.model({
         id: a.integer().required(),
         name: a.string().required(),
         email: a.string().required(),
@@ -93,7 +93,7 @@ const localSchema = a.schema({
         roles: a.json().required()
     }).identifier(["id"]),
 
-    "workout_exercises": a.model({
+    "workoutExercises": a.model({
         id: a.integer().required(),
         entityName: a.string().required(),
         idUser: a.integer().required(),
