@@ -28,7 +28,7 @@ export enum AppStatePage {
 	Workout = "workouts",
 	Muscle = "muscles",
 	Location = "locations",
-	WorkoutExercise = "workout_exercises",
+	WorkoutExercise = "workoutExercises",
 	Settings = "settings"
 
 }
@@ -145,14 +145,14 @@ export enum EntityTypes {
 	Setting = 'settings',
 	User = "users",
 	Workout = "workouts",
-	WorkoutExercise = "workout_exercises",
+	WorkoutExercise = "workoutExercises",
 	Exercise = "exercises",
-	SessionWorkout = "session_workouts",
-	SessionWorkoutExercise = "session_workout_exercises",
-	ActionState = "action_states",
+	SessionWorkout = "sessionWorkouts",
+	SessionWorkoutExercise = "sessionWorkoutExercises",
+	ActionState = "actionStates",
 	Session = "sessions",
-	SessionExercise = "session_exercises",
-	EntityRelationship = "entity_relationships",
+	SessionExercise = "sessionExercises",
+	EntityRelationship = "entityRelationships",
 
 }
 

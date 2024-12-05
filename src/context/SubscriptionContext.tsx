@@ -78,21 +78,21 @@ export const SubscriptionProvider: React.FC<{ children: ReactNode }> = ({ childr
 
 		// Subscriptions for Users
 		subscriptions.push(
-			client.models.user_details.onCreate().subscribe({
+			client.models.userDetails.onCreate().subscribe({
 				next: handleEvent(AppStatePage.User, 'CREATE'),
 				error: (error: any) => console.warn('Create User subscription error:', error),
 			})
 		);
 
 		subscriptions.push(
-			client.models.user_details.onUpdate().subscribe({
+			client.models.userDetails.onUpdate().subscribe({
 				next: handleEvent(AppStatePage.User, 'UPDATE'),
 				error: (error: any) => console.warn('Update User subscription error:', error),
 			})
 		);
 
 		subscriptions.push(
-			client.models.user_details.onDelete().subscribe({
+			client.models.userDetails.onDelete().subscribe({
 				next: handleEvent(AppStatePage.User, 'DELETE_USER'),
 				error: (error: any) => console.warn('Delete User subscription error:', error),
 			})

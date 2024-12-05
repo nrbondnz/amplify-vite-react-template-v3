@@ -89,7 +89,7 @@ const ManageRelationships: React.ForwardRefRenderFunction<
 
 	const fetchMappings = async () => {
 		try {
-			const response = await client.models.entity_relationships.list();
+			const response = await client.models.entityRelationships.list();
 			const relationships = response.data as IEntityRelationship[];
 			console.log("Fetched relationships: ", relationships);
 
@@ -192,10 +192,10 @@ const ManageRelationships: React.ForwardRefRenderFunction<
 
 			if (type === "new") {
 				console.log("Saving new relationship: ", relationshipData);
-				await client.models.entity_relationships.create(relationshipData);
+				await client.models.entityRelationships.create(relationshipData);
 			} else if (type === "delete") {
 				console.log("Deleting relationship: ", change);
-				await client.models.entity_relationships.delete({ id: change.relationshipId });
+				await client.models.entityRelationships.delete({ id: change.relationshipId });
 			}
 		}
 		setCurrentChanges([]);

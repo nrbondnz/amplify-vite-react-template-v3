@@ -20,7 +20,7 @@ const NewWorkoutExercise: React.FC<NewWorkoutExerciseProps> = ({ loading, getNex
 	const handleSave = async (newEntity: IWorkoutExercise) => {
 		try {
 			newEntity.id = getNextId(); // Assign the next ID using getNextId()
-			await client.models.workout_exercises.create(newEntity);
+			await client.models.workoutExercises.create(newEntity);
 			console.log('Saving entity:', newEntity);
 			navigate('/workoutExercises'); // Navigate to /workoutExercises after saving
 		} catch (error) {
