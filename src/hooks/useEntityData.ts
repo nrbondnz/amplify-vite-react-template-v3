@@ -21,7 +21,7 @@ export const useEntityData = <T extends WithId>(entityType: EntityTypes, options
 		try {
 			switch (entity) {
 				case EntityTypes.Location:
-					data = (await client.models.locations.list()).data as T[];
+					data = (await client.models.locations.list()).data as unknown as T[];
 					break;
 				/*case EntityTypes.User:
 					data = (await client.models.user_details.list()).data as T[];
