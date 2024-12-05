@@ -23,7 +23,7 @@ const HomePage: React.FC = () => {
 
 	const handleGotoApp = () => {
 		const event: AppEvent = {
-			entity: 'not set2',
+			entity: 'not set22',
 			actionType: 'APP_REQUEST',
 			pageType: 'CONTROL'
 		};
