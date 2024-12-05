@@ -26,7 +26,7 @@
 .file-loader-cell .button {
     display: inline-block;
     width: auto; /* Adjust width based on content if needed */
-    margin-right: 2%; /* Use % for margins */
+    margin-right: 3%; /* Use % for margins */
 }
 
 .file-loader-cell .file-controls {
