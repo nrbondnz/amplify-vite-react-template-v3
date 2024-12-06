@@ -2,7 +2,8 @@
 import { Amplify } from "aws-amplify";
 import outputs from '../../amplify_outputs.json';
 import { useEntities } from "@components/utils/entityFetcher";
-import { EntityTypes } from "@shared/types/types";
+import { EntityTypes, IEntityRelationship } from "@shared/types/types";
+import { useEntityData } from "@hooks/useEntityData";
 
 Amplify.configure(outputs);
 
@@ -10,70 +11,85 @@ export const FindExerciseCombo: React.FC = () => {
 	const machines = useEntities(EntityTypes.Machine);
 	const exercises = useEntities(EntityTypes.Exercise);
 	const muscles = useEntities(EntityTypes.Muscle);
-	//const entityRelationships = useEntities(EntityTypes.WorkoutExercise);
+	const { entities } = useEntityData<IEntityRelationship>(EntityTypes.EntityRelationship);
 
 	const [machineFilter, setMachineFilter] = useState<number[]>([]);
 	const [exerciseFilter, setExerciseFilter] = useState<number[]>([]);
 	const [muscleFilter, setMuscleFilter] = useState<number[]>([]);
 
-	const toggleFilter = (filter: number[], setFilter: React.Dispatch<React.SetStateAction<number[]>>, value: number) => {
-		setFilter(
-			filter.includes(value)
-				? filter.filter(item => item !== value)
-				: [...filter, value]
-		);
+	const handleFilter = (entityType: EntityTypes, id: number) => {
+		if (!entities) return;
+
+		switch (entityType) {
+			case EntityTypes.Machine:
+				const relatedMusclesFromMachine = entities
+					.filter(rel => rel.machineId === id)
+					.map(rel => rel.muscleId)
+					.filter(muscleId => muscleId !== null) as number[];
+
+				const relatedExercisesFromMachine = entities
+					.filter(rel => rel.machineId === id)
+					.map(rel => rel.exerciseId)
+					.filter(exerciseId => exerciseId !== null) as number[];
+
+				setMuscleFilter(relatedMusclesFromMachine.length ? relatedMusclesFromMachine : [-1]);
+				setExerciseFilter(relatedExercisesFromMachine.length ? relatedExercisesFromMachine : [-1]);
+				setMachineFilter([id]);
+				break;
+
+			case EntityTypes.Exercise:
+				const relatedMusclesFromExercise = entities
+					.filter(rel => rel.exerciseId === id)
+					.map(rel => rel.muscleId)
+					.filter(muscleId => muscleId !== null) as number[];
+
+				const relatedMachinesFromExercise = entities
+					.filter(rel => rel.exerciseId === id)
+					.map(rel => rel.machineId)
+					.filter(machineId => machineId !== null) as number[];
+
+				setMuscleFilter(relatedMusclesFromExercise.length ? relatedMusclesFromExercise : [-1]);
+				setMachineFilter(relatedMachinesFromExercise.length ? relatedMachinesFromExercise : [-1]);
+				setExerciseFilter([id]);
+				break;
+
+			case EntityTypes.Muscle:
+				const relatedMachinesFromMuscle = entities
+					.filter(rel => rel.muscleId === id)
+					.map(rel => rel.machineId)
+					.filter(machineId => machineId !== null) as number[];
+
+				const relatedExercisesFromMuscle = entities
+					.filter(rel => rel.muscleId === id)
+					.map(rel => rel.exerciseId)
+					.filter(exerciseId => exerciseId !== null) as number[];
+
+				setMachineFilter(relatedMachinesFromMuscle.length ? relatedMachinesFromMuscle : [-1]);
+				setExerciseFilter(relatedExercisesFromMuscle.length ? relatedExercisesFromMuscle : [-1]);
+				setMuscleFilter([id]);
+				break;
+
+			default:
+				break;
+		}
+	};
+
+	const resetFilters = () => {
+		setMachineFilter([]);
+		setExerciseFilter([]);
+		setMuscleFilter([]);
 	};
 
 	const filteredMachines = machines.filter(m => machineFilter.length === 0 || machineFilter.includes(m.id));
 	const filteredExercises = exercises.filter(e => exerciseFilter.length === 0 || exerciseFilter.includes(e.id));
 	const filteredMuscles = muscles.filter(m => muscleFilter.length === 0 || muscleFilter.includes(m.id));
 
-	// Assuming the largest list to ensure all rows display correctly
 	const maxRows = Math.max(filteredMachines.length, filteredExercises.length, filteredMuscles.length);
 
 	return (
 		<div>
 			<h1>Find Exercise Combo</h1>
-
-			<div>
-				<h3>Machines Filter</h3>
-				{machines.map(machine => (
-					<button
-						key={machine.id}
-						onClick={() => toggleFilter(machineFilter, setMachineFilter, machine.id)}
-						style={{ background: machineFilter.includes(machine.id) ? "lightblue" : "" }}
-					>
-						{machine.entityName}
-					</button>
-				))}
-			</div>
-
-			<div>
-				<h3>Exercises Filter</h3>
-				{exercises.map(exercise => (
-					<button
-						key={exercise.id}
-						onClick={() => toggleFilter(exerciseFilter, setExerciseFilter, exercise.id)}
-						style={{ background: exerciseFilter.includes(exercise.id) ? "lightblue" : "" }}
-					>
-						{exercise.entityName}
-					</button>
-				))}
-			</div>
-
-			<div>
-				<h3>Muscles Filter</h3>
-				{muscles.map(muscle => (
-					<button
-						key={muscle.id}
-						onClick={() => toggleFilter(muscleFilter, setMuscleFilter, muscle.id)}
-						style={{ background: muscleFilter.includes(muscle.id) ? "lightblue" : "" }}
-					>
-						{muscle.entityName}
-					</button>
-				))}
-			</div>
-
+			<button onClick={resetFilters}>Reset Filters</button>
 			<table border={1} cellPadding="5">
 				<thead>
 				<tr>
@@ -85,9 +101,15 @@ export const FindExerciseCombo: React.FC = () => {
 				<tbody>
 				{[...Array(maxRows)].map((_, index) => (
 					<tr key={index}>
-						<td>{filteredMachines[index]?.entityName || '-'}</td>
-						<td>{filteredExercises[index]?.entityName || '-'}</td>
-						<td>{filteredMuscles[index]?.entityName || '-'}</td>
+						<td onClick={() => filteredMachines[index] && handleFilter(EntityTypes.Machine, filteredMachines[index].id)}>
+							{filteredMachines[index]?.entityName || (machineFilter.includes(-1) ? '0' : '-')}
+						</td>
+						<td onClick={() => filteredExercises[index] && handleFilter(EntityTypes.Exercise, filteredExercises[index].id)}>
+							{filteredExercises[index]?.entityName || (exerciseFilter.includes(-1) ? '0' : '-')}
+						</td>
+						<td onClick={() => filteredMuscles[index] && handleFilter(EntityTypes.Muscle, filteredMuscles[index].id)}>
+							{filteredMuscles[index]?.entityName || (muscleFilter.includes(-1) ? '0' : '-')}
+						</td>
 					</tr>
 				))}
 				</tbody>
