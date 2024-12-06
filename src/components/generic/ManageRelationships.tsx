@@ -21,7 +21,6 @@ const getKeyField = (type: EntityTypes) => {
 			return "muscleId";
 		case EntityTypes.Exercise:
 			return "exerciseId";
-		// Add cases for other EntityTypes as needed
 		case EntityTypes.Machine:
 			return "machineId";
 		default:
@@ -35,7 +34,6 @@ const getPartnerField = (type: EntityTypes) => {
 			return "muscleId";
 		case EntityTypes.Exercise:
 			return "exerciseId";
-		// Add cases for other EntityTypes as needed
 		case EntityTypes.Machine:
 			return "machineId";
 		default:
@@ -49,7 +47,6 @@ const getPartnerModels = async (type: EntityTypes) => {
 			return await client.models.muscles.list();
 		case EntityTypes.Exercise:
 			return await client.models.exercises.list();
-		// Add cases for other EntityTypes as needed
 		default:
 			throw new Error(`Unsupported entity type: ${type}`);
 	}
@@ -61,22 +58,31 @@ interface ManageRelationshipsProps {
 	partnerType: EntityTypes;
 }
 
-// Define the methods that will be exposed to the ref
 interface ManageRelationshipsHandle {
 	saveRelationships: () => void;
 	cancelRelationships: () => void;
 }
 
-// Types for new and delete operations
 interface NewRelationship extends IEntityRelationship {
 	type: "new";
 }
+
 interface DeleteRelationship {
 	type: "delete";
 	relationshipId: number;
-	id: number; // Added to ensure compatibility
+	id: number;
 }
+
 type ExtendedRelationship = NewRelationship | DeleteRelationship;
+
+const removeDuplicates = <T extends { id: number }>(items: T[]): T[] => {
+	const uniqueIds = new Set<number>();
+	return items.filter(item => {
+		const isNew = !uniqueIds.has(item.id);
+		uniqueIds.add(item.id);
+		return isNew;
+	});
+};
 
 const ManageRelationships: React.ForwardRefRenderFunction<
 	ManageRelationshipsHandle,
@@ -91,8 +97,6 @@ const ManageRelationships: React.ForwardRefRenderFunction<
 		try {
 			const response = await client.models.entityRelationships.list();
 			const relationships = response.data as IEntityRelationship[];
-			console.log("Fetched relationships: ", relationships);
-
 			const keyField = getKeyField(keyType);
 			const partnerField = getPartnerField(partnerType);
 
@@ -104,11 +108,19 @@ const ManageRelationships: React.ForwardRefRenderFunction<
 			const partnerMappings = relationships.filter(
 				(rel) => rel[keyField as keyof IEntityRelationship] === keyId
 			);
-			console.log("Mappings for keyId:", keyId, partnerMappings);
 
 			const partnersResponse = await getPartnerModels(partnerType);
-			const partners = partnersResponse.data as IExercise[];
-			console.log("Fetched available partners: ", partners);
+			let partners: IExercise[] = partnersResponse.data.map((partner: any) => ({
+				id: partner.id,
+				entityName: partner.entityName,
+				description: partner.description || "",
+				idMachine: partner.idMachine || null,
+				displayNum: partner.displayNum || null,
+				idUser: partner.idUser || null,
+				fame: partner.fame || null,
+			}));
+
+			partners = removeDuplicates(partners);
 
 			const mappedPartners = partnerMappings
 				.map((rel) => {
@@ -119,8 +131,7 @@ const ManageRelationships: React.ForwardRefRenderFunction<
 				})
 				.filter((partner): partner is IExercise & { relationshipId: number } => partner !== undefined);
 
-			setMappings(mappedPartners);
-			console.log("Set mappings state: ", mappedPartners);
+			setMappings(removeDuplicates(mappedPartners));
 		} catch (error) {
 			console.error(`Failed to fetch ${keyType.toLowerCase()} mappings:`, error);
 		}
@@ -129,8 +140,16 @@ const ManageRelationships: React.ForwardRefRenderFunction<
 	const fetchAvailablePartners = async () => {
 		try {
 			const partnersResponse = await getPartnerModels(partnerType);
-			setAvailablePartners(partnersResponse.data as IExercise[]);
-			console.log("Set available partners state: ", partnersResponse.data);
+			const partners: IExercise[] = partnersResponse.data.map((partner: any) => ({
+				id: partner.id,
+				entityName: partner.entityName,
+				description: partner.description || "",
+				idMachine: partner.idMachine || null,
+				displayNum: partner.displayNum || null,
+				idUser: partner.idUser || null,
+				fame: partner.fame || null,
+			}));
+			setAvailablePartners(removeDuplicates(partners));
 		} catch (error) {
 			console.error(`Failed to fetch ${partnerType.toLowerCase()}s:`, error);
 		}
@@ -144,7 +163,6 @@ const ManageRelationships: React.ForwardRefRenderFunction<
 	const rollbackChanges = async () => {
 		await fetchMappings();
 		setCurrentChanges([]);
-		console.log("Rolled back changes");
 	};
 
 	const handleAddPartner = (partnerId: number) => {
@@ -172,7 +190,7 @@ const ManageRelationships: React.ForwardRefRenderFunction<
 
 		const newMapping = availablePartners.find((part) => part.id === partnerId);
 		if (newMapping) {
-			setMappings([...mappings, { ...newMapping, relationshipId: newRelationship.id }]);
+			setMappings(removeDuplicates([...mappings, { ...newMapping, relationshipId: newRelationship.id }]));
 			setCurrentChanges([...currentChanges, newRelationship]);
 		}
 	};
@@ -180,7 +198,11 @@ const ManageRelationships: React.ForwardRefRenderFunction<
 	const handleRemovePartner = (partnerId: number) => {
 		const relationship = mappings.find((part) => part.id === partnerId);
 		if (relationship) {
-			const newDeleteRelationship: DeleteRelationship = { relationshipId: relationship.relationshipId, id: getNextId(), type: "delete" };
+			const newDeleteRelationship: DeleteRelationship = {
+				relationshipId: relationship.relationshipId,
+				id: getNextId(),
+				type: "delete"
+			};
 			setMappings(mappings.filter((part) => part.id !== partnerId));
 			setCurrentChanges([...currentChanges, newDeleteRelationship]);
 		}
@@ -191,15 +213,12 @@ const ManageRelationships: React.ForwardRefRenderFunction<
 			const { type, ...relationshipData } = change;
 
 			if (type === "new") {
-				console.log("Saving new relationship: ", relationshipData);
 				await client.models.entityRelationships.create(relationshipData);
 			} else if (type === "delete") {
-				console.log("Deleting relationship: ", change);
 				await client.models.entityRelationships.delete({ id: change.relationshipId });
 			}
 		}
 		setCurrentChanges([]);
-		console.log("Relationships saved and current changes reset");
 	};
 
 	useImperativeHandle(ref, () => ({
@@ -214,7 +233,7 @@ const ManageRelationships: React.ForwardRefRenderFunction<
 				<h3>Current Mappings</h3>
 				<ul>
 					{mappings.map((partner) => (
-						<li key={partner.id}>
+						<li key={`${partner.id}-${partner.relationshipId}`}> {/* Unique Key */}
 							{partner.entityName}
 							<button onClick={() => handleRemovePartner(partner.id)}>Remove</button>
 						</li>

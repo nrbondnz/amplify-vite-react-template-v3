@@ -1,0 +1,11 @@
+﻿/* styles.css or your corresponding stylesheet */
+.table-bordered {
+    border-collapse: collapse;
+    width: 100%;
+}
+
+.table-bordered th,
+.table-bordered td {
+    border: 1px solid black; /* Specify border style */
+    padding: 5px;
+}

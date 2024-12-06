@@ -1,4 +1,6 @@
 // src/App.tsx
+//import ComboDetails from "@components/ComboDetails";
+import ExerciseDetails from "@components/ExerciseDetails";
 import EditExercise from "@components/exercises/EditExercise";
 import ListExercise from "@components/exercises/ListExercise";
 import NewExercise from "@components/exercises/NewExercise";
@@ -7,10 +9,12 @@ import HomePage from "@components/HomePage";
 import EditLocation from "@components/locations/EditLocation";
 import ListLocation from "@components/locations/ListLocation";
 import { NewLocation } from "@components/locations/NewLocation";
+import MachineDetails from "@components/MachineDetails";
 import EditMachine from "@components/machines/EditMachine";
 import MachineList from "@components/machines/MachineList";
 import ManageSettings from "@components/machines/ManageSettings";
 import NewMachine from "@components/machines/NewMachine";
+import MuscleDetails from "@components/MuscleDetailsComponent";
 import EditMuscle from "@components/muscles/EditMuscle";
 import ListMuscle from "@components/muscles/ListMuscle";
 import NewMuscle from "@components/muscles/NewMuscle";
@@ -49,6 +53,9 @@ const App: React.FC = () => {
                 <Route path="/settings/:entityId/:entityType" element={<ManageSettings onSaveRef={React.createRef()} />} />
                 <Route path="/imageselector" element={<ImageSelector alt="machines" />} />
                 <Route path="/findExerciseCombo" element={<FindExerciseCombo />} />
+                <Route path="/combo-details/machines/:id" element={<MachineDetails />} />
+                <Route path="/combo-details/exercises/:id" element={<ExerciseDetails />} />
+                <Route path="/combo-details/muscles/:id" element={<MuscleDetails />} />
 
                 <Route path="/workouts" element={<ListWorkout />} />
                 <Route path="/workouts/new" element={<NewWorkout />} />

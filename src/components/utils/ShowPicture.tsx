@@ -59,7 +59,7 @@ const ShowPicture: React.FC<ShowPictureProps> = ({ name, entityDisplayNum, detai
 
 	if (!imageExists || !imageUrl) {
 		console.log('Image does not exist', getPicturePath());
-		return <div>Image not found</div>; // Return an alternate component if the image doesn't exist
+		return <div></div>; // Return an alternate component if the image doesn't exist
 	}
 
 	return (
