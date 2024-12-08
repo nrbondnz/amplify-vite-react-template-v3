@@ -29,10 +29,12 @@ const EditExercise: React.FC<EditExerciseProps> = ({ getEntityById, loading }) =
 	}
 
 	const handleSaveEntity = async (updatedEntity: IExercise) => {
+		console.log('Attempting to save entity:', updatedEntity);
 		try {
-			await client.models.exercises.update(updatedEntity);
+			const fred = await client.models.exercises.update(updatedEntity);
+			console.log('Saved entity:', fred);
 			manageRelationshipsRef.current?.saveRelationships();
-			console.log('Saving entity:', updatedEntity);
+
 			navigate('/exercises');
 		} catch (error) {
 			console.error('Failed to save the entity:', error);

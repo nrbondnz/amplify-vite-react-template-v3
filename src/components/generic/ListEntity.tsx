@@ -73,7 +73,10 @@ const ListEntity = <T extends WithId & { entityName: string }>({
 						className={`entity-row ${index % 2 === 0 ? 'even' : 'odd'}`}
 					>
 						<td>{entity.id}</td>
-						<td>{entity.entityName}{displayNums[index] !== undefined ? '-' + displayNums[index] : ''}</td> {/* Display displayNum or 'N/A' if undefined */}
+						<td>
+							{entity.entityName}
+							{displayNums[index] !== undefined ? '-' + displayNums[index] : 'n/a'}
+						</td>
 					</tr>
 				))}
 				</tbody>

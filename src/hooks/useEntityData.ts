@@ -15,53 +15,45 @@ export const useEntityData = <T extends WithId>(entityType: EntityTypes, options
 		return entities.filter(entity => entity.id === id);
 	};
 
-	const getResponseByModel = async (entity: EntityTypes): Promise<T[]> => {
-		let data: T[] = [];
+	const fetchAllEntityData = async (fetchFunction: (options?: any) => Promise<any>) => {
+		let allData: T[] = [];
+		let nextToken: string | null | undefined = null;
 
+		do {
+			const response = await fetchFunction({ limit: 1000, nextToken }); // Adjust the limit as needed
+			allData = allData.concat(response.data);
+			nextToken = response.nextToken; // Update to nextToken if present
+		} while (nextToken);
+
+		return allData;
+	};
+
+	const getResponseByModel = async (entity: EntityTypes): Promise<T[]> => {
 		try {
 			switch (entity) {
 				case EntityTypes.Location:
-					data = (await client.models.locations.list()).data as unknown as T[];
-					break;
-				/*case EntityTypes.User:
-					data = (await client.models.user_details.list()).data as T[];
-					break;*/
+					return await fetchAllEntityData((opts) => client.models.locations.list(opts));
 				case EntityTypes.Machine:
-					data = (await client.models.machines.list()).data as unknown as T[];
-					break;
+					return await fetchAllEntityData((opts) => client.models.machines.list(opts));
 				case EntityTypes.Muscle:
-					data = (await client.models.muscles.list()).data as unknown as T[];
-					break;
+					return await fetchAllEntityData((opts) => client.models.muscles.list(opts));
 				case EntityTypes.Setting:
-					data = (await client.models.settings.list()).data as unknown as T[];
-					break;
+					return await fetchAllEntityData((opts) => client.models.settings.list(opts));
 				case EntityTypes.Workout:
-					data = (await client.models.workouts.list()).data  as unknown as T[];
-					break;
+					return await fetchAllEntityData((opts) => client.models.workouts.list(opts));
 				case EntityTypes.WorkoutExercise:
-					data = (await client.models.workoutExercises.list()).data  as unknown as T[];
-					break;
+					return await fetchAllEntityData((opts) => client.models.workoutExercises.list(opts));
 				case EntityTypes.Exercise:
-					data = (await client.models.exercises.list()).data  as unknown as T[];
-					break;
+					return await fetchAllEntityData((opts) => client.models.exercises.list(opts));
 				case EntityTypes.SessionWorkout:
-					data = (await client.models.sessionWorkouts.list()).data  as unknown as T[];
-					break;
+					return await fetchAllEntityData((opts) => client.models.sessionWorkouts.list(opts));
 				case EntityTypes.SessionWorkoutExercise:
-					data = (await client.models.sessionWorkoutExercises.list()).data  as unknown as T[];
-					break;
+					return await fetchAllEntityData((opts) => client.models.sessionWorkoutExercises.list(opts));
 				case EntityTypes.EntityRelationship:
-					data = (await client.models.entityRelationships.list()).data  as unknown as T[];
-					break;
+					return await fetchAllEntityData((opts) => client.models.entityRelationships.list(opts));
 				default:
 					throw new Error(`Unknown entity type: ${entity}`);
 			}
-
-			if (!data) {
-				throw new Error(`No data returned for entity type: ${entity}`);
-			}
-
-			return data;
 		} catch (error) {
 			throw new Error(`Error fetching data for model ${entity}: ${error instanceof Error ? error.message : 'unknown error'}`);
 		}
@@ -79,8 +71,6 @@ export const useEntityData = <T extends WithId>(entityType: EntityTypes, options
 		const numericId = (typeof id === 'string') ? Number(id) : id;
 		return entities.find(entity => entity.id === numericId) || null;
 	}, [entities]);
-	
-	
 
 	useEffect(() => {
 		const fetchEntities = async () => {
@@ -111,5 +101,5 @@ export const useEntityData = <T extends WithId>(entityType: EntityTypes, options
 		fetchEntities();
 	}, [entityType, options]);
 
-	return { entities, setEntities, error, getEntityById, getNextId, loading, filterById};
+	return { entities, setEntities, error, getEntityById, getNextId, loading, filterById };
 };

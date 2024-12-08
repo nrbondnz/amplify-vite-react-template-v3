@@ -52,7 +52,10 @@ const EditEntity = <T extends WithId>({ pEntity, pEntityName, onSave, onDelete, 
 		}
 	};
 
-	const handleSave = () => onSave(updatedEntity);
+	const handleSave = () => {
+		console.log('Saving entity:', updatedEntity);
+		onSave(updatedEntity);
+	}
 
 	const handleDelete = () => onDelete(updatedEntity);
 
