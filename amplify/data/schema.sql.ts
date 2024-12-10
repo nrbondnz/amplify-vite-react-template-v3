@@ -9,7 +9,7 @@ export const schema = configure({
         identifier: "IDKqHBfCxHbSCsl0OIO7GcFg",
         engine: "mysql",
         connectionUri: secret("SQL_CONNECTION_STRING"),
-        // Removed vpcConfig
+
     }
 }).schema({
     "actionStates": a.model({
@@ -26,10 +26,10 @@ export const schema = configure({
     ]),
     "entityRelationships": a.model({
         id: a.integer().required(),
-        exerciseId: a.integer(),
-        muscleId: a.integer(),
-        machineId: a.integer(),
-        entityName: a.string(),
+        exerciseId: a.integer().required(),
+        muscleId: a.integer().required(),
+        machineId: a.integer().required(),
+        entityName: a.string().required(),
         extraDetails: a.string()
     }).identifier([
         "id"

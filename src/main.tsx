@@ -19,7 +19,7 @@ Amplify.configure(outputs);
 ReactDOM.createRoot(document.getElementById('root')!).render(
     <React.StrictMode>
         <Authenticator
-            hideSignUp={true}
+            hideSignUp={false}
             components={{
                 SignIn,
                 SignUp,

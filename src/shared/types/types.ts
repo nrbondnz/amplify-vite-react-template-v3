@@ -178,7 +178,8 @@ export const defaultSesionWorkout = {
 	id: 0,
 	idUser: 0,
 	idWorkout: 0,
-	complete: false
+	complete: false,
+	entityName: 'default session workout',
 }
 
 export const defaultSessionWorkoutExercise = {
@@ -231,19 +232,19 @@ export interface ISetting extends WithId {
 }
 
 export interface IEntityRelationship extends WithId {
-	exerciseId: number | null;
-	muscleId: number | null;
-	machineId: number | null;
+	exerciseId: number ;
+	muscleId: number ;
+	machineId: number ;
 	extraDetails: string | null;
 }
 
 export const defaultEntityRelationship: IEntityRelationship = {
 	id: 0,
-	entityName: 'default exercise',
-	exerciseId: null,
-	muscleId: null,
-	machineId: null,
-	extraDetails: null
+	entityName: 'default ent rel',
+	exerciseId: -1,
+	muscleId: -1,
+	machineId: -1,
+	extraDetails: ''
 
 
 }

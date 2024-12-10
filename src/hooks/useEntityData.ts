@@ -15,16 +15,36 @@ export const useEntityData = <T extends WithId>(entityType: EntityTypes, options
 		return entities.filter(entity => entity.id === id);
 	};
 
-	const fetchAllEntityData = async (fetchFunction: (options?: any) => Promise<any>) => {
-		let allData: T[] = [];
+	const filterByField = (fieldName: keyof T, fieldId: number | string): T[] => {
+		return entities.filter(entity => entity[fieldName] === fieldId && entity[fieldName] !== -1);
+	};
+
+	const fetchAllEntityData = async (fetchFunction: (options?: any) => Promise<any>) => {let allData: T[] = [];
 		let nextToken: string | null | undefined = null;
+		const fetchPromises: Promise<void>[] = [];
+
+		const processFetchResponse = (response: any) => {
+			console.log('Fetched Response:', response);
+			allData = allData.concat(response.data);
+			nextToken = response.nextToken;
+		};
 
 		do {
-			const response = await fetchFunction({ limit: 1000, nextToken }); // Adjust the limit as needed
-			allData = allData.concat(response.data);
-			nextToken = response.nextToken; // Update to nextToken if present
+			fetchPromises.push(
+				fetchFunction({ limit: 1000, nextToken })
+					.then(processFetchResponse)
+					.catch(error => {
+						console.error(`Error fetching data: ${error instanceof Error ? error.message : error}`);
+						// Depending on your needs, handle the error:
+						// Option 1: Continue fetching ignoring this error
+						// Option 2: Adjust error recovery, fallback, or rethrow if needed
+					})
+			);
 		} while (nextToken);
 
+		await Promise.all(fetchPromises);
+
+		console.log('All Entities Fetched:', allData);
 		return allData;
 	};
 
@@ -50,7 +70,9 @@ export const useEntityData = <T extends WithId>(entityType: EntityTypes, options
 				case EntityTypes.SessionWorkoutExercise:
 					return await fetchAllEntityData((opts) => client.models.sessionWorkoutExercises.list(opts));
 				case EntityTypes.EntityRelationship:
-					return await fetchAllEntityData((opts) => client.models.entityRelationships.list(opts));
+					const fred = await fetchAllEntityData((opts) => client.models.entityRelationships.list(opts));
+					console.log('Fred:', fred);
+					return fred;
 				default:
 					throw new Error(`Unknown entity type: ${entity}`);
 			}
@@ -101,5 +123,5 @@ export const useEntityData = <T extends WithId>(entityType: EntityTypes, options
 		fetchEntities();
 	}, [entityType, options]);
 
-	return { entities, setEntities, error, getEntityById, getNextId, loading, filterById };
+	return { entities, setEntities, error, getEntityById, getNextId, loading, filterById, filterByField };
 };
