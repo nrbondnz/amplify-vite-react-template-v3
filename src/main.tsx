@@ -1,5 +1,6 @@
 import App from "@App";
 import AppContent from "@components/AppContent";
+import { DataProvider } from "@context/DataContext";
 import { SubscriptionProvider } from "@context/SubscriptionContext";
 import React from 'react';
 import ReactDOM from 'react-dom/client';
@@ -26,10 +27,12 @@ ReactDOM.createRoot(document.getElementById('root')!).render(
             }}
         >
             <SubscriptionProvider>
+                <DataProvider >
                 <BrowserRouter>
                     <AppContent />
                     <App />
                 </BrowserRouter>
+                    </DataProvider>
             </SubscriptionProvider>
         </Authenticator>
     </React.StrictMode>

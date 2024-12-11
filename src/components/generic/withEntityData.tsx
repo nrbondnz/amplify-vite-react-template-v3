@@ -1,7 +1,6 @@
-﻿import React from 'react';
-import { useEntityData } from '@hooks/useEntityData';
+﻿import { useDataContext } from "@context/DataContext";
+import React from 'react';
 import { EntityTypes, WithId } from '@shared/types/types';
-//import { WithId } from '@hooks/useEntityData';
 
 interface WithEntityDataProps<T extends WithId> {
 	entities: T[];
@@ -14,17 +13,25 @@ interface WithEntityDataProps<T extends WithId> {
 const withEntityData = <T extends WithId,>(entityType: EntityTypes) => (
 	Component: React.ComponentType<WithEntityDataProps<T>>
 ) => {
-	return (props: Omit<WithEntityDataProps<T>, 'entities' | 'getEntityById' | 'getNextId' | 'loading' | 'error'>) => {
-		const { entities, error, getEntityById, getNextId, loading } = useEntityData<T>(entityType);
+	return (props: Omit<WithEntityDataProps<T>, keyof WithEntityDataProps<T>>) => {
+		// Get the manager dynamically
+		const manager = useDataContext().getManagerByType(entityType);
+
+		// Check and cast manager to the correct inferred type
+		if (!manager) {
+			throw new Error(`Manager for entity type ${entityType} not found.`);
+		}
+
+		const typedManager = manager as unknown as WithEntityDataProps<T>
 
 		return (
 			<Component
 				{...props}
-				entities={entities}
-				getEntityById={getEntityById}
-				getNextId={getNextId}
-				loading={loading}
-				error={error}
+				entities={typedManager.entities}
+				getEntityById={typedManager.getEntityById}
+				getNextId={typedManager.getNextId}
+				loading={typedManager.loading}
+				error={typedManager.error}
 			/>
 		);
 	};

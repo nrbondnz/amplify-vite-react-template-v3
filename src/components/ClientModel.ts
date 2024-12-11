@@ -1,9 +1,4 @@
-﻿interface IMachine {
-	id: number;
-	name: string;
-	numOfMachine: number;
-	idLocation: number;
-}
+﻿
 
 interface Observer<T> {
 	next: (value: T) => void;
@@ -27,6 +22,6 @@ interface ClientModel<T> {
 }
 
 interface ModelTypesClient {
-	machines: ClientModel<IMachine>;
+	//machines: ClientModel<IMachine>;
 	// Add other model types as needed
 }

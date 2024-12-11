@@ -123,5 +123,5 @@ export const useEntityData = <T extends WithId>(entityType: EntityTypes, options
 		fetchEntities();
 	}, [entityType, options]);
 
-	return { entities, setEntities, error, getEntityById, getNextId, loading, filterById, filterByField };
+	return { entities, entityType, setEntities, error, getEntityById, getNextId, loading, filterById, filterByField };
 };
