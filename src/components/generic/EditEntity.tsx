@@ -1,10 +1,10 @@
-﻿import { useState, ChangeEvent, useEffect } from 'react';
+﻿import { useDataContext } from "@context/DataContext";
+import { useState, ChangeEvent, useEffect } from 'react';
 import '../../index.css';
 import FileLoader from "@components/utils/FileLoader";
 import { useSubscription } from '@context/SubscriptionContext';
-import { AppEvent, EntityTypes, ILocation, WithId, WithIdAndDisplayNum } from '@shared/types/types';
+import { AppEvent, EntityTypes, WithId, WithIdAndDisplayNum } from '@shared/types/types';
 import { requiredDisplayNamesMap } from '@shared/types/types';
-import { useEntityData } from '@hooks/useEntityData';
 import ShowPicture from '@components/utils/ShowPicture';
 
 interface EditEntityProps<T> {
@@ -20,9 +20,9 @@ const EditEntity = <T extends WithId>({ pEntity, pEntityName, onSave, onDelete, 
 	const [updatedEntity, setUpdatedEntity] = useState<T>(pEntity);
 	const [entityName] = useState<string | null>(pEntityName);
 	const { addCustomEvent } = useSubscription();
-
+	const dataContext = useDataContext();
 	// Fetch locations
-	const { entities: locations, loading: locationsLoading, error: locationsError } = useEntityData<ILocation>(EntityTypes.Location);
+	const { entities: locations, loading: locationsLoading, error: locationsError } = dataContext.eRM;
 
 	// Type guard to check if entity has the idLocation field
 	const isEntityWithLocation = (entity: any): entity is T & { idLocation: number } => {

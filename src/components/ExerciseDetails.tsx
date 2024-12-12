@@ -1,11 +1,12 @@
-﻿import React from 'react';
+﻿import { useDataContext } from "@context/DataContext";
+import React from 'react';
 import { useParams } from 'react-router-dom';
-import { useEntityData } from "@hooks/useEntityData";
-import { EntityTypes, IEntityRelationship } from "@shared/types/types";
+
 
 const ExerciseDetails: React.FC = () => {
 	const { id } = useParams<Record<string, string | undefined>>();
-	const { entities } = useEntityData<IEntityRelationship>(EntityTypes.EntityRelationship);
+	const dataContext = useDataContext();
+	const entities = dataContext.eRM.entities;
 
 	if (!id || !entities) return <div>Loading...</div>;
 

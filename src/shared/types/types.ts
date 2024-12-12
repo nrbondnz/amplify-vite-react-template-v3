@@ -249,6 +249,14 @@ export const defaultEntityRelationship: IEntityRelationship = {
 
 }
 
+export const doesFieldExist = <T extends Object>(fieldName: keyof T, entity: T): boolean => {
+	return fieldName in entity;
+};
+
+export const getFieldValue = (fieldName: string, entity: Record<string, any>): any => {
+	return Object.prototype.hasOwnProperty.call(entity, fieldName) ? entity[fieldName] : undefined;
+};
+
 export enum SettingStatus {
 	'new',
 	'update',

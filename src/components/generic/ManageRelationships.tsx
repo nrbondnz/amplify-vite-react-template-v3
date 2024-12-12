@@ -1,11 +1,15 @@
 ﻿
+import { useDataContext } from "@context/DataContext";
 import React, { ForwardedRef, forwardRef, useEffect, useImperativeHandle, useState } from "react";
-import { useEntityData } from "@hooks/useEntityData";
-import { EntityTypes, getEntityDefault, IEntityRelationship } from "@shared/types/types";
+import {
+	EntityTypes,
+	getEntityDefault, getFieldValue,
+	IEntityRelationship
+} from "@shared/types/types";
 import { client } from "@shared/utils/client";
 
 // Helper function to determine key and partner fields
-const getField = (type: EntityTypes): string => {
+const getField = (type: EntityTypes): keyof IEntityRelationship => {
 	switch (type) {
 		case EntityTypes.Muscle:
 			return "muscleId";
@@ -48,9 +52,9 @@ const ManageRelationships: React.ForwardRefRenderFunction<
 	const [unmappedPartners, setUnmappedPartners] = useState<any[]>([]);
 	const [currentChanges, setCurrentChanges] = useState<any[]>([]);
 	const [selectedPartnerId, setSelectedPartnerId] = useState<number | "">("");
-
-	const entityRelationData = useEntityData<any>(EntityTypes.EntityRelationship);
-	const partnerEntityData = useEntityData<any>(partnerType);
+	const dataContext = useDataContext();
+	const entityRelationData = dataContext.eRM
+	const partnerEntityData = dataContext.getManagerByType(partnerType)
 
 	const setupPartnerEntities = async () => {
 		try {
@@ -58,9 +62,8 @@ const ManageRelationships: React.ForwardRefRenderFunction<
 			const partnerField = getField(partnerType);
 
 			// Exclude entities with an ID of -1
-			const connectedPartners = entityRelationData.filterByField(keyField, keyId).filter(rel => rel[partnerField] !== -1);
-
-			const partnersData = partnerEntityData.entities;
+			const connectedPartners = entityRelationData.filterByField(keyField as keyof IEntityRelationship, keyId).filter(rel => rel[partnerField] !== -1);
+			const partnersData = partnerEntityData!.entities;
 
 			const initialMappedPartners = connectedPartners
 				.map(rel => {
@@ -87,12 +90,13 @@ const ManageRelationships: React.ForwardRefRenderFunction<
 
 	const fetchAvailablePartners = async () => {
 		try {
-			const partners = partnerEntityData.entities
+			const partners = partnerEntityData!.entities
 				.filter(partner => partner.id !== -1)
 				.map(partner => ({
 					id: partner.id,
 					entityName: partner.entityName,
-					displayNum: partner.displayNum || null,
+					// Use getFieldValue to safely retrieve displayNum
+					displayNum: getFieldValue("displayNum", partner) ?? null,
 				}));
 			setUnmappedPartners(partners);
 		} catch (error) {
@@ -103,7 +107,7 @@ const ManageRelationships: React.ForwardRefRenderFunction<
 	useEffect(() => {
 		setupPartnerEntities();
 		fetchAvailablePartners();
-	}, [keyId, keyType, partnerType, entityRelationData.entities, partnerEntityData.entities]);
+	}, [keyId, keyType, partnerType, entityRelationData.entities, partnerEntityData!.entities]);
 
 	const rollbackChanges = async () => {
 		await setupPartnerEntities();

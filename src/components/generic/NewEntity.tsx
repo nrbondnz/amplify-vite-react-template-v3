@@ -1,12 +1,12 @@
-﻿import { useState, ChangeEvent, useEffect } from 'react';
+﻿import { useDataContext } from "@context/DataContext";
+import { useState, ChangeEvent, useEffect } from 'react';
 import { useSubscription } from "@context/SubscriptionContext";
-import { useEntityData } from "../../hooks/useEntityData";
+
 import {
 	AppEvent,
 	EntityTypes,
-	ILocation,
 	WithId
-} from '../../shared/types/types';
+} from '@shared/types/types';
 
 interface NewEntityProps<T extends WithId> {
 	entity: T;
@@ -30,9 +30,9 @@ const requiredDisplayNamesMap: { [key in EntityTypes]?: { [field: string]: strin
 const NewEntity = <T extends WithId>({ entity, entityName, onSave, onCancel, onEntityChange }: NewEntityProps<T>) => {
 	const [newEntity, setNewEntity] = useState<T>(entity);
 	const { addCustomEvent } = useSubscription();
-
+	const dataContext = useDataContext();
 	// Fetch locations
-	const { entities: locations, loading: locationsLoading, error: locationsError } = useEntityData<ILocation>(EntityTypes.Location);
+	const { entities: locations, loading: locationsLoading, error: locationsError } = dataContext.lM
 
 	// Check if the object has a specified field
 	const hasField = (obj: any, field: string): boolean => {

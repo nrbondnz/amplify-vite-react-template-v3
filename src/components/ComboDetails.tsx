@@ -1,13 +1,14 @@
-﻿import React from 'react';
+﻿import { useDataContext } from "@context/DataContext";
+import React from 'react';
 import { useParams } from 'react-router-dom';
 //import { useEntities } from "@components/utils/entityFetcher";
 import { EntityTypes, IEntityRelationship } from "@shared/types/types";
-import { useEntityData } from "@hooks/useEntityData";
+
 
 const ComboDetails: React.FC = () => {
 	const { type, id } = useParams<Record<string, string | undefined>>();
-
-	const { entities } = useEntityData<IEntityRelationship>(EntityTypes.EntityRelationship);
+	const dataContext = useDataContext();
+	const entities  = dataContext.eRM.entities
 
 	if (!type || !id || !entities) {
 		return <div>Loading...</div>;
