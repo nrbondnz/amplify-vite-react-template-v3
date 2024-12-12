@@ -28,6 +28,7 @@ const EditMachine: React.FC<EditMachineProps> = ({ getEntityById, loading }) => 
 	const [currentEntity, setCurrentEntity] = useState<IMachine | null>(null);
 	const [saveEnabled, setSaveEnabled] = useState(false);
 	const manageRelationshipsRef = useRef<{ saveRelationships: () => void; cancelRelationships: () => void }>(null);
+	const manageRelationshipsRef2 = useRef<{ saveRelationships: () => void; cancelRelationships: () => void }>(null);
 
 	useEffect(() => {
 		if (entity) {
@@ -58,6 +59,7 @@ const EditMachine: React.FC<EditMachineProps> = ({ getEntityById, loading }) => 
 			const currentSettings = manageSettingsRef.current?.saveSettings() || [];
 			await manageSettingsRef.current?.saveSettingsToDB(currentSettings);
 			manageRelationshipsRef.current?.saveRelationships();
+			manageRelationshipsRef2.current?.saveRelationships();
 		} catch (error) {
 			console.error('Failed to save the entity:', error);
 		}
@@ -75,6 +77,7 @@ const EditMachine: React.FC<EditMachineProps> = ({ getEntityById, loading }) => 
 
 	const handleCancel = () => {
 		manageRelationshipsRef.current?.cancelRelationships();
+		manageRelationshipsRef2.current?.cancelRelationships();
 		//navigate('/machines');
 	};
 
@@ -111,6 +114,12 @@ const EditMachine: React.FC<EditMachineProps> = ({ getEntityById, loading }) => 
 			</button>
 			<ManageRelationships
 				ref={manageRelationshipsRef}
+				keyId={entity.id}
+				keyType={EntityTypes.Machine}
+				partnerType={EntityTypes.Muscle}
+			/>
+			<ManageRelationships
+				ref={manageRelationshipsRef2}
 				keyId={entity.id}
 				keyType={EntityTypes.Machine}
 				partnerType={EntityTypes.Exercise}

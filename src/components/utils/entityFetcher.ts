@@ -1,9 +1,10 @@
 ﻿// entityFetcher.ts
 
-import { useEntityData } from "@hooks/useEntityData";
+import { useDataContext } from "@context/DataContext";
 import { EntityTypes } from "@shared/types/types";
 
 export const useEntities = (entityType: EntityTypes) => {
-	const { entities } = useEntityData(entityType);
+	const dataContext = useDataContext();
+	const entities  = dataContext.getManagerByType(entityType);
 	return entities;
 };

@@ -25,7 +25,7 @@ export const useEntityData = <T extends WithId>(entityType: EntityTypes, options
 
 		const processFetchResponse = (response: any) => {
 			console.log('Fetched Response:', response);
-			allData = allData.concat(response.data);
+			allData = allData.concat(response.data.filter((entry: WithId) => entry.id != -1));
 			nextToken = response.nextToken;
 		};
 

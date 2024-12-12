@@ -17,6 +17,7 @@ const EditMuscle: React.FC<EditMuscleProps> = ({ getEntityById, loading }) => {
 	const { id } = useParams<{ id: string }>();
 	const navigate = useNavigate();
 	const manageRelationshipsRef = useRef<{ saveRelationships: () => void; cancelRelationships: () => void }>(null);
+	const manageRelationshipsRef2 = useRef<{ saveRelationships: () => void; cancelRelationships: () => void }>(null);
 
 	if (loading) {
 		return <div>Loading...</div>;
@@ -32,6 +33,7 @@ const EditMuscle: React.FC<EditMuscleProps> = ({ getEntityById, loading }) => {
 		try {
 			await client.models.muscles.update(updatedEntity);
 			manageRelationshipsRef.current?.saveRelationships();
+			manageRelationshipsRef2.current?.saveRelationships();
 			console.log('Saving entity:', updatedEntity);
 			navigate('/appcontent');
 		} catch (error) {
@@ -51,6 +53,7 @@ const EditMuscle: React.FC<EditMuscleProps> = ({ getEntityById, loading }) => {
 
 	const handleCancel = () => {
 		manageRelationshipsRef.current?.cancelRelationships();
+		manageRelationshipsRef2.current?.cancelRelationships();
 		console.log('Canceling changes');
 	};
 
@@ -62,6 +65,12 @@ const EditMuscle: React.FC<EditMuscleProps> = ({ getEntityById, loading }) => {
 				keyId={entity.id}
 				keyType={EntityTypes.Muscle}
 				partnerType={EntityTypes.Exercise}
+			/>
+			<ManageRelationships
+				ref={manageRelationshipsRef2}
+				keyId={entity.id}
+				keyType={EntityTypes.Muscle}
+				partnerType={EntityTypes.Machine}
 			/>
 		</>
 	);

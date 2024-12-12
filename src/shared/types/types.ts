@@ -249,8 +249,15 @@ export const defaultEntityRelationship: IEntityRelationship = {
 
 }
 
+export enum SettingStatus {
+	'new',
+	'update',
+	'delete',
+	'unchanged'
+}
+
 export interface ISettingWithStatus extends ISetting {
-	status?: 'new' | 'update' | 'delete';
+	status?: SettingStatus;
 }
 
 export enum SettingKeys {

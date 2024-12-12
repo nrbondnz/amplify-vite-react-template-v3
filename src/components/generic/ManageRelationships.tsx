@@ -1,4 +1,5 @@
-﻿import React, { ForwardedRef, forwardRef, useEffect, useImperativeHandle, useState } from "react";
+﻿
+import React, { ForwardedRef, forwardRef, useEffect, useImperativeHandle, useState } from "react";
 import { useEntityData } from "@hooks/useEntityData";
 import { EntityTypes, getEntityDefault, IEntityRelationship } from "@shared/types/types";
 import { client } from "@shared/utils/client";
@@ -180,7 +181,7 @@ const ManageRelationships: React.ForwardRefRenderFunction<
 	}));
 
 	return (
-		<div>
+		<div className="manage-relationships-container">
 			<h2>Manage {keyType} to {partnerType} Mappings</h2>
 			<div>
 				<h3>Current Mappings</h3>

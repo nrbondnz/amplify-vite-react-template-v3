@@ -4,10 +4,10 @@ import {
   IEntityRelationship,
   IExercise,
   ILocation, IMachine,
-  IMuscle, IUser, IWorkout, IWorkoutExercise
+  IMuscle, ISetting, IUser, IWorkout, IWorkoutExercise
 } from "@shared/types/types";
 
-export interface EntityManagerTypes<T> {
+export interface IEntityManager<T> {
   entities: T[]; // Array of entities
   setEntities: React.Dispatch<React.SetStateAction<T[]>>; // Function to manage state
   error: string | null; // Error state
@@ -19,11 +19,12 @@ export interface EntityManagerTypes<T> {
 }
 
 // This is now the manager type for IEntityRelationship
-export type EntityRelationshipManager = EntityManagerTypes<IEntityRelationship>
-export type LocationManager = EntityManagerTypes<ILocation>
-export type MachineManager = EntityManagerTypes<IMachine>
-export type ExerciseManager = EntityManagerTypes<IExercise>
-export type MuscleManager = EntityManagerTypes<IMuscle>
-export type UserManager = EntityManagerTypes<IUser>
-export type WorkoutManager = EntityManagerTypes<IWorkout>
-export type WorkoutExerciseManager = EntityManagerTypes<IWorkoutExercise>
+export type EntityRelationshipManager = IEntityManager<IEntityRelationship>
+export type LocationManager = IEntityManager<ILocation>
+export type MachineManager = IEntityManager<IMachine>
+export type ExerciseManager = IEntityManager<IExercise>
+export type MuscleManager = IEntityManager<IMuscle>
+export type UserManager = IEntityManager<IUser>
+export type WorkoutManager = IEntityManager<IWorkout>
+export type WorkoutExerciseManager = IEntityManager<IWorkoutExercise>
+export type SettingsManager = IEntityManager<ISetting>

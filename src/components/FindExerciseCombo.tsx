@@ -1,10 +1,15 @@
-﻿import React, { useState } from 'react';
+﻿import { useDataContext } from "@context/DataContext";
+import { useSubscription } from "@context/SubscriptionContext";
+import React, { useState } from 'react';
 import { Amplify } from "aws-amplify";
 import { useNavigate } from 'react-router-dom';
 import outputs from '../../amplify_outputs.json';
-import { useEntities } from "@components/utils/entityFetcher";
-import { EntityTypes, IEntityRelationship, WithIdAndDisplayNum } from "@shared/types/types";
-import { useEntityData } from "@hooks/useEntityData";
+import {
+	AppEvent,
+	EntityTypes,
+	WithIdAndDisplayNum
+} from "@shared/types/types";
+
 import ShowPicture from '@components/utils/ShowPicture';
 import '@components/FindExerciseCombo.css';
 
@@ -12,26 +17,36 @@ Amplify.configure(outputs);
 
 export const FindExerciseCombo: React.FC = () => {
 	const navigate = useNavigate();
-	const machines = useEntities(EntityTypes.Machine);
-	const exercises = useEntities(EntityTypes.Exercise);
-	const muscles = useEntities(EntityTypes.Muscle);
-	const { entities } = useEntityData<IEntityRelationship>(EntityTypes.EntityRelationship);
+	const dataContext = useDataContext();
+	const machineManager = dataContext.mM;
+	const exerciseManager = dataContext.eM;
+	const muscleManager = dataContext.muM;
+	const relationshipManager = dataContext.eRM;
 
 	const [machineFilter, setMachineFilter] = useState<number[]>([]);
 	const [exerciseFilter, setExerciseFilter] = useState<number[]>([]);
 	const [muscleFilter, setMuscleFilter] = useState<number[]>([]);
+	const { addCustomEvent } = useSubscription();
+	const handleCancel = () => {
+		const event: AppEvent = {
+			entity: "exercises",
+			actionType: 'CANCEL_REQUEST',
+			pageType: 'APPHOME',
+		};
+		addCustomEvent(event);
+	}
 
 	const handleFilter = (entityType: EntityTypes, id: number) => {
-		if (!entities) return;
+		if (!relationshipManager.entities) return;
 
 		switch (entityType) {
 			case EntityTypes.Machine:
-				const relatedMusclesFromMachine = entities
+				const relatedMusclesFromMachine = relationshipManager.entities
 					.filter(rel => rel.machineId === id)
 					.map(rel => rel.muscleId)
 					.filter(muscleId => muscleId !== null) as number[];
 
-				const relatedExercisesFromMachine = entities
+				const relatedExercisesFromMachine = relationshipManager.entities
 					.filter(rel => rel.machineId === id)
 					.map(rel => rel.exerciseId)
 					.filter(exerciseId => exerciseId !== null) as number[];
@@ -42,12 +57,12 @@ export const FindExerciseCombo: React.FC = () => {
 				break;
 
 			case EntityTypes.Exercise:
-				const relatedMusclesFromExercise = entities
+				const relatedMusclesFromExercise = relationshipManager.entities
 					.filter(rel => rel.exerciseId === id)
 					.map(rel => rel.muscleId)
 					.filter(muscleId => muscleId !== null) as number[];
 
-				const relatedMachinesFromExercise = entities
+				const relatedMachinesFromExercise = relationshipManager.entities
 					.filter(rel => rel.exerciseId === id)
 					.map(rel => rel.machineId)
 					.filter(machineId => machineId !== null) as number[];
@@ -58,12 +73,12 @@ export const FindExerciseCombo: React.FC = () => {
 				break;
 
 			case EntityTypes.Muscle:
-				const relatedMachinesFromMuscle = entities
+				const relatedMachinesFromMuscle = relationshipManager.entities
 					.filter(rel => rel.muscleId === id)
 					.map(rel => rel.machineId)
 					.filter(machineId => machineId !== null) as number[];
 
-				const relatedExercisesFromMuscle = entities
+				const relatedExercisesFromMuscle = relationshipManager.entities
 					.filter(rel => rel.muscleId === id)
 					.map(rel => rel.exerciseId)
 					.filter(exerciseId => exerciseId !== null) as number[];
@@ -106,9 +121,9 @@ export const FindExerciseCombo: React.FC = () => {
 		}
 	};
 
-	const filteredMachines = machines.filter(m => machineFilter.length === 0 || machineFilter.includes(m.id));
-	const filteredExercises = exercises.filter(e => exerciseFilter.length === 0 || exerciseFilter.includes(e.id));
-	const filteredMuscles = muscles.filter(m => muscleFilter.length === 0 || muscleFilter.includes(m.id));
+	const filteredMachines = machineManager.entities.filter(m => machineFilter.length === 0 || machineFilter.includes(m.id));
+	const filteredExercises = exerciseManager.entities.filter(e => exerciseFilter.length === 0 || exerciseFilter.includes(e.id));
+	const filteredMuscles = muscleManager.entities.filter(m => muscleFilter.length === 0 || muscleFilter.includes(m.id));
 
 	const maxRows = Math.max(filteredMachines.length, filteredExercises.length, filteredMuscles.length);
 
@@ -116,6 +131,7 @@ export const FindExerciseCombo: React.FC = () => {
 		<div>
 			<h1>Find Exercise Combo</h1>
 			<button onClick={resetFilters}>Reset Filters</button>
+			<button onClick={handleCancel}>Cancel</button>
 			<table className="table-bordered">
 				<thead>
 				<tr>

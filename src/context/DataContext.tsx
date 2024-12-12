@@ -1,20 +1,28 @@
-﻿import React, { createContext, useContext, useMemo } from "react";
-import { useEntityData } from "@hooks/useEntityData";
+﻿import { useEntityData } from "@hooks/useEntityData";
 import {
 	EntityRelationshipManager,
+	ExerciseManager,
 	LocationManager,
 	MachineManager,
-	ExerciseManager,
 	MuscleManager,
 	UserManager,
-	WorkoutManager,
 	WorkoutExerciseManager,
-} from "@shared/types/entityManagerTypes";
+	WorkoutManager,
+	SettingsManager
+} from "@shared/types/IEntityManager";
 import {
 	EntityTypes,
-	IEntityRelationship, IExercise,
-	ILocation, IMachine, IMuscle, IUser, IWorkout, IWorkoutExercise
+	IEntityRelationship,
+	IExercise,
+	ILocation,
+	IMachine,
+	IMuscle,
+	ISetting,
+	IUser,
+	IWorkout,
+	IWorkoutExercise
 } from "@shared/types/types";
+import React, { createContext, useContext, useMemo } from "react";
 
 // Extend the DataContext to expose shortened manager names
 interface DataContextValue {
@@ -26,6 +34,8 @@ interface DataContextValue {
 	uM: UserManager; // UserManager as `uM`
 	wM: WorkoutManager; // WorkoutManager as `wM`
 	weM: WorkoutExerciseManager; // WorkoutExerciseManager as `weM`
+	sM: SettingsManager; // SettingsManager as `sM`
+
 	getManagerByType: (
 		entityType: EntityTypes
 	) =>
@@ -37,6 +47,7 @@ interface DataContextValue {
 		| UserManager
 		| WorkoutManager
 		| WorkoutExerciseManager
+		| SettingsManager
 		| undefined; // Function to fetch the correct manager dynamically
 }
 
@@ -52,11 +63,10 @@ export const DataProvider: React.FC<{ children: React.ReactNode }> = ({ children
 	const uM = useEntityData<IUser>(EntityTypes.User);
 	const wM = useEntityData<IWorkout>(EntityTypes.Workout);
 	const weM = useEntityData<IWorkoutExercise>(EntityTypes.WorkoutExercise);
+	const sM = useEntityData<ISetting>(EntityTypes.Setting);
 
 	// Map entity types to their respective managers
-	// Define a proper type for the managers object
 	const managers = useMemo(() => {
-		// Initialize the managers map with either a manager or null for unhandled types
 		const map: Partial<Record<EntityTypes, any>> = {
 			[EntityTypes.EntityRelationship]: eRM,
 			[EntityTypes.Location]: lM,
@@ -66,9 +76,10 @@ export const DataProvider: React.FC<{ children: React.ReactNode }> = ({ children
 			[EntityTypes.User]: uM,
 			[EntityTypes.Workout]: wM,
 			[EntityTypes.WorkoutExercise]: weM,
+			[EntityTypes.Setting]: sM, // Added SettingsManager here
 		};
 
-		// Fill in missing EntityTypes with null values
+		// Ensure every EntityType is defined in the map
 		Object.values(EntityTypes).forEach((type) => {
 			if (!(type in map)) {
 				map[type] = null;
@@ -76,7 +87,7 @@ export const DataProvider: React.FC<{ children: React.ReactNode }> = ({ children
 		});
 
 		return map as Record<EntityTypes, any>;
-	}, [eRM, lM, mM, eM, muM, uM, wM, weM]);
+	}, [eRM, lM, mM, eM, muM, uM, wM, weM, sM]);
 
 	const getManagerByType = (
 		entityType: EntityTypes
@@ -89,23 +100,37 @@ export const DataProvider: React.FC<{ children: React.ReactNode }> = ({ children
 		| UserManager
 		| WorkoutManager
 		| WorkoutExerciseManager
+		| SettingsManager
 		| undefined => {
-		return managers[entityType]; // Fetch the manager dynamically
+		// Safely cast here to avoid type error
+		return managers[entityType] as
+			| EntityRelationshipManager
+			| LocationManager
+			| MachineManager
+			| ExerciseManager
+			| MuscleManager
+			| UserManager
+			| WorkoutManager
+			| WorkoutExerciseManager
+			| SettingsManager
+			| undefined;
 	};
 
-	const contextValue = useMemo(
+	// Context value memo
+	const contextValue: DataContextValue = useMemo(
 		() => ({
-			eRM,
-			lM,
-			mM,
-			eM,
-			muM,
-			uM,
-			wM,
-			weM,
 			getManagerByType,
+		eRM,
+		lM,
+		mM,
+		eM,
+		muM,
+		uM,
+		wM,
+		weM,
+		sM,
 		}),
-		[eRM, lM, mM, eM, muM, uM, wM, weM, getManagerByType]
+		[eRM, lM, mM, eM, muM, uM, wM, weM, sM]
 	);
 
 	return <DataContext.Provider value={contextValue}>{children}</DataContext.Provider>;

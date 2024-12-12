@@ -17,6 +17,7 @@ const EditExercise: React.FC<EditExerciseProps> = ({ getEntityById, loading }) =
 	const { id } = useParams<{ id: string }>();
 	const navigate = useNavigate();
 	const manageRelationshipsRef = useRef<{ saveRelationships: () => void; cancelRelationships: () => void }>(null);
+	const manageRelationshipsRef2 = useRef<{ saveRelationships: () => void; cancelRelationships: () => void }>(null);
 
 	if (loading) {
 		return <div>Loading...</div>;
@@ -34,7 +35,7 @@ const EditExercise: React.FC<EditExerciseProps> = ({ getEntityById, loading }) =
 			const fred = await client.models.exercises.update(updatedEntity);
 			console.log('Saved entity:', fred);
 			manageRelationshipsRef.current?.saveRelationships();
-
+			manageRelationshipsRef2.current?.saveRelationships();
 			navigate('/exercises');
 		} catch (error) {
 			console.error('Failed to save the entity:', error);
@@ -65,6 +66,12 @@ const EditExercise: React.FC<EditExerciseProps> = ({ getEntityById, loading }) =
 				keyId={entity.id}
 				keyType={EntityTypes.Exercise}
 				partnerType={EntityTypes.Muscle}
+			/>
+			<ManageRelationships
+				ref={manageRelationshipsRef2}
+				keyId={entity.id}
+				keyType={EntityTypes.Exercise}
+				partnerType={EntityTypes.Machine}
 			/>
 		</>
 	);

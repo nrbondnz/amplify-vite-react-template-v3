@@ -23,6 +23,12 @@ const AppContent: React.FC = () => {
 					navigate(path);
 					return;
 				}
+				if (lastEvent.actionType === "CANCEL_REQUEST") {
+					const path = `/app`;
+					console.log(`Path: ${path}`);
+					navigate(path);
+					return;
+				}
 			}
 			if (lastEvent.pageType === "CONTROL") {
 				if (lastEvent.actionType === "APP_REQUEST") {

@@ -1,5 +1,14 @@
 ﻿.settings-container {
     padding: 1em; /* Use em for scalable padding */
+    border: 2px solid #ddd;
+    margin: 1%;
+}
+
+.manage-relationships-container {
+    padding: 1em; /* Use em for scalable padding */
+    border: 2px solid #ddd;
+    margin-outside: 2%;
+    margin-bottom: 2%; /* Add spacing to the bottom of the container */
 }
 
 .settings-item {
@@ -38,6 +47,8 @@
 .file-loader-cell .file-controls .file-not-found {
     margin-left: 2%; /* Use % for spacing */
 }
+
+
 
 /* Media Queries for Mobile */
 @media only screen and (max-width: 767px) {
