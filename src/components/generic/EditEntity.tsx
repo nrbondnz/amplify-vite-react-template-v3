@@ -22,7 +22,7 @@ const EditEntity = <T extends WithId>({ pEntity, pEntityName, onSave, onDelete, 
 	const { addCustomEvent } = useSubscription();
 	const dataContext = useDataContext();
 	// Fetch locations
-	const { entities: locations, loading: locationsLoading, error: locationsError } = dataContext.eRM;
+	const { entities: locations, loading: locationsLoading, error: locationsError } = dataContext.lM;
 
 	// Type guard to check if entity has the idLocation field
 	const isEntityWithLocation = (entity: any): entity is T & { idLocation: number } => {

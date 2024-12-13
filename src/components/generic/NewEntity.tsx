@@ -1,4 +1,5 @@
 ﻿import { useDataContext } from "@context/DataContext";
+import { AuthUser, getCurrentUser } from "aws-amplify/auth";
 import { useState, ChangeEvent, useEffect } from 'react';
 import { useSubscription } from "@context/SubscriptionContext";
 
@@ -32,7 +33,8 @@ const NewEntity = <T extends WithId>({ entity, entityName, onSave, onCancel, onE
 	const { addCustomEvent } = useSubscription();
 	const dataContext = useDataContext();
 	// Fetch locations
-	const { entities: locations, loading: locationsLoading, error: locationsError } = dataContext.lM
+	const { entities: locations, loading: locationsLoading, error: locationsError } = dataContext.lM;
+	const [user, setUser] = useState<AuthUser>();
 
 	// Check if the object has a specified field
 	const hasField = (obj: any, field: string): boolean => {
@@ -40,13 +42,33 @@ const NewEntity = <T extends WithId>({ entity, entityName, onSave, onCancel, onE
 	};
 
 	useEffect(() => {
-		if (hasField(newEntity, 'idLocation') && locations.length > 0) {
-			const updatedEntity = { ...newEntity, idLocation: locations[0].id };
-			setNewEntity(updatedEntity);
-			if (onEntityChange) {
-				onEntityChange(updatedEntity);
+		const fetchCurrentUser = async () => {
+			try {
+				const currentUser: AuthUser = await getCurrentUser(); // Await the promise
+				setUser(currentUser); // Set the resolved user
+
+				// Update the `newEntity` with programmatic values for `idUser`
+				let updatedEntity = { ...newEntity };
+				if (hasField(newEntity, 'idUser')) {
+					updatedEntity = { ...updatedEntity, idUser: currentUser.userId }; // Programmatically set the user ID
+				}
+
+				// Update `idLocation` if applicable
+				if (hasField(newEntity, 'idLocation') && locations.length > 0) {
+					updatedEntity = { ...updatedEntity, idLocation: locations[0].id };
+				}
+
+				// Update the state and notify changes if required
+				setNewEntity(updatedEntity);
+				if (onEntityChange) {
+					onEntityChange(updatedEntity);
+				}
+			} catch (error) {
+				console.error('Error fetching current user:', error);
 			}
-		}
+		};
+
+		fetchCurrentUser(); // Call the async function
 	}, [locations, newEntity, onEntityChange]);
 
 	const handleChange = (key: keyof T, value: T[keyof T]) => {
@@ -65,7 +87,12 @@ const NewEntity = <T extends WithId>({ entity, entityName, onSave, onCancel, onE
 	const requiredFields = requiredFieldsMap ? Object.keys(requiredFieldsMap) : [];
 
 	const hasAllRequiredFields = (entity: T): boolean => {
-		return requiredFields.every(field => entity[field as keyof T] !== undefined && entity[field as keyof T] !== null && entity[field as keyof T] !== 0);
+		return requiredFields.every(
+			(field) =>
+				entity[field as keyof T] !== undefined &&
+				entity[field as keyof T] !== null &&
+				entity[field as keyof T] !== 0
+		);
 	};
 
 	const handleSave = () => {
@@ -80,11 +107,11 @@ const NewEntity = <T extends WithId>({ entity, entityName, onSave, onCancel, onE
 
 	const handleCancel = () => {
 		const done = onCancel();
-		if ( done && done.length > 0) {
+		if (done && done.length > 0) {
 			const event: AppEvent = {
-				entity: entityName ,
+				entity: entityName,
 				actionType: 'CANCEL_REQUEST',
-				pageType: done// not top level
+				pageType: done // not top level
 			};
 			addCustomEvent(event);
 		} else {
@@ -123,6 +150,21 @@ const NewEntity = <T extends WithId>({ entity, entityName, onSave, onCancel, onE
 		}
 
 		if (isBasicType(value)) {
+			if (key === 'idUser') {
+				// Display the user's login email but set `idUser` programmatically
+				return (
+					<tr key={key}>
+						<td><label>{displayName || 'User'}:</label></td>
+						<td>
+
+								{user?.signInDetails?.loginId || "Loading..."}
+
+
+						</td>
+					</tr>
+				);
+			}
+
 			if (key === 'description') {
 				return (
 					<tr key={key}>
