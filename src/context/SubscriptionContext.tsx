@@ -1,6 +1,6 @@
 ﻿import React, { createContext, useContext, useState, useEffect, ReactNode } from 'react';
 import { generateClient } from 'aws-amplify/data';
-import type { Schema } from '../../amplify/data/resource';
+import type { Schema } from '@amplify-data/resource';
 import { AppEvent, AppStatePage } from '@shared/types/types';
 
 interface SubscriptionContextProps {
@@ -13,6 +13,8 @@ const SubscriptionContext = createContext<SubscriptionContextProps | undefined>(
 
 export const SubscriptionProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
 	const [lastEvent, setLastEvent] = useState<AppEvent | null>(null);
+	//const [refreshExerciseManager, setRefreshExerciseManager] =
+	// useState(false);
 	const client = generateClient<Schema>();
 
 	const subscribeToEntityEvents = () => {
@@ -37,6 +39,7 @@ export const SubscriptionProvider: React.FC<{ children: ReactNode }> = ({ childr
 			client.models.locations.onCreate().subscribe({
 				next: handleEvent(AppStatePage.Location, 'CREATE'),
 				error: (error: any) => console.warn('Create Location subscription error:', error),
+				complete: () => {}, // Placeholder for complete
 			})
 		);
 
@@ -44,6 +47,7 @@ export const SubscriptionProvider: React.FC<{ children: ReactNode }> = ({ childr
 			client.models.locations.onUpdate().subscribe({
 				next: handleEvent(AppStatePage.Location, 'UPDATE'),
 				error: (error: any) => console.warn('Update Location subscription error:', error),
+				complete: () => {}, // Placeholder for complete
 			})
 		);
 

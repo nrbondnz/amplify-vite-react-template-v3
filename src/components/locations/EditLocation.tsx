@@ -1,28 +1,29 @@
-﻿// src/components/locations/EditLocation.tsx
-//import { useSubscription } from "@context/SubscriptionContext";
+﻿import React from "react";
+import { useParams } from "react-router-dom";
+import EditEntity from "@components/generic/EditEntity";
+import withEntityData from "@components/generic/withEntityData";
 import { client } from "@shared/utils/client";
-//import { deleteLocations } from "mutations";
-import React from 'react';
-import {  useParams } from 'react-router-dom';
-import EditEntity from '@components/generic/EditEntity';
-import withEntityData from '@components/generic/withEntityData';
-import { EntityTypes, ILocation } from '@shared/types/types';
+import { EntityTypes, ILocation } from "@shared/types/types";
 
 interface EditLocationProps {
-	entities: ILocation[];
-	getEntityById: (id: string) => ILocation | null;
-	loading: boolean;
+	entityManager: {
+		entities: ILocation[];
+		getEntityById: (id: string) => ILocation | null;
+		getNextId: () => number; // Added this field to align with `withEntityData`!
+		refreshEntities: () => void;
+		loading: boolean;
+		error: string | null;
+	};
 }
-const EditLocation: React.FC<EditLocationProps> = ({ getEntityById, loading }) => {
-	const { id } = useParams<{ id: string }>();
-	//const navigate = useNavigate(); // Use the useNavigate hook
-	//const { addCustomEvent } = useSubscription();
 
-	if (loading) {
+const EditLocation: React.FC<EditLocationProps> = ({ entityManager }) => {
+	const { id } = useParams<{ id: string }>();
+
+	if (entityManager.loading) {
 		return <div>Loading...</div>;
 	}
 
-	const entity = getEntityById(id!);
+	const entity = entityManager.getEntityById(id!);
 
 	if (!entity) {
 		return <div>Entity not found</div>;
@@ -31,29 +32,39 @@ const EditLocation: React.FC<EditLocationProps> = ({ getEntityById, loading }) =
 	const handleSave = async (updatedEntity: ILocation) => {
 		try {
 			await client.models.locations.update(updatedEntity);
-			console.log('Saving entity:', updatedEntity);
-			//navigate('/appcontent'); // Navigate to /locations after saving
+			console.log("Saving entity:", updatedEntity);
+			entityManager.refreshEntities(); // Refresh entity list after save
+			// Optional: Add `navigate` or additional actions here.
 		} catch (error) {
-			console.error('Failed to save the entity:', error);
+			console.error("Failed to save the entity:", error);
 		}
 	};
 
 	const handleDelete = async (updatedEntity: ILocation) => {
 		try {
-			client.models.locations.delete({id:updatedEntity.id})
-			console.log('Deleting entity:', updatedEntity);
-			console.log("Post delete : ", client.models.locations.list);
-			//navigate('/appcontent'); // Navigate to /locations after saving
+			await client.models.locations.delete({ id: updatedEntity.id });
+			console.log("Deleting entity:", updatedEntity);
+			entityManager.refreshEntities(); // Refresh entity list after delete
+			// Optional: Add `navigate` or additional actions here.
 		} catch (error) {
-			console.error('Failed to delete the entity:', error);
+			console.error("Failed to delete the entity:", error);
 		}
 	};
-	
-	const handleCancel = () => {
-		
-	}
 
-	return <EditEntity pEntity={entity} pEntityName="locations"  onSave={handleSave} onDelete={handleDelete} onCancel={handleCancel} />;
+	const handleCancel = () => {
+		console.log("Canceling changes");
+		// Optional: Add navigation or custom actions upon canceling.
+	};
+
+	return (
+		<EditEntity
+			pEntity={entity}
+			pEntityName="locations"
+			onSave={handleSave}
+			onDelete={handleDelete}
+			onCancel={handleCancel}
+		/>
+	);
 };
 
 export default withEntityData<ILocation>(EntityTypes.Location)(EditLocation);

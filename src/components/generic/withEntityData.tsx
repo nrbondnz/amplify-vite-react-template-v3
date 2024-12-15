@@ -1,37 +1,61 @@
-﻿import { useDataContext } from "@context/DataContext";
-import React from 'react';
-import { EntityTypes, WithId } from '@shared/types/types';
+﻿import React from "react";
+import { useDataContext } from "@context/DataContext";
+import { EntityTypes } from "@shared/types/types";
 
-interface WithEntityDataProps<T extends WithId> {
-	entities: T[];
-	getEntityById: (id: string) => T | null;
-	getNextId: () => number;
-	loading: boolean;
-	error: string | null;
-}
-
-const withEntityData = <T extends WithId,>(entityType: EntityTypes) => (
-	Component: React.ComponentType<WithEntityDataProps<T>>
+/**
+ * Higher-Order Component (HOC) to pass the entity manager for a specified entity type to a child component.
+ *
+ * @param entityType The type of entities being managed (e.g., "Exercise").
+ */
+const withEntityData = <T extends { id: string | number }>(
+	entityType: EntityTypes
+) => (
+	Component: React.ComponentType<{
+		entityManager: {
+			entities: T[];
+			getEntityById: (id: string) => T | null;
+			getNextId: () => number;
+			refreshEntities: () => void;
+			loading: boolean;
+			error: string | null;
+		};
+	}>
 ) => {
-	return (props: Omit<WithEntityDataProps<T>, keyof WithEntityDataProps<T>>) => {
-		// Get the manager dynamically
+	return (props: any) => {
+		// Retrieve entity manager using the DataContext
 		const manager = useDataContext().getManagerByType(entityType);
 
-		// Check and cast manager to the correct inferred type
 		if (!manager) {
-			throw new Error(`Manager for entity type ${entityType} not found.`);
+			throw new Error(`Entity manager for type ${entityType} is undefined.`);
 		}
 
-		const typedManager = manager as unknown as WithEntityDataProps<T>
+		/**
+		 * Generate the next available ID for a new entity.
+		 * This assumes that all entities have numeric or string-based IDs that can be parsed into numbers.
+		 */
+		const getNextId = (): number => {
+			if (manager.entities.length === 0) return 1; // Handle if there are no existing entities
+			return (
+				Math.max(
+					...manager.entities.map((entity) =>
+						typeof entity.id === "string" ? parseInt(entity.id, 10) : entity.id
+					)
+				) + 1
+			);
+		};
 
+		// Return the wrapped component with the entity manager as a prop
 		return (
 			<Component
 				{...props}
-				entities={typedManager.entities}
-				getEntityById={typedManager.getEntityById}
-				getNextId={typedManager.getNextId}
-				loading={typedManager.loading}
-				error={typedManager.error}
+				entityManager={{
+					entities: manager.entities,
+					getEntityById: manager.getEntityById,
+					getNextId, // Inject the getNextId function
+					refreshEntities: manager.refreshEntities,
+					loading: manager.loading,
+					error: manager.error,
+				}}
 			/>
 		);
 	};

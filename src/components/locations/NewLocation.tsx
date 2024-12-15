@@ -1,49 +1,56 @@
 ﻿import NewEntity from "@components/generic/NewEntity";
+import withEntityData from "@components/generic/withEntityData";
+import { EntityTypes, ILocation, getEntityDefault } from "@shared/types/types";
 import { client } from "@shared/utils/client";
-import React from 'react';
-import withEntityData from '@components/generic/withEntityData';
-import {
-	defaultLocation,
-	EntityTypes,
-	ILocation
-} from '@shared/types/types';
+import React from "react";
+import { useNavigate } from "react-router-dom";
 
 interface NewLocationProps {
-	loading: boolean;
-	getNextId?: () => number;
+	entityManager: {
+		entities: ILocation[]; // List of locations
+		getEntityById: (id: string) => ILocation | null; // Retrieve location by ID
+		getNextId: () => number; // Generate the next location ID
+		refreshEntities: () => void; // Refresh the locations list
+		loading: boolean; // Loading state
+		error: string | null; // Error state
+	};
 }
 
-export const NewLocation: React.FC<NewLocationProps> = ({ loading}) => {
-	//const navigate = useNavigate();
+const NewLocation: React.FC<NewLocationProps> = ({ entityManager }) => {
+	const navigate = useNavigate();
 
-	if (loading) {
+	// Handle loading state
+	if (entityManager.loading) {
 		return <div>Loading...</div>;
 	}
 
 	const handleSave = async (newEntity: ILocation) => {
-		// Ensure default values for selection elements
-
-
-		console.log('Attempting to save entity:', newEntity);
 		try {
-			console.log('New entity before save:', JSON.stringify(newEntity, null, 2));
+			newEntity.id = entityManager.getNextId(); // Assign the next ID
+			const savedLocation = await client.models.locations.create(newEntity);
+			console.log("Saving location:", savedLocation);
 
-			const response = await client.models.locations.create(newEntity);
-
-			if (response.data) {
-				console.log('Entity saved successfully:', response);
-				//navigate('/locations'); // Navigate to /locations after saving
-			} else {
-				console.warn('Entity save responded with no data:', response);
-			}
+			entityManager.refreshEntities(); // Refresh list after saving
+			navigate("/locations"); // Navigate back to the locations list
 		} catch (error) {
-			console.error('Failed to save the entity:', error);
-			console.error('Error details:', error);
+			console.error("Failed to save the location:", error);
 		}
 	};
 
-	return <NewEntity entity={defaultLocation} entityName="locations" onSave={handleSave} onCancel={() => "NEW"} />;
+	const handleCancel = (): string => {
+		navigate("/locations");
+		return "cancelled";
+	};
+
+	return (
+		<NewEntity
+			entity={getEntityDefault<ILocation>(EntityTypes.Location).defaultEntity}
+			entityName="locations"
+			onSave={handleSave}
+			onCancel={handleCancel}
+		/>
+	);
 };
 
-// @ts-ignore
+// Always export the default as the HOC-wrapped component
 export default withEntityData<ILocation>(EntityTypes.Location)(NewLocation);

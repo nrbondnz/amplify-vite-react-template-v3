@@ -69,7 +69,7 @@ const NewEntity = <T extends WithId>({ entity, entityName, onSave, onCancel, onE
 		};
 
 		fetchCurrentUser(); // Call the async function
-	}, [locations, newEntity, onEntityChange]);
+	}, [onEntityChange]);
 
 	const handleChange = (key: keyof T, value: T[keyof T]) => {
 		const updatedEntity = { ...newEntity, [key]: value };
@@ -156,10 +156,12 @@ const NewEntity = <T extends WithId>({ entity, entityName, onSave, onCancel, onE
 					<tr key={key}>
 						<td><label>{displayName || 'User'}:</label></td>
 						<td>
-
-								{user?.signInDetails?.loginId || "Loading..."}
-
-
+							<input
+								type="text"
+								value={user?.signInDetails?.loginId || "Loading..."} // Display
+								// login email or "Loading..."
+								readOnly
+							/>
 						</td>
 					</tr>
 				);

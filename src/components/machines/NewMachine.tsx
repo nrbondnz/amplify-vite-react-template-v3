@@ -1,58 +1,60 @@
-﻿//import { useEntityData } from "@hooks/useEntityData";
-import NewEntity from "@components/generic/NewEntity";
-import withEntityData from '@components/generic/withEntityData';
-import { EntityTypes, getEntityDefault, IMachine, } from '@shared/types/types';
+﻿import NewEntity from "@components/generic/NewEntity";
+import withEntityData from "@components/generic/withEntityData";
+import { EntityTypes, getEntityDefault, IMachine } from "@shared/types/types";
 import { client } from "@shared/utils/client";
-import React from 'react';
-import { useNavigate } from 'react-router-dom';
-import ManageSettings from './ManageSettings';
+import React from "react";
+import { useNavigate } from "react-router-dom";
+import ManageSettings from "./ManageSettings";
 
 interface NewMachineProps {
-	loading: boolean;
-	getNextId: () => number;
+	entityManager: {
+		entities: IMachine[]; // List of machines
+		getEntityById: (id: string) => IMachine | null; // Function to retrieve an entity by its ID
+		getNextId: () => number; // Generate the next machine ID
+		refreshEntities: () => void; // Refresh the machine list
+		loading: boolean; // Loading state
+		error: string | null; // Error state
+	};
 }
 
-const NewMachine: React.FC<NewMachineProps> = ({ loading, getNextId }) => {
-	
-	// Destructure useEntityData and rename getNextId to getNextSessionId
-	//const { loading: dataLoading, getNextId: getNextSessionId } =
-	// useEntityData<ISetting>(EntityTypes.Setting);
-
+const NewMachine: React.FC<NewMachineProps> = ({ entityManager }) => {
 	const navigate = useNavigate();
 
-	// Combine the loading states
-	if (loading ) {
+	if (entityManager.loading) {
 		return <div>Loading...</div>;
 	}
 
 	const handleSave = async (newEntity: IMachine) => {
 		try {
-			newEntity.id = getNextId(); // Assign the next ID using getNextId()
-
-			// Save the machine entity
+			newEntity.id = entityManager.getNextId(); // Assign the next ID using getNextId()
 			const savedMachine = await client.models.machines.create(newEntity);
-			console.log('Saving entity:', savedMachine);
+			console.log("Saving entity:", savedMachine);
 
-			// Loop over the settings and update each with the new entity ID
-		
-
-			// Navigate to /appcontent after saving
-			navigate('/appcontent');
+			entityManager.refreshEntities(); // Refresh entities after saving
+			navigate("/appcontent"); // Navigate after save
 		} catch (error) {
-			console.error('Failed to save the entity:', error);
+			console.error("Failed to save the entity:", error);
 		}
 	};
 
-
-	function handleCancel():string {
-		navigate('/appcontent');
+	const handleCancel = (): string => {
+		navigate("/appcontent");
 		return "NEW";
-	}
+	};
 
 	return (
 		<>
-			<NewEntity entity={getEntityDefault<IMachine>(EntityTypes.Machine).defaultEntity} entityName="machines" onSave={handleSave}  onCancel={handleCancel} />
-			<ManageSettings entityType={EntityTypes.Machine} entityId={-1} onSaveRef={()=>{}}/>
+			<NewEntity
+				entity={getEntityDefault<IMachine>(EntityTypes.Machine).defaultEntity}
+				entityName="machines"
+				onSave={handleSave}
+				onCancel={handleCancel}
+			/>
+			<ManageSettings
+				entityType={EntityTypes.Machine}
+				entityId={-1}
+				onSaveRef={() => {}}
+			/>
 		</>
 	);
 };

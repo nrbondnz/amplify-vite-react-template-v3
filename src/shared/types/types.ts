@@ -209,7 +209,7 @@ export interface IExercise extends WithIdAndDisplayNum {
 	idMachine: number;
 	displayNum: number;
 	description: string;
-	idUser: number | null;
+	idUser: string | null;
 	fame: number;
 }
 

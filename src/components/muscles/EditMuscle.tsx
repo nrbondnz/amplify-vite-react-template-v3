@@ -1,29 +1,43 @@
-﻿import React, { useRef } from 'react';
+﻿import React, { useRef } from "react";
 import { client } from "@shared/utils/client";
-import { useParams } from 'react-router-dom';
-import { useNavigate } from 'react-router-dom';
-import EditEntity from '@components/generic/EditEntity';
-import ManageRelationships from '@components/generic/ManageRelationships';
-import withEntityData from '@components/generic/withEntityData';
-import { EntityTypes, IMuscle } from '@shared/types/types';
+import { useParams, useNavigate } from "react-router-dom";
+import EditEntity from "@components/generic/EditEntity";
+import ManageRelationships from "@components/generic/ManageRelationships";
+import withEntityData from "@components/generic/withEntityData";
+import { EntityTypes, IMuscle } from "@shared/types/types";
 
 interface EditMuscleProps {
-	entities: IMuscle[];
-	getEntityById: (id: string) => IMuscle | null;
-	loading: boolean;
+	entityManager: {
+		entities: IMuscle[];
+		getEntityById: (id: string) => IMuscle | null;
+		getNextId: () => number;
+		refreshEntities: () => void;
+		loading: boolean;
+		error: string | null;
+	};
 }
 
-const EditMuscle: React.FC<EditMuscleProps> = ({ getEntityById, loading }) => {
+const EditMuscle: React.FC<EditMuscleProps> = ({ entityManager }) => {
 	const { id } = useParams<{ id: string }>();
 	const navigate = useNavigate();
-	const manageRelationshipsRef = useRef<{ saveRelationships: () => void; cancelRelationships: () => void }>(null);
-	const manageRelationshipsRef2 = useRef<{ saveRelationships: () => void; cancelRelationships: () => void }>(null);
 
-	if (loading) {
+	// Refs for managing relationships
+	const manageRelationshipsRefs = useRef<{
+		[key: string]: { saveRelationships: () => void; cancelRelationships: () => void } | null;
+	}>({
+		Exercise: null,
+		Machine: null,
+	});
+
+	if (entityManager.loading) {
 		return <div>Loading...</div>;
 	}
 
-	const entity = getEntityById(id!);
+	if (!id) {
+		return <div>Invalid entity ID</div>;
+	}
+
+	const entity = entityManager.getEntityById(id);
 
 	if (!entity) {
 		return <div>Entity not found</div>;
@@ -31,47 +45,53 @@ const EditMuscle: React.FC<EditMuscleProps> = ({ getEntityById, loading }) => {
 
 	const handleSaveEntity = async (updatedEntity: IMuscle) => {
 		try {
-			await client.models.muscles.update(updatedEntity);
-			manageRelationshipsRef.current?.saveRelationships();
-			manageRelationshipsRef2.current?.saveRelationships();
-			console.log('Saving entity:', updatedEntity);
-			navigate('/appcontent');
+			await client.models.muscles.update(updatedEntity); // Save updated muscle
+			entityManager.refreshEntities(); // Refresh after saving
+			Object.values(manageRelationshipsRefs.current).forEach((ref) => ref?.saveRelationships());
+			console.log("Saved entity:", updatedEntity);
+			navigate("/muscles"); // Navigate back to muscles list
 		} catch (error) {
-			console.error('Failed to save the entity:', error);
+			console.error("Failed to save the entity:", error);
 		}
 	};
 
 	const handleDelete = async (updatedEntity: IMuscle) => {
 		try {
-			await client.models.muscles.delete(updatedEntity);
-			console.log('Deleting entity:', updatedEntity);
-			navigate('/appcontent');
+			await client.models.muscles.delete(updatedEntity); // Delete the muscle
+			console.log("Deleted entity:", updatedEntity);
+			navigate("/muscles"); // Navigate back to muscles list
 		} catch (error) {
-			console.error('Failed to delete the entity:', error);
+			console.error("Failed to delete the entity:", error);
 		}
 	};
 
 	const handleCancel = () => {
-		manageRelationshipsRef.current?.cancelRelationships();
-		manageRelationshipsRef2.current?.cancelRelationships();
-		console.log('Canceling changes');
+		Object.values(manageRelationshipsRefs.current).forEach((ref) => ref?.cancelRelationships());
+		console.log("Canceling changes");
+		navigate("/muscles"); // Navigate back to muscles list
 	};
 
 	return (
 		<>
-			<EditEntity pEntity={entity!} pEntityName="muscles" onSave={handleSaveEntity} onDelete={handleDelete} onCancel={handleCancel} />
-			<ManageRelationships
-				ref={manageRelationshipsRef}
-				keyId={entity.id}
-				keyType={EntityTypes.Muscle}
-				partnerType={EntityTypes.Exercise}
+			{/* Muscle edit form */}
+			<EditEntity
+				pEntity={entity!}
+				pEntityName="muscles"
+				onSave={handleSaveEntity}
+				onDelete={handleDelete}
+				onCancel={handleCancel}
 			/>
-			<ManageRelationships
-				ref={manageRelationshipsRef2}
-				keyId={entity.id}
-				keyType={EntityTypes.Muscle}
-				partnerType={EntityTypes.Machine}
-			/>
+
+			{/* Manage relationships */}
+			{["Exercise", "Machine"].map((partnerType) => (
+				<ManageRelationships
+					key={partnerType}
+					ref={(ref) => (manageRelationshipsRefs.current[partnerType] = ref)}
+					keyId={entity.id}
+					keyType={EntityTypes.Muscle}
+					partnerType={EntityTypes[partnerType as keyof typeof EntityTypes]}
+				/>
+			))}
 		</>
 	);
 };

@@ -40,7 +40,7 @@ export const schema = configure({
         idMachine: a.integer(),
         displayNum: a.integer(),
         description: a.string().required(),
-        idUser: a.integer(),
+        idUser: a.string(),
         fame: a.integer()
     }).identifier([
         "id"

@@ -55,6 +55,13 @@ const EditEntity = <T extends WithId>({ pEntity, pEntityName, onSave, onDelete, 
 	const handleSave = () => {
 		console.log('Saving entity:', updatedEntity);
 		onSave(updatedEntity);
+		const event: AppEvent = {
+			entity: pEntityName,
+			entityId: updatedEntity.id,
+			actionType: 'UPDATE',
+			pageType: 'EDIT'
+		};
+		addCustomEvent(event);
 	}
 
 	const handleDelete = () => onDelete(updatedEntity);

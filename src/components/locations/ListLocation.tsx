@@ -1,12 +1,39 @@
-﻿// src/components/locations/ListLocation.tsx
-import ListEntity from '@components/generic/ListEntity';
-import withEntityData from '@components/generic/withEntityData';
+﻿import React from "react";
+import ListEntity from "@components/generic/ListEntity";
+import withEntityData from "@components/generic/withEntityData";
 import { EntityTypes, ILocation } from "@shared/types/types";
-//import { EntityTypes, ILocation } from '@shared/types/types';
 
-// Provide the right endpoint and props
-const ListLocation = withEntityData<ILocation>(EntityTypes.Location)(({ entities }) => (
-	<ListEntity title="Locations" entities={entities} entityDBName="locations" />
-));
+interface ListLocationProps {
+	entityManager: {
+		entities: ILocation[]; // List of entities
+		getEntityById: (id: string) => ILocation | null; // Retrieve an entity by its ID
+		getNextId: () => number; // Generate the next available ID
+		refreshEntities: () => void; // Function to refresh entity data
+		loading: boolean; // Loading state
+		error: string | null; // Error state
+	};
+}
 
-export default ListLocation;
+const ListLocation: React.FC<ListLocationProps> = ({ entityManager }) => {
+	if (entityManager.loading) {
+		return <div>Loading locations...</div>; // Loading feedback
+	}
+
+	if (entityManager.error) {
+		return <div>Error loading locations: {entityManager.error}</div>; // Error feedback
+	}
+
+	if (!entityManager.entities || entityManager.entities.length === 0) {
+		return <div>No locations found.</div>; // Handle empty state
+	}
+
+	return (
+		<ListEntity
+			title="Locations"
+			entities={entityManager.entities} // List of locations
+			entityDBName="locations" // Database name for the entity
+		/>
+	);
+};
+
+export default withEntityData<ILocation>(EntityTypes.Location)(ListLocation);

@@ -1,36 +1,54 @@
-﻿// src/components/workouts/NewWorkout.tsx
-import NewEntity from "@components/generic/NewEntity";
+﻿import NewEntity from "@components/generic/NewEntity";
 import { client } from "@shared/utils/client";
-import React from 'react';
-import withEntityData from '@components/generic/withEntityData';
-import { defaultWorkout, EntityTypes, IWorkout } from '@shared/types/types';
-import { useNavigate } from 'react-router-dom';
+import React from "react";
+import withEntityData from "@components/generic/withEntityData";
+import { defaultWorkout, EntityTypes, IWorkout } from "@shared/types/types";
+import { useNavigate } from "react-router-dom";
 
 interface NewWorkoutProps {
-	loading: boolean;
-	getNextId: () => number;
+	entityManager: {
+		entities: IWorkout[]; // List of entities
+		getEntityById: (id: string) => IWorkout | null; // Retrieve an entity by its ID
+		getNextId: () => number; // Generate the next available ID
+		refreshEntities: () => void; // Refresh list of entities
+		loading: boolean; // Loading state
+		error: string | null; // Error state
+	};
 }
 
-const NewWorkout: React.FC<NewWorkoutProps> = ({ loading, getNextId }) => {
+const NewWorkout: React.FC<NewWorkoutProps> = ({ entityManager }) => {
 	const navigate = useNavigate();
 
-	if (loading) {
+	if (entityManager.loading) {
 		return <div>Loading...</div>;
 	}
 
 	const handleSave = async (newEntity: IWorkout) => {
 		try {
-			newEntity.id = getNextId(); // Assign the next ID using getNextId()
-			await client.models.workouts.create(newEntity);
-			console.log('Saving entity:', newEntity);
-			navigate('/workouts'); // Navigate to /workouts after saving
+			newEntity.id = entityManager.getNextId(); // Assign the next available ID
+			const res = await client.models.workouts.create(newEntity);
+			console.log("Save response:", res);
+			console.log("Saved entity:", newEntity);
+			entityManager.refreshEntities(); // Refresh list after saving
+			navigate("/workouts"); // Navigate to workouts page
 		} catch (error) {
-			console.error('Failed to save the entity:', error);
-			
+			console.error("Failed to save the entity:", error);
 		}
 	};
 
-	return <NewEntity entity={defaultWorkout} entityName="workouts" onSave={handleSave} onCancel={() => "NEW" } />;
+	const handleCancel = (): string => {
+		console.log("Canceling new entity creation...");
+		return "cancelled"; // Return a string for compatibility
+	};
+
+	return (
+		<NewEntity
+			entity={defaultWorkout}
+			entityName="workouts"
+			onSave={handleSave}
+			onCancel={handleCancel}
+		/>
+	);
 };
 
 export default withEntityData<IWorkout>(EntityTypes.Workout)(NewWorkout);

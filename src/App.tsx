@@ -8,7 +8,7 @@ import { FindExerciseCombo } from "@components/FindExerciseCombo";
 import HomePage from "@components/HomePage";
 import EditLocation from "@components/locations/EditLocation";
 import ListLocation from "@components/locations/ListLocation";
-import { NewLocation } from "@components/locations/NewLocation";
+import NewLocation from "@components/locations/NewLocation";
 import MachineDetails from "@components/MachineDetails";
 import EditMachine from "@components/machines/EditMachine";
 import MachineList from "@components/machines/MachineList";
@@ -64,7 +64,7 @@ const App: React.FC = () => {
                 <Route path="/workout_exercises/new" element={<NewWorkoutExercise />} />
                 <Route path="/workout_exercises/:id" element={<EditWorkoutExercise />} />
                 <Route path="/locations" element={<ListLocation />} />
-                <Route path="/locations/new" element={<NewLocation loading={false} />} />
+                <Route path="/locations/new" element={<NewLocation/>} />
                 <Route path="/locations/:id" element={<EditLocation />} />
                 <Route path="/muscles" element={<ListMuscle />} />
                 <Route path="/muscles/new" element={<NewMuscle />} />
