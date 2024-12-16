@@ -8,6 +8,7 @@ import { useNavigate } from "react-router-dom";
 interface NewMuscleProps {
 	entityManager: {
 		entities: IMuscle[];
+		setEntities: (entities: IMuscle[]) => void;
 		getEntityById: (id: string) => IMuscle | null;
 		getNextId: () => number;
 		refreshEntities: () => void;

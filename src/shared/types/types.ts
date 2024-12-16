@@ -75,7 +75,7 @@ export interface AppEvent {
 }
 
 export interface AppData {
-	users: IUser[];
+	users: IUserDetails[];
 	exercises: IExercise[];
 	locations: ILocation[];
 	machines: IMachine[];
@@ -143,7 +143,7 @@ export enum EntityTypes {
 	Location = "locations",
 	Muscle = "muscles",
 	Setting = 'settings',
-	User = "users",
+	User = "userDetails",
 	Workout = "workouts",
 	WorkoutExercise = "workoutExercises",
 	Exercise = "exercises",
@@ -153,8 +153,9 @@ export enum EntityTypes {
 	Session = "sessions",
 	SessionExercise = "sessionExercises",
 	EntityRelationship = "entityRelationships",
-
 }
+
+
 
 export const defaultUserWorkEx: IWorkoutExercise = {
 	id: 0,
@@ -296,43 +297,37 @@ export const defaultSetting: ISetting = {
 }
 
 
-
-export const getEntityDefault = <T>(entityType: EntityTypes): {defaultEntity: T, entityDBName: string} => {
-	let defaultEntity;
+export const getEntityDefault = <T extends WithId>(
+	entityType: EntityTypes
+): { defaultEntity: T; entityDBName: string } => {
 	switch (entityType) {
 		case EntityTypes.Machine:
-			defaultEntity = defaultMachine as T;
-
-			return { defaultEntity: defaultMachine as T, entityDBName: entityType.toString() };
+			return { defaultEntity: defaultMachine as unknown as T, entityDBName: entityType.toString() };
 		case EntityTypes.Exercise:
-			return { defaultEntity: defaultExercise as T, entityDBName: entityType.toString() };
+			return { defaultEntity: defaultExercise as unknown as T, entityDBName: entityType.toString() };
 		case EntityTypes.Setting:
-			return { defaultEntity: defaultSetting as T, entityDBName: entityType.toString() };
+			return { defaultEntity: defaultSetting as unknown as T, entityDBName: entityType.toString() };
 		case EntityTypes.User:
-			return { defaultEntity: defaultUser as T, entityDBName: entityType.toString() };
+			return { defaultEntity: defaultUser as unknown as T, entityDBName: entityType.toString() };
 		case EntityTypes.Workout:
-			return { defaultEntity: defaultWorkout as T, entityDBName: entityType.toString() };
+			return { defaultEntity: defaultWorkout as unknown as T, entityDBName: entityType.toString() };
 		case EntityTypes.WorkoutExercise:
-			return { defaultEntity: defaultWorkoutExercise as T, entityDBName: entityType.toString() };
+			return { defaultEntity: defaultWorkoutExercise as unknown as T, entityDBName: entityType.toString() };
 		case EntityTypes.Muscle:
-			return { defaultEntity: defaultMuscle as T, entityDBName: entityType.toString() };
+			return { defaultEntity: defaultMuscle as unknown as T, entityDBName: entityType.toString() };
 		case EntityTypes.Location:
-			return { defaultEntity: defaultLocation as T, entityDBName: entityType.toString() };
+			return { defaultEntity: defaultLocation as unknown as T, entityDBName: entityType.toString() };
 		case EntityTypes.SessionWorkout:
-			return { defaultEntity: defaultSesionWorkout as T, entityDBName: entityType.toString() };
-		case EntityTypes.SessionWorkoutExercise as T:
-			return { defaultEntity: defaultSessionWorkoutExercise as T, entityDBName: entityType.toString() };
+			return { defaultEntity: defaultSesionWorkout as unknown as T, entityDBName: entityType.toString() };
+		case EntityTypes.SessionWorkoutExercise:
+			return { defaultEntity: defaultSessionWorkoutExercise as unknown as T, entityDBName: entityType.toString() };
 		case EntityTypes.SessionExercise:
-			return { defaultEntity: defaultSessionExercise as T, entityDBName: entityType.toString() };
+			return { defaultEntity: defaultSessionExercise as unknown as T, entityDBName: entityType.toString() };
 		case EntityTypes.EntityRelationship:
-			return { defaultEntity: defaultEntityRelationship as T, entityDBName: entityType.toString() };
-
+			return { defaultEntity: defaultEntityRelationship as unknown as T, entityDBName: entityType.toString() };
 		default:
 			throw new Error(`Unhandled entity type: ${entityType}`);
 	}
-	return { defaultEntity: defaultEntity as T, entityDBName: entityType.toString() };
-
-
 };
 
 export const requiredFieldsMap: { [key in EntityTypes]?: (keyof any)[] } = {
@@ -388,29 +383,26 @@ export interface IWorkout extends WithId {
 	entityName: string;
 }
 
-export interface IUser extends WithId {
+export interface IUserDetails extends WithId {
 	email: string;
 	phoneNumber?: string | null;  // Optional
-	idLocation: number;
-	roles: string[];  // Assuming it’s a JSON array
+	idLocation: number;  // Assuming it’s a JSON array
 }
 
-export const defaultUser: IUser = {
+export const defaultUser: IUserDetails = {
 	id: -1,
 	entityName: 'default',
 	email: 'default@example.com',
 	phoneNumber: '0275560006',
 	idLocation: 1,
-	roles: ['user']
 };
 
-export const defaultUserInfo: IUser = {
+export const defaultUserInfo: IUserDetails = {
 	id: -1,
 	entityName: 'default',
 	email: 'default@example.com',
 	phoneNumber: '0275560006',
 	idLocation: 1,
-	roles: ['user']
 };
 
 export interface IMuscle extends WithIdAndDisplayNum {

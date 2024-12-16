@@ -8,6 +8,7 @@ import { useNavigate } from "react-router-dom";
 interface NewWorkoutExerciseProps {
 	entityManager: {
 		entities: IWorkoutExercise[];
+		setEntities: (entities: IWorkoutExercise[]) => void;
 		getEntityById: (id: string) => IWorkoutExercise | null;
 		getNextId: () => number;
 		refreshEntities: () => void;

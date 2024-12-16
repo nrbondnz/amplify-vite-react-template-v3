@@ -8,6 +8,7 @@ import { EntityTypes, IWorkout } from "@shared/types/types";
 interface EditWorkoutProps {
 	entityManager: {
 		entities: IWorkout[]; // List of entities
+		setEntities: (entities: IWorkout[]) => void;
 		getEntityById: (id: string) => IWorkout | null; // Retrieve an entity by its ID
 		getNextId: () => number; // Generate the next ID (not required, but part of the injected type)
 		refreshEntities: () => void; // Function to refresh entities

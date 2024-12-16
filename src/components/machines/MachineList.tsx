@@ -5,6 +5,7 @@ import { EntityTypes, IMachine } from "@shared/types/types";
 interface MachineListProps {
 	entityManager: {
 		entities: IMachine[]; // List of entities (machines)
+		setEntities: (entities: IMachine[]) => void;
 		getEntityById: (id: string) => IMachine | null; // Retrieve machine by ID
 		getNextId: () => number; // Generate a new machine ID
 		refreshEntities: () => void; // Refresh the machine list

@@ -9,6 +9,7 @@ import { EntityTypes, IExercise } from "@shared/types/types";
 interface EditExerciseProps {
 	entityManager: {
 		entities: IExercise[];
+		setEntities: (entities: IExercise[]) => void;
 		getEntityById: (id: string) => IExercise | null;
 		getNextId: () => number; // Added to align with the `withEntityData` injection
 		refreshEntities: () => void;
@@ -53,7 +54,8 @@ const EditExercise: React.FC<EditExerciseProps> = ({ entityManager }) => {
 		try {
 			const updated = await client.models.exercises.update(updatedEntity);
 			console.log("Saved entity:", updated);
-			entityManager.refreshEntities(); // Refresh after saving
+			entityManager.setEntities(await client.models.exercises.list() as unknown as IExercise[]);
+			console.log("list : ", entityManager.entities)// Refresh after saving
 			Object.values(manageRelationshipsRefs.current).forEach((ref) =>
 				ref?.saveRelationships()
 			);

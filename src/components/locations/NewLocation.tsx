@@ -8,6 +8,7 @@ import { useNavigate } from "react-router-dom";
 interface NewLocationProps {
 	entityManager: {
 		entities: ILocation[]; // List of locations
+		setEntities: (entities: ILocation[]) => void;
 		getEntityById: (id: string) => ILocation | null; // Retrieve location by ID
 		getNextId: () => number; // Generate the next location ID
 		refreshEntities: () => void; // Refresh the locations list

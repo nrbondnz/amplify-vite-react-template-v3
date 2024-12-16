@@ -1,15 +1,15 @@
-﻿import { client } from "../shared/utils/client";
+﻿import { IEntityManager } from "@shared/types/IEntityManager";
+import { client } from "../shared/utils/client";
 import { EntityTypes, WithId } from "../shared/types/types";
 import { Amplify } from "aws-amplify";
-import { useCallback, useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import outputs from "../../amplify_outputs.json";
 
 Amplify.configure(outputs);
-
-export const useEntityData = <T extends WithId>(entityType: EntityTypes) => {
+export const useEntityData = <T extends WithId,>(entityType: EntityTypes): IEntityManager<T> => {
 	const [entities, setEntities] = useState<T[]>([]);
-	const [error, setError] = useState<string | null>(null);
-	const [loading, setLoading] = useState<boolean>(true);
+	const [, setError] = useState<string | null>(null);
+	const [, setLoading] = useState<boolean>(true);
 
 	// Fetch all data in paginated manner
 	const fetchAllEntityData = async (fetchFunction: (options?: any) => Promise<any>) => {
@@ -19,6 +19,7 @@ export const useEntityData = <T extends WithId>(entityType: EntityTypes) => {
 		// Paginated fetching
 		do {
 			try {
+				console.log(`Fetching data for ${entityType}...`);
 				const response = await fetchFunction({ limit: 1000, nextToken });
 				console.log(`Fetched response for ${entityType}:`, response);
 				allData = allData.concat(response.data.filter((entry: WithId) => entry.id !== -1));
@@ -41,6 +42,8 @@ export const useEntityData = <T extends WithId>(entityType: EntityTypes) => {
 			switch (entity) {
 				case EntityTypes.Location:
 					return await fetchAllEntityData((opts) => client.models.locations.list(opts));
+				case EntityTypes.User:
+					return await fetchAllEntityData((opts) => client.models.userDetails.list(opts));
 				case EntityTypes.Machine:
 					return await fetchAllEntityData((opts) => client.models.machines.list(opts));
 				case EntityTypes.Muscle:
@@ -101,10 +104,10 @@ export const useEntityData = <T extends WithId>(entityType: EntityTypes) => {
 		}
 	};
 
-	// Refresh entity list by calling the fetchEntities method
+/*	// Refresh entity list by calling the fetchEntities method
 	const refreshEntities = () => {
 		console.log(`Refreshing entities for ${entityType}...`);
-		fetchEntities();
+		fetchEntities().then(r => console.log("r : ",r));
 	};
 
 	// Filter entities by ID
@@ -133,24 +136,30 @@ export const useEntityData = <T extends WithId>(entityType: EntityTypes) => {
 	const getNextId = useCallback((): number => {
 		const maxId = entities.reduce((max, entity) => (entity.id > max ? entity.id : max), 0);
 		return maxId + 1;
-	}, [entities]);
+	}, [entities]);*/
 
 	// Effect to fetch initial entities on hook call
 	useEffect(() => {
 		fetchEntities(); // Fetch entities when hook is initialized
 	}, [entityType]);
 
-	// Return hook values
+	//const entities: T[] = []; // Replace with your actual entities
+
 	return {
 		entities,
-		setEntities,
-		error,
-		loading,
-		refreshEntities,
-		fetchEntities,
-		filterById,
-		filterByField,
-		getEntityById,
-		getNextId,
+		setEntities: () => {},
+		error: null,
+		loading: false,
+		refreshEntities: () => {},
+		fetchEntities: async () => {},
+		filterById: (id: string | number) => {
+			// Example implementation
+			return entities.filter((entity: any) => entity.id === id);
+		},
+		filterByField: (fieldName: string | number | symbol, fieldValue: string | number) => {
+			// Example implementation
+			return entities.filter((entity) => entity[fieldName as keyof T] === fieldValue);
+		},
+		getNextId: () => Math.random(),
 	};
 };

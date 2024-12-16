@@ -6,6 +6,7 @@ import { EntityTypes, ILocation } from "@shared/types/types";
 interface ListLocationProps {
 	entityManager: {
 		entities: ILocation[]; // List of entities
+		setEntities: (entities: ILocation[]) => void;
 		getEntityById: (id: string) => ILocation | null; // Retrieve an entity by its ID
 		getNextId: () => number; // Generate the next available ID
 		refreshEntities: () => void; // Function to refresh entity data

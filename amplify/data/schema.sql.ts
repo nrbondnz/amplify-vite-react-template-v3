@@ -98,11 +98,10 @@ export const schema = configure({
     ]),
     "userDetails": a.model({
         id: a.integer().required(),
-        name: a.string().required(),
+        entityName: a.string().required(),
         email: a.string().required(),
         phoneNumber: a.string(),
-        idLocation: a.integer().required(),
-        roles: a.json().required()
+        idLocation: a.integer().required()
     }).identifier([
         "id"
     ]),

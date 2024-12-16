@@ -8,6 +8,7 @@ import { EntityTypes, ILocation } from "@shared/types/types";
 interface EditLocationProps {
 	entityManager: {
 		entities: ILocation[];
+		setEntities: (entities: ILocation[]) => void;
 		getEntityById: (id: string) => ILocation | null;
 		getNextId: () => number; // Added this field to align with `withEntityData`!
 		refreshEntities: () => void;

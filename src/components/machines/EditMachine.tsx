@@ -10,6 +10,7 @@ import ManageSettings from "./ManageSettings";
 interface EditMachineProps {
 	entityManager: {
 		entities: IMachine[]; // List of machines
+		setEntities: (entities: IMachine[]) => void;
 		getEntityById: (id: string) => IMachine | null; // Retrieve machine by ID
 		getNextId: () => number; // Generate new machine ID (optional but part of the type)
 		refreshEntities: () => void; // Refresh list of machines

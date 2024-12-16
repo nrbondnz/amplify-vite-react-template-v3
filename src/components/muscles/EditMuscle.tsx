@@ -9,6 +9,7 @@ import { EntityTypes, IMuscle } from "@shared/types/types";
 interface EditMuscleProps {
 	entityManager: {
 		entities: IMuscle[];
+		setEntities: (entities: IMuscle[]) => void;
 		getEntityById: (id: string) => IMuscle | null;
 		getNextId: () => number;
 		refreshEntities: () => void;
