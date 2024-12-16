@@ -25,7 +25,7 @@ type ListEntityProps<T> = {
 };
 
 // Component definition
-const ListEntity = <T extends WithId & { entityName: string }>({
+const ListEntity = <T extends WithId>({
 																   title,
 																   entityDBName,
 																   entities = [], // Default to an empty array if not provided
@@ -98,14 +98,14 @@ const ListEntity = <T extends WithId & { entityName: string }>({
 	};
 
 	// Build an array of display numbers if the field exists in entities
-	const displayNums = Array.isArray(displayEntities)
+	/*const displayNums = Array.isArray(displayEntities)
 		? displayEntities.map((entity) =>
 			hasField(entity, "displayNum") ? entity.displayNum : undefined
 		)
-		: [];
+		: [];*/
 
 	console.log("About to render ListEntity with:", displayEntities);
-
+//displayEntities.forEach(entity => console.log(entity));
 	// Render component structure
 	return (
 		<div>
@@ -118,6 +118,7 @@ const ListEntity = <T extends WithId & { entityName: string }>({
 					Cancel
 				</button>
 			</div>
+
 			<table className="styled-table">
 				<thead>
 				<tr>
@@ -126,7 +127,7 @@ const ListEntity = <T extends WithId & { entityName: string }>({
 				</tr>
 				</thead>
 				<tbody>
-				{/* Ensure that displayEntities is correctly iterated */}
+				{/* Safely render the list of entities */}
 				{displayEntities.length > 0 ? (
 					displayEntities.map((entity, index) => (
 						<tr
@@ -137,9 +138,9 @@ const ListEntity = <T extends WithId & { entityName: string }>({
 							<td>{entity.id}</td>
 							<td>
 								{entity.entityName}
-								{displayNums[index] !== undefined
-									? "-" + displayNums[index]
-									: "n/a"}
+								{/* Check and optionally render the `displayNum` field */}
+								{hasField(entity, "displayNum")
+								&& entity.displayNum != null && entity.displayNum != 0 ? " (" + entity.displayNum + ")" : ""}
 							</td>
 						</tr>
 					))

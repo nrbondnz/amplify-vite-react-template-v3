@@ -65,16 +65,26 @@ const EditEntity = <T extends WithId>({ pEntity, pEntityName, onSave, onDelete, 
 		addCustomEvent(event);
 	}
 
-	const handleDelete = () => onDelete(updatedEntity);
+	const handleDelete = () => {
+		onDelete(updatedEntity);
+		const event: AppEvent = {
+			entity: pEntityName,
+			entityId: updatedEntity.id,
+			actionType: 'DELETE',
+			pageType: 'EDIT'
+		};
+		addCustomEvent(event);
+	}
 
 	const handleCancel = () => {
 		onCancel();
 		const event: AppEvent = {
 			entity: pEntityName,
 			entityId: updatedEntity.id,
-			actionType: 'CANCEL_REQUEST',
+			actionType: 'CANCEL',
 			pageType: 'EDIT'
 		};
+
 		addCustomEvent(event);
 	};
 

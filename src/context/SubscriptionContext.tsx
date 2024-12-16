@@ -20,153 +20,57 @@ export const SubscriptionProvider: React.FC<{ children: ReactNode }> = ({ childr
 	const subscribeToEntityEvents = () => {
 		const subscriptions: any[] = [];
 
-		const handleEvent = (entity: AppStatePage, actionType: string, entityId?: number, pageType?: string, entityData?: any) => (data: any) => {
-			entityData = data.data; // Adjust this if the structure is different
-
+		// Generic event handler
+		const handleEvent = (entity: AppStatePage, actionType: string) => (data: any) => {
 			const event: AppEvent = {
 				entity,
 				actionType,
-				entityId: entityId ?? 0,
-				pageType: pageType ?? '',
-				entityData: entityData, // Optional: Include the full entity data if needed
+				entityId: data?.id ?? 0,
+				pageType: '', // Optional: adjust if needed
+				entityData: data,
 			};
-			console.log('Setting lastEvent:', event)
+			console.log(`Event received: ${actionType} for ${entity}`, event);
 			setLastEvent(event);
 		};
 
-		// Subscriptions for Locations
-		subscriptions.push(
-			client.models.locations.onCreate().subscribe({
-				next: handleEvent(AppStatePage.Location, 'CREATE'),
-				error: (error: any) => console.warn('Create Location subscription error:', error),
-				complete: () => {}, // Placeholder for complete
-			})
-		);
+		// Dynamically loop through all models in `client.models`
+		Object.entries(client.models).forEach(([key, model]) => {
+			// Safely assert each model conforms to the `Model` type
+			const typedModel = model as unknown as {
+				onCreate: () => { subscribe: (callback: any) => any };
+				onUpdate: () => { subscribe: (callback: any) => any };
+				onDelete: () => { subscribe: (callback: any) => any };
+			};
 
-		subscriptions.push(
-			client.models.locations.onUpdate().subscribe({
-				next: handleEvent(AppStatePage.Location, 'UPDATE'),
-				error: (error: any) => console.warn('Update Location subscription error:', error),
-				complete: () => {}, // Placeholder for complete
-			})
-		);
+			// Attempt to map the model name to the corresponding AppStatePage
+			const entity = (AppStatePage as any)[key.charAt(0).toUpperCase() + key.slice(1)];
+			if (!entity) {
+				console.warn(`Skipping subscription for model: ${key} (no AppStatePage mapping)`);
+				return;
+			}
 
-		subscriptions.push(
-			client.models.locations.onDelete().subscribe({
-				next: handleEvent(AppStatePage.Location, 'DELETE'),
-				error: (error: any) => console.warn('Delete Location subscription error:', error),
-			})
-		);
+			// Safely access `onCreate`, `onUpdate`, and `onDelete`
+			subscriptions.push(
+				typedModel.onCreate().subscribe({
+					next: handleEvent(entity, 'CREATE'),
+					error: (error: any) => console.warn(`Create ${key} subscription error`, error),
+				})
+			);
 
-		// Subscriptions for Machines
-		subscriptions.push(
-			client.models.machines.onCreate().subscribe({
-				next: handleEvent(AppStatePage.Machine, 'CREATE'),
-				error: (error: any) => console.warn('Create Machine subscription error:', error),
-			})
-		);
+			subscriptions.push(
+				typedModel.onUpdate().subscribe({
+					next: handleEvent(entity, 'UPDATE'),
+					error: (error: any) => console.warn(`Update ${key} subscription error`, error),
+				})
+			);
 
-		subscriptions.push(
-			client.models.machines.onUpdate().subscribe({
-				next: handleEvent(AppStatePage.Machine, 'UPDATE'),
-				error: (error: any) => console.warn('Update Machine subscription error:', error),
-			})
-		);
-
-		subscriptions.push(
-			client.models.machines.onDelete().subscribe({
-				next: handleEvent(AppStatePage.Machine, 'DELETE'),
-				error: (error: any) => console.warn('Delete Machine subscription error:', error),
-			})
-		);
-
-		// Subscriptions for Users
-		subscriptions.push(
-			client.models.userDetails.onCreate().subscribe({
-				next: handleEvent(AppStatePage.User, 'CREATE'),
-				error: (error: any) => console.warn('Create User subscription error:', error),
-			})
-		);
-
-		subscriptions.push(
-			client.models.userDetails.onUpdate().subscribe({
-				next: handleEvent(AppStatePage.User, 'UPDATE'),
-				error: (error: any) => console.warn('Update User subscription error:', error),
-			})
-		);
-
-		subscriptions.push(
-			client.models.userDetails.onDelete().subscribe({
-				next: handleEvent(AppStatePage.User, 'DELETE_USER'),
-				error: (error: any) => console.warn('Delete User subscription error:', error),
-			})
-		);
-
-		// Subscriptions for Exercises
-		subscriptions.push(
-			client.models.exercises.onCreate().subscribe({
-				next: handleEvent(AppStatePage.Exercise, 'CREATE_EXERCISE'),
-				error: (error: any) => console.warn('Create Exercise subscription error:', error),
-			})
-		);
-
-		subscriptions.push(
-			client.models.exercises.onUpdate().subscribe({
-				next: handleEvent(AppStatePage.Exercise, 'UPDATE_EXERCISE'),
-				error: (error: any) => console.warn('Update Exercise subscription error:', error),
-			})
-		);
-
-		subscriptions.push(
-			client.models.exercises.onDelete().subscribe({
-				next: handleEvent(AppStatePage.Exercise, 'DELETE_EXERCISE'),
-				error: (error: any) => console.warn('Delete Exercise subscription error:', error),
-			})
-		);
-
-		// Subscriptions for Workouts
-		subscriptions.push(
-			client.models.workouts.onCreate().subscribe({
-				next: handleEvent(AppStatePage.Workout, 'CREATE_WORKOUT'),
-				error: (error: any) => console.warn('Create Workout subscription error:', error),
-			})
-		);
-
-		subscriptions.push(
-			client.models.workouts.onUpdate().subscribe({
-				next: handleEvent(AppStatePage.Workout, 'UPDATE_WORKOUT'),
-				error: (error: any) => console.warn('Update Workout subscription error:', error),
-			})
-		);
-
-		subscriptions.push(
-			client.models.workouts.onDelete().subscribe({
-				next: handleEvent(AppStatePage.Workout, 'DELETE_WORKOUT'),
-				error: (error: any) => console.warn('Delete Workout subscription error:', error),
-			})
-		);
-
-		// Subscriptions for Muscles
-		subscriptions.push(
-			client.models.muscles.onCreate().subscribe({
-				next: handleEvent(AppStatePage.Muscle, 'CREATE_MUSCLE'),
-				error: (error: any) => console.warn('Create Muscle subscription error:', error),
-			})
-		);
-
-		subscriptions.push(
-			client.models.muscles.onUpdate().subscribe({
-				next: handleEvent(AppStatePage.Muscle, 'UPDATE_MUSCLE'),
-				error: (error: any) => console.warn('Update Muscle subscription error:', error),
-			})
-		);
-
-		subscriptions.push(
-			client.models.muscles.onDelete().subscribe({
-				next: handleEvent(AppStatePage.Muscle, 'DELETE_MUSCLE'),
-				error: (error: any) => console.warn('Delete Muscle subscription error:', error),
-			})
-		);
+			subscriptions.push(
+				typedModel.onDelete().subscribe({
+					next: handleEvent(entity, 'DELETE'),
+					error: (error: any) => console.warn(`Delete ${key} subscription error`, error),
+				})
+			);
+		});
 
 		// Cleanup function to unsubscribe from all subscriptions
 		return () => {

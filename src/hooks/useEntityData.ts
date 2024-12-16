@@ -2,7 +2,7 @@
 import { client } from "../shared/utils/client";
 import { EntityTypes, WithId } from "../shared/types/types";
 import { Amplify } from "aws-amplify";
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import outputs from "../../amplify_outputs.json";
 
 Amplify.configure(outputs);
@@ -104,7 +104,7 @@ export const useEntityData = <T extends WithId,>(entityType: EntityTypes): IEnti
 		}
 	};
 
-/*	// Refresh entity list by calling the fetchEntities method
+	// Refresh entity list by calling the fetchEntities method
 	const refreshEntities = () => {
 		console.log(`Refreshing entities for ${entityType}...`);
 		fetchEntities().then(r => console.log("r : ",r));
@@ -136,7 +136,7 @@ export const useEntityData = <T extends WithId,>(entityType: EntityTypes): IEnti
 	const getNextId = useCallback((): number => {
 		const maxId = entities.reduce((max, entity) => (entity.id > max ? entity.id : max), 0);
 		return maxId + 1;
-	}, [entities]);*/
+	}, [entities]);
 
 	// Effect to fetch initial entities on hook call
 	useEffect(() => {
@@ -150,16 +150,17 @@ export const useEntityData = <T extends WithId,>(entityType: EntityTypes): IEnti
 		setEntities: () => {},
 		error: null,
 		loading: false,
-		refreshEntities: () => {},
+		refreshEntities: () => { return refreshEntities()},
 		fetchEntities: async () => {},
 		filterById: (id: string | number) => {
 			// Example implementation
-			return entities.filter((entity: any) => entity.id === id);
+			return filterById(id as number)
 		},
-		filterByField: (fieldName: string | number | symbol, fieldValue: string | number) => {
+		filterByField: (fieldName , fieldValue: string | number) => {
 			// Example implementation
-			return entities.filter((entity) => entity[fieldName as keyof T] === fieldValue);
+			return filterByField(fieldName as keyof T, fieldValue)
 		},
-		getNextId: () => Math.random(),
+		getNextId: () => getNextId(),
+		getEntityById: (id: string | number) => getEntityById(id),
 	};
 };

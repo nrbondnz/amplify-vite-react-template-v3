@@ -1,4 +1,5 @@
-﻿import React, { useContext, useMemo } from "react";
+﻿import { client } from "@shared/utils/client";
+import React, { useContext, useEffect, useMemo, useRef } from "react";
 import { useEntityData } from "@hooks/useEntityData";
 import { IEntityManager } from "@shared/types/IEntityManager";
 import {
@@ -81,6 +82,71 @@ export const DataProvider: React.FC<{ children: React.ReactNode }> = ({ children
 		}),
 		[eRM, lM, mM, eM, muM, uM, wM, weM, sM]
 	);
+
+	const subscriptions = useRef<any[]>([]); // Track active subscriptions
+
+	useEffect(() => {
+		// Clear existing subscriptions to ensure no duplicates
+		subscriptions.current.forEach((sub) => sub.unsubscribe());
+		subscriptions.current = []; // Reset subscriptions array
+
+		const createSubscription = (
+			model: any,
+			manager: { refreshEntities: () => void }
+		) => {
+			// Subscribe to updates
+			subscriptions.current.push(
+				model.onUpdate().subscribe({
+					next: () => {
+						console.log(`${model.name} updated, refreshing data...`);
+						manager.refreshEntities();
+						console.log(`${model.name} updated, refresh complete. entities: `, manager);
+					},
+					error: (err: any) =>
+						console.error(`Subscription error (onUpdate - ${model.name}):`, err),
+				})
+			);
+
+			// Subscribe to creations
+			subscriptions.current.push(
+				model.onCreate().subscribe({
+					next: () => {
+						console.log(`${model.name} created, refreshing data...`);
+						manager.refreshEntities();
+					},
+					error: (err: any) =>
+						console.error(`Subscription error (onCreate - ${model.name}):`, err),
+				})
+			);
+
+			// Subscribe to deletions
+			subscriptions.current.push(
+				model.onDelete().subscribe({
+					next: () => {
+						console.log(`${model.name} deleted, refreshing data...`);
+						manager.refreshEntities();
+					},
+					error: (err: any) =>
+						console.error(`Subscription error (onDelete - ${model.name}):`, err),
+				})
+			);
+		};
+
+		// Subscribe each entity type to changes with a single instance of subscriptions
+		createSubscription(client.models.entityRelationships, eRM);
+		createSubscription(client.models.locations, lM);
+		createSubscription(client.models.machines, mM);
+		createSubscription(client.models.exercises, eM);
+		createSubscription(client.models.muscles, muM);
+		createSubscription(client.models.userDetails, uM);
+		createSubscription(client.models.workouts, wM);
+		createSubscription(client.models.workoutExercises, weM);
+		createSubscription(client.models.settings, sM);
+
+		// Cleanup when component unmounts
+		return () => subscriptions.current.forEach((sub) => sub.unsubscribe());
+	}, []); // Empty dependency array ensures subscriptions are created only ONCE
+
 
 	return <DataContext.Provider value={contextValue}>{children}</DataContext.Provider>;
 };
