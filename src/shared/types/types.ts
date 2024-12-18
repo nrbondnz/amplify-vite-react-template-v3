@@ -278,6 +278,7 @@ export enum SettingKeys {
 
 export interface IMachine extends WithIdAndDisplayNum {
 	idLocation: number;
+	description: string;
 
 }
 
@@ -286,6 +287,7 @@ export const defaultMachine: IMachine = {
 	entityName: 'default Machine',
 	displayNum: -1,
 	idLocation: 0,
+	description: 'default machine description'
 };
 
 export const defaultSetting: ISetting = {

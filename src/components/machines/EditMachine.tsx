@@ -63,13 +63,14 @@ const EditMachine: React.FC<EditMachineProps> = ({ entityManager }) => {
 
 	const handleSave = async (updatedEntity: IMachine) => {
 		try {
-			await client.models.machines.update(updatedEntity);
-			console.log("Saving entity:", updatedEntity);
+
 
 			const currentSettings = manageSettingsRef.current?.saveSettings() || [];
 			await manageSettingsRef.current?.saveSettingsToDB(currentSettings);
 			manageRelationshipsRef.current?.saveRelationships();
 			manageRelationshipsRef2.current?.saveRelationships();
+			await client.models.machines.update(updatedEntity);
+			console.log("Saving entity:", updatedEntity);
 		} catch (error) {
 			console.error("Failed to save the entity:", error);
 		}

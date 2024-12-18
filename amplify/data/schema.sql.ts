@@ -55,7 +55,8 @@ export const schema = configure({
         id: a.integer().required(),
         entityName: a.string().required(),
         displayNum: a.integer().required(),
-        idLocation: a.integer().required()
+        idLocation: a.integer().required(),
+        description: a.string()
     }).identifier([
         "id"
     ]),
