@@ -6,45 +6,11 @@ import { secret } from "@aws-amplify/backend";
 
 export const schema = configure({
     database: {
-        identifier: "IDKqHBfCxHbSCsl0OIO7GcFg",
+        identifier: "ID0a3F1CxY6MivZQnZHByfbA",
         engine: "mysql",
         connectionUri: secret("SQL_CONNECTION_STRING"),
-
     }
 }).schema({
-    "actionStates": a.model({
-        id: a.integer().required(),
-        LOADED: a.string().required(),
-        appPage: a.string(),
-        appCommand: a.string(),
-        entityId: a.integer(),
-        entityName: a.string(),
-        parentId: a.integer(),
-        parentName: a.string()
-    }).identifier([
-        "id"
-    ]),
-    "entityRelationships": a.model({
-        id: a.integer().required(),
-        exerciseId: a.integer().required(),
-        muscleId: a.integer().required(),
-        machineId: a.integer().required(),
-        entityName: a.string().required(),
-        extraDetails: a.string()
-    }).identifier([
-        "id"
-    ]),
-    "exercises": a.model({
-        id: a.integer().required(),
-        entityName: a.string().required(),
-        idMachine: a.integer(),
-        displayNum: a.integer(),
-        description: a.string().required(),
-        idUser: a.string(),
-        fame: a.integer()
-    }).identifier([
-        "id"
-    ]),
     "locations": a.model({
         id: a.integer().required(),
         entityName: a.string()
@@ -60,22 +26,20 @@ export const schema = configure({
     }).identifier([
         "id"
     ]),
-    "muscles": a.model({
+    "userDetails": a.model({
         id: a.integer().required(),
-        entityName: a.string().required(),
-        description: a.string().required(),
-        displayNum: a.integer().required(),
-        muscleFunction: a.string(),
-        idParent: a.integer(),
-        parentName: a.string()
+        name: a.string().required(),
+        email: a.string().required(),
+        phoneNumber: a.string(),
+        idLocation: a.integer().required(),
+        roles: a.json().required()
     }).identifier([
         "id"
     ]),
-    "sessionWorkoutExercises": a.model({
+    "workouts": a.model({
         id: a.integer().required(),
-        idSessionWorkout: a.integer().required(),
-        idExercise: a.integer(),
-        entityName: a.string()
+        idUser: a.integer().required(),
+        entityName: a.string().required()
     }).identifier([
         "id"
     ]),
@@ -85,24 +49,6 @@ export const schema = configure({
         idWorkout: a.integer().required(),
         complete: a.integer(),
         entityName: a.string()
-    }).identifier([
-        "id"
-    ]),
-    "settings": a.model({
-        id: a.integer().required(),
-        value: a.string(),
-        entityId: a.integer(),
-        entityType: a.string(),
-        entityName: a.string()
-    }).identifier([
-        "id"
-    ]),
-    "userDetails": a.model({
-        id: a.integer().required(),
-        entityName: a.string().required(),
-        email: a.string().required(),
-        phoneNumber: a.string(),
-        idLocation: a.integer().required()
     }).identifier([
         "id"
     ]),
@@ -117,10 +63,64 @@ export const schema = configure({
     }).identifier([
         "id"
     ]),
-    "workouts": a.model({
+    "actionStates": a.model({
         id: a.integer().required(),
-        idUser: a.integer().required(),
-        entityName: a.string().required()
+        LOADED: a.string().required(),
+        appPage: a.string(),
+        appCommand: a.string(),
+        entityId: a.integer(),
+        entityName: a.string(),
+        parentId: a.integer(),
+        parentName: a.string()
+    }).identifier([
+        "id"
+    ]),
+    "muscles": a.model({
+        id: a.integer().required(),
+        entityName: a.string().required(),
+        description: a.string().required(),
+        displayNum: a.integer().required(),
+        muscleFunction: a.string(),
+        idParent: a.integer(),
+        parentName: a.string()
+    }).identifier([
+        "id"
+    ]),
+    "settings": a.model({
+        id: a.integer().required(),
+        value: a.string(),
+        entityId: a.integer(),
+        entityType: a.string(),
+        entityName: a.string()
+    }).identifier([
+        "id"
+    ]),
+    "exercises": a.model({
+        id: a.integer().required(),
+        entityName: a.string().required(),
+        idMachine: a.integer(),
+        displayNum: a.integer(),
+        description: a.string().required(),
+        idUser: a.integer(),
+        fame: a.integer()
+    }).identifier([
+        "id"
+    ]),
+    "sessionWorkoutExercises": a.model({
+        id: a.integer().required(),
+        idSessionWorkout: a.integer().required(),
+        idExercise: a.integer(),
+        entityName: a.string()
+    }).identifier([
+        "id"
+    ]),
+    "entityRelationships": a.model({
+        id: a.integer().required(),
+        exerciseId: a.integer().required(),
+        muscleId: a.integer().required(),
+        machineId: a.integer().required(),
+        entityName: a.string().required(),
+        extraDetails: a.string()
     }).identifier([
         "id"
     ])

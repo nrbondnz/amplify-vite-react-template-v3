@@ -69,7 +69,7 @@ export interface AppEvent {
 	actionType: string;
 	entityId?: number;
 	pageType?: string;
-	entityData?: any;
+	entityData?: never;
 	// Optional field for specific entity
 	// Add other necessary fields as needed
 }
@@ -250,11 +250,11 @@ export const defaultEntityRelationship: IEntityRelationship = {
 
 }
 
-export const doesFieldExist = <T extends Object>(fieldName: keyof T, entity: T): boolean => {
+export const doesFieldExist = <T extends object>(fieldName: keyof T, entity: T): boolean => {
 	return fieldName in entity;
 };
 
-export const getFieldValue = (fieldName: string, entity: Record<string, any>): any => {
+export const getFieldValue = (fieldName: string, entity: Record<string, never>): unknown => {
 	return Object.prototype.hasOwnProperty.call(entity, fieldName) ? entity[fieldName] : undefined;
 };
 
@@ -332,7 +332,7 @@ export const getEntityDefault = <T extends WithId>(
 	}
 };
 
-export const requiredFieldsMap: { [key in EntityTypes]?: (keyof any)[] } = {
+export const requiredFieldsMap: { [key in EntityTypes]?: (keyof never)[] } = {
 	[EntityTypes.User]: ['email', 'entityName', 'idLocation'],
 	[EntityTypes.Machine]: ['entityName', 'displayNum', 'idLocation'],
 	[EntityTypes.Exercise]: ['entityName', 'idMachine', 'description'],
@@ -348,7 +348,7 @@ export const requiredDisplayNamesMap: {
     [key in EntityTypes]?: { [field: string]: { displayName : string, type?: string} }
 } = {
     [EntityTypes.User]: { email: { displayName: 'Email' }, entityName: { displayName: 'Name' }, idLocation: { displayName: 'Location ID' } },
-    [EntityTypes.Machine]: { entityName: { displayName: 'Name' }, displayNum: { displayName: 'Display Number' }, idLocation: { displayName: 'Location ID' } },
+    [EntityTypes.Machine]: { entityName: { displayName: 'Name' }, displayNum: { displayName: 'Display Number' }, idLocation: { displayName: 'Location ID' }, description: { displayName: 'Description', type: 'textarea' } },
     [EntityTypes.Exercise]: { entityName: { displayName: 'Name' }, idMachine: { displayName: 'Machine ID' }, description: { displayName: 'Description', type: 'textarea' } },
     [EntityTypes.Workout]: { entityName: { displayName: 'Name' }, idUser: { displayName: 'User ID' } },
     [EntityTypes.Location]: { entityName: { displayName: 'Location Town' } },
