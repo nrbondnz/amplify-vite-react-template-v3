@@ -38,14 +38,14 @@ export const schema = configure({
     ]),
     "workouts": a.model({
         id: a.integer().required(),
-        idUser: a.integer().required(),
+        idUser: a.string().required(),
         entityName: a.string().required()
     }).identifier([
         "id"
     ]),
     "sessionWorkouts": a.model({
         id: a.integer().required(),
-        idUser: a.integer().required(),
+        idUser: a.string().required(),
         idWorkout: a.integer().required(),
         complete: a.integer(),
         entityName: a.string()
@@ -55,7 +55,7 @@ export const schema = configure({
     "workoutExercises": a.model({
         id: a.integer().required(),
         entityName: a.string().required(),
-        idUser: a.integer().required(),
+        idUser: a.string().required(),
         idWorkout: a.integer().required(),
         idMachine: a.integer().required(),
         idExercise: a.integer().required(),
@@ -100,8 +100,8 @@ export const schema = configure({
         entityName: a.string().required(),
         idMachine: a.integer(),
         displayNum: a.integer(),
-        description: a.string().required(),
-        idUser: a.integer(),
+        description: a.string(),
+        idUser: a.string(),
         fame: a.integer()
     }).identifier([
         "id"

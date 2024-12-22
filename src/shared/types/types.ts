@@ -109,7 +109,7 @@ export interface WithIdAndDisplayNum extends WithId {
 export interface IWorkoutExercise extends WithId {
 	id: number;
 	entityName: string;
-	idUser: number;
+	idUser: string;
 	idWorkout: number;
 	idMachine: number;
 	idExercise: number;
@@ -121,7 +121,7 @@ export interface IWorkoutExercise extends WithId {
 export const defaultWorkoutExercise: IWorkoutExercise = {
 	id: 0,
 	entityName: 'default workout exercise',
-	idUser: 0,
+	idUser: "",
 	idWorkout: 0,
 	idMachine: 0,
 	idExercise: 0,
@@ -160,7 +160,7 @@ export enum EntityTypes {
 export const defaultUserWorkEx: IWorkoutExercise = {
 	id: 0,
 	entityName: '',
-	idUser: 0,
+	idUser: "",
 	idWorkout: 0,
 	idMachine: 0,
 	idExercise: 0,
@@ -170,14 +170,14 @@ export const defaultUserWorkEx: IWorkoutExercise = {
 
 export interface ISessionWorkout extends WithId {
 	id: number;
-	idUser: number;
+	idUser: string;
 	idWorkout: number;
 	complete: boolean;
 }
 
 export const defaultSesionWorkout = {
 	id: 0,
-	idUser: 0,
+	idUser: "",
 	idWorkout: 0,
 	complete: false,
 	entityName: 'default session workout',
@@ -220,7 +220,7 @@ export const defaultExercise: IExercise = {
 	idMachine: 0,
 	displayNum: 0,
 	description: 'default exercise description',
-	idUser: null,
+	idUser: "",
 	fame: 10
 };
 
@@ -359,11 +359,13 @@ export const requiredDisplayNamesMap: {
 export interface ILocation extends WithId {
 	id: number;
 	entityName: string;
+	description: string;
 }
 
 export const defaultLocation: ILocation = {
 	id: 0,
-	entityName: 'default Location'
+	entityName: 'default Location',
+	description: 'default location description'
 };
 
 // amplify/data/types.ts
@@ -381,7 +383,7 @@ export type Entity = {
 
 export interface IWorkout extends WithId {
 	id: number;
-	idUser: number;
+	idUser: string;
 	entityName: string;
 }
 
@@ -436,7 +438,7 @@ export interface IActionState extends WithId {
 
 export const defaultWorkout: IWorkout = {
 	id: 0,
-	idUser: 0,
+	idUser: "",
 	entityName: 'default workout',
 };
 
@@ -479,7 +481,7 @@ export interface ListWorkoutsProps {
 export interface NewWorkoutProps {
 	type: string;
 	payload: {
-		idUser: number;
+		idUser: string;
 	};
 }
 
@@ -524,7 +526,7 @@ export interface ListWorkoutsProps {
 export interface NewWorkoutProps {
 	type: string;
 	payload: {
-		idUser: number;
+		idUser: string;
 	};
 }
 
