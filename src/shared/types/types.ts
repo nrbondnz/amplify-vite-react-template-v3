@@ -334,10 +334,10 @@ export const getEntityDefault = <T extends WithId>(
 
 export const requiredFieldsMap: { [key in EntityTypes]?: (keyof never)[] } = {
 	[EntityTypes.User]: ['email', 'entityName', 'idLocation'],
-	[EntityTypes.Machine]: ['entityName', 'displayNum', 'idLocation'],
+	[EntityTypes.Machine]: ['entityName', 'displayNum', 'idLocation', 'description'],
 	[EntityTypes.Exercise]: ['entityName', 'idMachine', 'description'],
-	[EntityTypes.Workout]: ['entityName', 'idUser'],
-	[EntityTypes.Location]: ['entityName'],
+	[EntityTypes.Workout]: ['entityName', 'idUser','description'],
+	[EntityTypes.Location]: ['entityName', 'description'],
 	[EntityTypes.Muscle]: ['entityName', 'description'],
 	[EntityTypes.Setting]: ['entityName', 'value'],
 	[EntityTypes.WorkoutExercise]: ['entityName', 'idUser', 'idWorkout', 'idExercise']
@@ -350,8 +350,8 @@ export const requiredDisplayNamesMap: {
     [EntityTypes.User]: { email: { displayName: 'Email' }, entityName: { displayName: 'Name' }, idLocation: { displayName: 'Location ID' } },
     [EntityTypes.Machine]: { entityName: { displayName: 'Name' }, displayNum: { displayName: 'Display Number' }, idLocation: { displayName: 'Location ID' }, description: { displayName: 'Description', type: 'textarea' } },
     [EntityTypes.Exercise]: { entityName: { displayName: 'Name' }, idMachine: { displayName: 'Machine ID' }, description: { displayName: 'Description', type: 'textarea' } },
-    [EntityTypes.Workout]: { entityName: { displayName: 'Name' }, idUser: { displayName: 'User ID' } },
-    [EntityTypes.Location]: { entityName: { displayName: 'Location Town' } },
+    [EntityTypes.Workout]: { entityName: { displayName: 'Name' }, idUser: { displayName: 'User ID' }, description: { displayName: 'Description', type: 'textarea' } },
+    [EntityTypes.Location]: { entityName: { displayName: 'Location Town' }, description : { displayName: 'Description', type: 'textarea' } },
     [EntityTypes.Muscle]: { entityName: { displayName: 'Name' }, description: { displayName: 'Description', type: 'textarea' }, muscleFunction: { displayName: 'Muscle Function', type: 'textarea' }, idParent: { displayName: 'Parent ID' } },
     [EntityTypes.Setting]: { entityName: { displayName: 'Name' }, value: { displayName: 'Value' } },
     [EntityTypes.WorkoutExercise]: { entityName: { displayName: 'Name' }, idUser: { displayName: 'User ID' }, idWorkout: { displayName: 'Workout ID' }, idExercise: { displayName: 'Exercise ID' } }

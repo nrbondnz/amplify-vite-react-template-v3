@@ -9,23 +9,9 @@ export const schema = configure({
         identifier: "ID0a3F1CxY6MivZQnZHByfbA",
         engine: "mysql",
         connectionUri: secret("SQL_CONNECTION_STRING"),
+
     }
 }).schema({
-    "locations": a.model({
-        id: a.integer().required(),
-        entityName: a.string()
-    }).identifier([
-        "id"
-    ]),
-    "machines": a.model({
-        id: a.integer().required(),
-        entityName: a.string().required(),
-        displayNum: a.integer().required(),
-        idLocation: a.integer().required(),
-        description: a.string()
-    }).identifier([
-        "id"
-    ]),
     "userDetails": a.model({
         id: a.integer().required(),
         name: a.string().required(),
@@ -33,33 +19,6 @@ export const schema = configure({
         phoneNumber: a.string(),
         idLocation: a.integer().required(),
         roles: a.json().required()
-    }).identifier([
-        "id"
-    ]),
-    "workouts": a.model({
-        id: a.integer().required(),
-        idUser: a.string().required(),
-        entityName: a.string().required()
-    }).identifier([
-        "id"
-    ]),
-    "sessionWorkouts": a.model({
-        id: a.integer().required(),
-        idUser: a.string().required(),
-        idWorkout: a.integer().required(),
-        complete: a.integer(),
-        entityName: a.string()
-    }).identifier([
-        "id"
-    ]),
-    "workoutExercises": a.model({
-        id: a.integer().required(),
-        entityName: a.string().required(),
-        idUser: a.string().required(),
-        idWorkout: a.integer().required(),
-        idMachine: a.integer().required(),
-        idExercise: a.integer().required(),
-        max: a.string().required()
     }).identifier([
         "id"
     ]),
@@ -95,17 +54,6 @@ export const schema = configure({
     }).identifier([
         "id"
     ]),
-    "exercises": a.model({
-        id: a.integer().required(),
-        entityName: a.string().required(),
-        idMachine: a.integer(),
-        displayNum: a.integer(),
-        description: a.string(),
-        idUser: a.string(),
-        fame: a.integer()
-    }).identifier([
-        "id"
-    ]),
     "sessionWorkoutExercises": a.model({
         id: a.integer().required(),
         idSessionWorkout: a.integer().required(),
@@ -121,6 +69,61 @@ export const schema = configure({
         machineId: a.integer().required(),
         entityName: a.string().required(),
         extraDetails: a.string()
+    }).identifier([
+        "id"
+    ]),
+    "exercises": a.model({
+        id: a.integer().required(),
+        entityName: a.string().required(),
+        idMachine: a.integer(),
+        displayNum: a.integer(),
+        description: a.string().required(),
+        idUser: a.string(),
+        fame: a.integer()
+    }).identifier([
+        "id"
+    ]),
+    "locations": a.model({
+        id: a.integer().required(),
+        entityName: a.string(),
+        description: a.string()
+    }).identifier([
+        "id"
+    ]),
+    "machines": a.model({
+        id: a.integer().required(),
+        entityName: a.string().required(),
+        displayNum: a.integer().required(),
+        idLocation: a.integer().required(),
+        description: a.string()
+    }).identifier([
+        "id"
+    ]),
+    "workoutExercises": a.model({
+        id: a.integer().required(),
+        entityName: a.string().required(),
+        idUser: a.string().required(),
+        idWorkout: a.integer().required(),
+        idMachine: a.integer().required(),
+        idExercise: a.integer().required(),
+        max: a.string().required()
+    }).identifier([
+        "id"
+    ]),
+    "sessionWorkouts": a.model({
+        id: a.integer().required(),
+        idUser: a.string().required(),
+        idWorkout: a.integer().required(),
+        complete: a.integer(),
+        entityName: a.string()
+    }).identifier([
+        "id"
+    ]),
+    "workouts": a.model({
+        id: a.integer().required(),
+        idUser: a.string().required(),
+        entityName: a.string().required(),
+        description: a.string()
     }).identifier([
         "id"
     ])
