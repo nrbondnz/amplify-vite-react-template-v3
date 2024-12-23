@@ -9,7 +9,6 @@ export const schema = configure({
         identifier: "ID0a3F1CxY6MivZQnZHByfbA",
         engine: "mysql",
         connectionUri: secret("SQL_CONNECTION_STRING"),
-
     }
 }).schema({
     "userDetails": a.model({

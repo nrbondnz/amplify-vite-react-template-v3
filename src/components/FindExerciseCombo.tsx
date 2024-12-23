@@ -135,9 +135,32 @@ export const FindExerciseCombo: React.FC = () => {
 
 	const maxRows = Math.max(filteredMachines.length, filteredExercises.length, filteredMuscles.length);
 
+	const resetFilters = () => {
+		// Clear all filters
+		setMachineFilter([]);
+		setExerciseFilter([]);
+		setMuscleFilter([]);
+
+		// Clear search terms
+		setMachineNameFilter('');
+		setExerciseNameFilter('');
+		setMuscleNameFilter('');
+	};
+
+	const handleCancel = () => {
+		// Example: Navigate back or perform a reset
+		// Assuming this is part of a modal or process that needs exiting
+		window.history.back(); // Navigates back to the previous page (browser history)
+
+		// Optionally, you could clear state here if needed:
+		resetFilters();
+	};
+
 	return (
 		<div style={{ position: 'relative' }}>
 			<h1>Find Exercise Combo</h1>
+			<button onClick={resetFilters}>Reset Filters</button>
+			<button onClick={handleCancel}>Cancel</button>
 			<table className="table-bordered">
 				<thead>
 				<tr>
