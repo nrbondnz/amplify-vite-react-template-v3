@@ -13,9 +13,10 @@ const AppContent: React.FC = () => {
 	console.log('AppContent', lastEvent);
 
 	useEffect(() => {
-		console.log("AppContent useEffect");
+		console.log("AppContent useEffect : ", lastEvent);
 		if (lastEvent?.actionType) {
 			console.log(`Last Event: ${lastEvent.entity} - ${lastEvent.actionType}`);
+
 			if ( lastEvent.pageType === "APPHOME" ) {
 				if (lastEvent.actionType === "FIND_REQUEST") {
 					const path = `/app/find`;
@@ -37,6 +38,9 @@ const AppContent: React.FC = () => {
 					navigate(path);
 					return;
 				}
+			} else if (lastEvent.pageType === "COMBO_SEARCH") {
+				navigate( `/app/find/${lastEvent.entity}-selection/${lastEvent.entity}/${lastEvent.entityId}`);
+				return;
 			}
 			if (lastEvent.actionType === "EDIT_REQUEST") {
 				const path = `/${lastEvent.entity}/${lastEvent.entityId}`;
