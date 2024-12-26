@@ -3,11 +3,11 @@ import { AppEvent } from "@shared/types/types";
 import React from "react";
 import { useParams } from "react-router-dom";
 import { useDataContext } from "@context/DataContext";
-const { addCustomEvent } = useSubscription();
 const ExerciseSelection: React.FC = () => {
 	const { entityType, entityId } = useParams<{ entityType: string; entityId: string }>();
 	//const navigate = useNavigate();
 	const dataContext = useDataContext();
+	const { addCustomEvent } = useSubscription();
 
 	// Data Managers
 	const muscleManager = dataContext.muM;

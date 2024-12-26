@@ -3,24 +3,47 @@ import { generateClient } from 'aws-amplify/data';
 import type { Schema } from '@amplify-data/resource';
 import { AppEvent, AppStatePage } from '@shared/types/types';
 
+// Define the interface for the SubscriptionContext
 interface SubscriptionContextProps {
-	lastEvent: AppEvent | null;
-	addCustomEvent: (event: AppEvent) => void;
-	// other context properties and methods
+	eventHistory: AppEvent[]; // Array of event history, capped at length 10
+	lastEvent: AppEvent | null; // Most recent event
+	addCustomEvent: (event: AppEvent) => void; // Method to add a custom event
+	currentSelectedEntity: { entity: string; entityId: number } | null; // Current selected entity
 }
 
+// Create the context
 const SubscriptionContext = createContext<SubscriptionContextProps | undefined>(undefined);
 
 export const SubscriptionProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
-	const [lastEvent, setLastEvent] = useState<AppEvent | null>(null);
-	//const [refreshExerciseManager, setRefreshExerciseManager] =
-	// useState(false);
+	const [eventHistory, setEventHistory] = useState<AppEvent[]>([]); // Store a max length of 10 events
 	const client = generateClient<Schema>();
 
+	// Method to add a new custom event to the history
+	const addCustomEvent = (event: AppEvent) => {
+		console.log('Adding custom event:', event);
+
+		// Add the new event to the history and prune to a max length of 10
+		setEventHistory((prev) => {
+			const updatedHistory = [event, ...prev]; // Add event as the most recent
+			return updatedHistory.slice(0, 10); // Keep only the last 10 events
+		});
+	};
+
+	// Exposed current selected entity:
+	// This finds the most recent event that has both a valid `entity` and `entityId`
+	const currentSelectedEntity =
+		eventHistory.find(
+			(event): event is AppEvent =>
+				!!event.entity && event.entityId !== undefined // Ensure valid `entity` and `entityId`
+		)
+			? { entity: eventHistory[0].entity, entityId: eventHistory[0].entityId as number }
+			: null;
+
+	// Dynamically subscribe to Amplify events
 	const subscribeToEntityEvents = () => {
 		const subscriptions: any[] = [];
 
-		// Generic event handler
+		// Generic handler for events
 		const handleEvent = (entity: AppStatePage, actionType: string) => (data: any) => {
 			const event: AppEvent = {
 				entity,
@@ -30,26 +53,24 @@ export const SubscriptionProvider: React.FC<{ children: ReactNode }> = ({ childr
 				entityData: data,
 			};
 			console.log(`Event received: ${actionType} for ${entity}`, event);
-			setLastEvent(event);
+			addCustomEvent(event); // Add the new event to the list
 		};
 
-		// Dynamically loop through all models in `client.models`
+		// Loop through all models in `client.models` to set up subscriptions
 		Object.entries(client.models).forEach(([key, model]) => {
-			// Safely assert each model conforms to the `Model` type
 			const typedModel = model as unknown as {
 				onCreate: () => { subscribe: (callback: any) => any };
 				onUpdate: () => { subscribe: (callback: any) => any };
 				onDelete: () => { subscribe: (callback: any) => any };
 			};
 
-			// Attempt to map the model name to the corresponding AppStatePage
 			const entity = (AppStatePage as any)[key.charAt(0).toUpperCase() + key.slice(1)];
 			if (!entity) {
 				console.warn(`Skipping subscription for model: ${key} (no AppStatePage mapping)`);
 				return;
 			}
 
-			// Safely access `onCreate`, `onUpdate`, and `onDelete`
+			// Safely subscribe to onCreate, onUpdate, and onDelete
 			subscriptions.push(
 				typedModel.onCreate().subscribe({
 					next: handleEvent(entity, 'CREATE'),
@@ -78,29 +99,32 @@ export const SubscriptionProvider: React.FC<{ children: ReactNode }> = ({ childr
 		};
 	};
 
-	const addCustomEvent = (event: AppEvent) => {
-		console.log('Adding custom event:', event);
-		setLastEvent(event);
-	};
-
+	// Set up subscriptions on component mount
 	useEffect(() => {
 		const unsubscribe = subscribeToEntityEvents();
-
 		return () => {
-			// Cleanup subscription
-			if (unsubscribe && typeof unsubscribe === 'function') {
+			if (typeof unsubscribe === 'function') {
 				unsubscribe();
 			}
 		};
 	}, []);
 
+	// Provide the subscription context values
 	return (
-		<SubscriptionContext.Provider value={{ lastEvent, addCustomEvent }}>
+		<SubscriptionContext.Provider
+			value={{
+				eventHistory,
+				lastEvent: eventHistory[0] || null, // The most recent event (or null if no events exist)
+				addCustomEvent,
+				currentSelectedEntity, // The current selected entity (or null if no valid entity is found)
+			}}
+		>
 			{children}
 		</SubscriptionContext.Provider>
 	);
 };
 
+// Custom hook to access the SubscriptionContext
 export const useSubscription = () => {
 	const context = useContext(SubscriptionContext);
 	if (context === undefined) {

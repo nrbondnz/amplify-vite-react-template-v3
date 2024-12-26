@@ -10,79 +10,125 @@ const AppContent: React.FC = () => {
 	const { lastEvent } = useSubscription();
 	const navigate = useNavigate();
 
-	console.log('AppContent', lastEvent);
+	console.log("AppContent", lastEvent);
 
 	useEffect(() => {
-		console.log("AppContent useEffect : ", lastEvent);
-		if (lastEvent?.actionType) {
-			console.log(`Last Event: ${lastEvent.entity} - ${lastEvent.actionType}`);
-
-			if ( lastEvent.pageType === "APPHOME" ) {
-				if (lastEvent.actionType === "FIND_REQUEST") {
-					const path = `/app/find`;
-					console.log(`Path: ${path}`);
-					navigate(path);
-					return;
-				}
-				if (lastEvent.actionType === "CANCEL") {
-					const path = `/app`;
-					console.log(`Path: ${path}`);
-					navigate(path);
-					return;
-				}
-			}
-			if (lastEvent.pageType === "CONTROL") {
-				if (lastEvent.actionType === "APP_REQUEST") {
-					const path = `/app`;
-					console.log(`Path: ${path}`);
-					navigate(path);
-					return;
-				}
-			} else if (lastEvent.pageType === "COMBO_SEARCH") {
-				navigate( `/app/find/${lastEvent.entity}-selection/${lastEvent.entity}/${lastEvent.entityId}`);
-				return;
-			}
-			if (lastEvent.actionType === "EDIT_REQUEST") {
-				const path = `/${lastEvent.entity}/${lastEvent.entityId}`;
-				console.log(`Path: ${path}`);
-				navigate(path);
-				return;
-			} else if (lastEvent.actionType === "NEW_REQUEST") {
-				const path = `/${lastEvent.entity}/new`;
-				console.log(`Path: ${path}`);
-				navigate(path);
-				return;
-			} else if (lastEvent.actionType === "LIST_REQUEST") {
-				const path = `/${lastEvent.entity}`;
-				console.log(`Path: ${path}`);
-				navigate(path);
-				return;
-			} else if (lastEvent.actionType === "CANCEL_REQUEST") {
-				if (lastEvent.pageType && lastEvent.pageType === "LIST") {
-					navigate(`/`);
-				} else {
-					// just list as on sub page
-					navigate(`/${lastEvent.entity}`);
-				}
-				return;
-
-			} else if (lastEvent.actionType === "UPDATE" || lastEvent.actionType === "DELETE" || lastEvent.actionType === "CREATE") {
-				navigate(`/${lastEvent.entity}`);
-				return;
-			} else {
-				console.error(`Unknown action type: ${lastEvent.actionType}`);
-				navigate('/');
-				return;
-			}
-			// otherwise for now go to entity list
-			//const path = `/${lastEvent.entity}`;
-			//console.log(`Path: ${path}`);
-			//navigate(path);
-		} else {
-			console.error("No last event");
-			//navigate('/');
+		if (!lastEvent?.actionType) {
+			console.error("No last event or actionType");
+			navigate('/');
 			return;
 		}
+
+		console.log("AppContent useEffect : ", lastEvent);
+
+		// Define navigation logic by pageType and actionType
+		const handleNavigation = (pageType: string, actionType: string) => {
+			switch (pageType) {
+				case "APPHOME":
+					switch (actionType) {
+						case "FIND_REQUEST":
+							navigate(`/app/find`);
+							break;
+						case "CANCEL":
+							navigate(`/app`);
+							break;
+							case "LIST_REQUEST":
+								navigate(`/${lastEvent.entity}`);
+								break;
+						default:
+							console.error(`Unknown action type: ${actionType} for pageType: APPHOME`);
+							navigate(`/`);
+					}
+					break;
+
+				case "CONTROL":
+					if (actionType === "APP_REQUEST") {
+						navigate(`/app`);
+					} else {
+						console.error(`Unknown action type: ${actionType} for pageType: CONTROL`);
+						navigate(`/`);
+					}
+					break;
+
+				case "COMBO_SEARCH":
+					navigate(`/app/find/${lastEvent.entity}-selection/${lastEvent.entity}/${lastEvent.entityId}`);
+					break;
+
+				case "LIST":
+					if (actionType === "CANCEL_REQUEST") {
+						navigate(`/`);
+					} else if (actionType === "EDIT_REQUEST") {
+						navigate(`/${lastEvent.entity}/${lastEvent.entityId}`);
+					} else if (actionType === "NEW_REQUEST") {
+						// use history to work out workout id
+						if (lastEvent.entity === "workoutExercises") {
+							navigate(`/app/find`);
+							break;
+						}
+						navigate(`/${lastEvent.entity}/new`);
+						break;
+					} else {
+						console.error(`Unknown action type: ${actionType} for pageType: LIST`);
+						navigate(`/`);
+					}
+					break;
+				case "NEW":
+					if (actionType === "ADDED_ENTITY" || actionType === "CANCEL_REQUEST") {
+						navigate(`/${lastEvent.entity}`);
+
+					} else {
+						console.error(`Unknown action type: ${actionType} for pageType: NEW`);
+					}
+					break;
+				case "EDIT":
+					if (actionType === "CANCEL_REQUEST") {
+						navigate(`/${lastEvent.entity}`);
+
+					} else {
+						console.error(`Unknown action type: ${actionType} for pageType: NEW`);
+					}
+					break;
+				case "BUILDER":
+					if (actionType === "ADD") {
+						// update current workout, if none selectedLis
+						// going back to search page
+						navigate(`/app/find/${lastEvent.entity}-selection/${lastEvent.entity}/${lastEvent.entityId}`);
+					} else {
+						console.error(`Unknown action type: ${actionType} for pageType: LIST`);
+						navigate(`/`);
+					}
+					break;
+				default:
+					// Handle generic cases for unknown pageType or common actions
+					switch (actionType) {
+						case "EDIT_REQUEST":
+							navigate(`/${lastEvent.entity}/${lastEvent.entityId}`);
+							break;
+						case "NEW_REQUEST":
+							navigate(`/${lastEvent.entity}/new`);
+							break;
+						case "LIST_REQUEST":
+							navigate(`/${lastEvent.entity}`);
+							break;
+						case "CANCEL_REQUEST":
+							// Fallback for non-"LIST" pageType
+							navigate(`/${lastEvent.entity}`);
+							break;
+						case "UPDATE":
+						case "DELETE":
+						case "CREATE":
+							navigate(`/${lastEvent.entity}`);
+							break;
+						default:
+							console.error(`Unknown action type: ${actionType}`);
+							navigate(`/`);
+					}
+			}
+		};
+
+		// Call the defined navigation logic
+		handleNavigation(lastEvent.pageType!, lastEvent.actionType);
+
 	}, [lastEvent, navigate]);
 
 	return <div></div>;

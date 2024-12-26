@@ -16,7 +16,7 @@ const HomePage: React.FC = () => {
 		const event: AppEvent = {
 			entity: page,
 			actionType: 'LIST_REQUEST',
-			pageType: ''
+			pageType: 'HOME'
 		};
 		addCustomEvent(event);
 	};

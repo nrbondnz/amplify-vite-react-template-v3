@@ -2,7 +2,7 @@ import App from "@App";
 import AppContent from "@components/AppContent";
 import { DataProvider } from "@context/DataContext";
 import { SubscriptionProvider } from "@context/SubscriptionContext";
-import React from 'react';
+
 import ReactDOM from 'react-dom/client';
 import { Authenticator } from '@aws-amplify/ui-react';
 import { Amplify } from 'aws-amplify';
@@ -18,7 +18,7 @@ Amplify.configure(outputs);
 
 
 ReactDOM.createRoot(document.getElementById('root')!).render(
-    <React.StrictMode>
+
         <Authenticator
             hideSignUp={false}
             components={{
@@ -29,11 +29,11 @@ ReactDOM.createRoot(document.getElementById('root')!).render(
             <SubscriptionProvider>
                 <DataProvider >
                 <BrowserRouter>
-                    <AppContent />
                     <App />
+                    <AppContent/>
                 </BrowserRouter>
                     </DataProvider>
             </SubscriptionProvider>
         </Authenticator>
-    </React.StrictMode>
+
 );

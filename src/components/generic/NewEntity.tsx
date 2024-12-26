@@ -19,10 +19,10 @@ interface NewEntityProps<T extends WithId> {
 
 const requiredDisplayNamesMap: { [key in EntityTypes]?: { [field: string]: string } } = {
 	[EntityTypes.User]: { email: 'Email', entityName: 'Name', idLocation: 'Location ID' },
-	[EntityTypes.Machine]: { entityName: 'Name', displayNum: 'Display Number', idLocation: 'Location ID' },
+	[EntityTypes.Machine]: { entityName: 'Name', displayNum: 'Display Number', idLocation: 'Location ID', description: 'Description' },
 	[EntityTypes.Exercise]: { entityName: 'Name', idMachine: 'Machine ID', description: 'Description' },
 	[EntityTypes.Workout]: { entityName: 'Name', idUser: 'User ID' },
-	[EntityTypes.Location]: { entityName: 'Location Town' },
+	[EntityTypes.Location]: { entityName: 'Location Town', description: 'Description' },
 	[EntityTypes.Muscle]: { entityName: 'Name', description: 'Description' },
 	[EntityTypes.Setting]: { entityName: 'Name', value: 'Value' },
 	[EntityTypes.WorkoutExercise]: { entityName: 'Name', idUser: 'User ID', idWorkout: 'Workout ID', idExercise: 'Exercise ID' }
@@ -99,6 +99,13 @@ const NewEntity = <T extends WithId>({ entity, entityName, onSave, onCancel, onE
 		if (hasAllRequiredFields(newEntity)) {
 			console.log("Saving entity:", newEntity);
 			onSave(newEntity);
+			const event: AppEvent = {
+				entity: entityName,
+				actionType: "ADDED_ENTITY",
+				entityId: 0,
+				pageType: "NEW",
+			};
+			addCustomEvent(event);
 		} else {
 			console.error("Entity is missing required fields:", newEntity);
 			// Optionally add user notification for missing fields here

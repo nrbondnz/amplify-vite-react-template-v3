@@ -23,10 +23,6 @@ const ListWorkout: React.FC<ListWorkoutProps> = ({ entityManager }) => {
 		return <div>Error loading workouts: {entityManager.error}</div>;
 	}
 
-	if (!entityManager.entities || entityManager.entities.length === 0) {
-		return <div>No workouts found.</div>;
-	}
-
 	return (
 		<ListEntity
 			title="Workouts"

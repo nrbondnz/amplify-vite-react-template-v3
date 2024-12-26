@@ -26,16 +26,18 @@ type ListEntityProps<T> = {
 
 // Component definition
 const ListEntity = <T extends WithId>({
-																   title,
-																   entityDBName,
-																   entities = [], // Default to an empty array if not provided
-															   }: ListEntityProps<T>) => {
+										  title,
+										  entityDBName,
+										  entities = [], // Default to an empty array if not provided
+									  }: ListEntityProps<T>) => {
 	// Access subscription and data context
 	const { addCustomEvent } = useSubscription();
 	const { getManagerByType } = useDataContext();
 
 	// State for entity manager and entities to be displayed
-	const [, setEntityManager] = useState<IEntityManager<T> | undefined>(undefined);
+	const [, setEntityManager] = useState<
+		IEntityManager<T> | undefined
+	>(undefined);
 	const [displayEntities, setDisplayEntities] = useState<T[]>(entities);
 
 	// Effect to fetch entities on mount or when `entityDBName` changes
@@ -43,28 +45,29 @@ const ListEntity = <T extends WithId>({
 		const manager = getManagerByType(getEntityTypesFromName(entityDBName)!);
 		setEntityManager(manager);
 
-		if (manager?.entities?.length! > 0) {
-			// Use the entities from the manager if available
-			setDisplayEntities(manager!.entities as T[]);
-		} else if (entities.length === 0) {
-			// Otherwise, fetch from DB if no predefined entities were passed
-			const fetchEntitiesFromDB = async () => {
-				try {
-					if (manager) {
-						// Fetch entities through the manager dynamically
-						console.log("Fetched entities from DB manager:", manager.entities);
-						setDisplayEntities(manager.entities as T[]); // Ensure types are aligned
-					} else {
-						console.warn(`No manager found for ${entityDBName}. Setting empty state.`);
-						setDisplayEntities([]);
-					}
-				} catch (err) {
-					console.error("Error fetching entities from DB:", err);
-					setDisplayEntities([]);
-				}
-			};
+		// Safeguard for when no manager is found
+		if (!manager) {
+			console.warn(`No manager found for entity: ${entityDBName}`);
+			setDisplayEntities([]); // Ensure an empty list to handle the UI gracefully
+			return;
+		}
 
-			fetchEntitiesFromDB();
+		// Fetch and display entities dynamically
+		const fetchEntities = async () => {
+			try {
+				const fetchedEntities = manager.entities || [];
+				console.log("Fetched entities from manager:", fetchedEntities);
+				setDisplayEntities(fetchedEntities as T[]); // Safely set fetched entities
+			} catch (err) {
+				// Log the error but continue rendering with an empty state
+				console.error(`Error fetching entities for ${entityDBName}:`, err);
+				setDisplayEntities([]); // Use an empty state to avoid breaking
+			}
+		};
+
+		// If no predefined entities are provided, fetch them
+		if (!entities.length) {
+			fetchEntities();
 		}
 	}, [entityDBName, entities, getManagerByType]);
 
@@ -97,20 +100,14 @@ const ListEntity = <T extends WithId>({
 		addCustomEvent(event);
 	};
 
-	// Build an array of display numbers if the field exists in entities
-	/*const displayNums = Array.isArray(displayEntities)
-		? displayEntities.map((entity) =>
-			hasField(entity, "displayNum") ? entity.displayNum : undefined
-		)
-		: [];*/
-
 	console.log("About to render ListEntity with:", displayEntities);
-//displayEntities.forEach(entity => console.log(entity));
+
 	// Render component structure
 	return (
 		<div>
 			<h1>{title}</h1>
 			<div>
+				{/* Always show New and Cancel buttons */}
 				<button className="button-green" onClick={handleNewClick}>
 					New
 				</button>
@@ -119,17 +116,17 @@ const ListEntity = <T extends WithId>({
 				</button>
 			</div>
 
-			<table className="styled-table">
-				<thead>
-				<tr>
-					<th>ID</th>
-					<th>Name</th>
-				</tr>
-				</thead>
-				<tbody>
-				{/* Safely render the list of entities */}
-				{displayEntities.length > 0 ? (
-					displayEntities.map((entity, index) => (
+			{/* Display content regardless of whether entities are available */}
+			{displayEntities.length > 0 ? (
+				<table className="styled-table">
+					<thead>
+					<tr>
+						<th>ID</th>
+						<th>Name</th>
+					</tr>
+					</thead>
+					<tbody>
+					{displayEntities.map((entity, index) => (
 						<tr
 							key={entity.id}
 							onClick={() => handleEditClick(entity.id)}
@@ -138,19 +135,23 @@ const ListEntity = <T extends WithId>({
 							<td>{entity.id}</td>
 							<td>
 								{entity.entityName}
-								{/* Check and optionally render the `displayNum` field */}
-								{hasField(entity, "displayNum")
-								&& entity.displayNum != null && entity.displayNum != 0 ? " (" + entity.displayNum + ")" : ""}
+								{/* Optionally display `displayNum` */}
+								{hasField(entity, "displayNum") &&
+								entity.displayNum != null &&
+								entity.displayNum !== 0
+									? ` (${entity.displayNum})`
+									: ""}
 							</td>
 						</tr>
-					))
-				) : (
-					<tr>
-						<td colSpan={2}>No entities available</td>
-					</tr>
-				)}
-				</tbody>
-			</table>
+					))}
+					</tbody>
+				</table>
+			) : (
+				// Render a fallback when there are no entities
+				<div className="empty-state">
+					<p>No {title} defined yet.</p>
+				</div>
+			)}
 		</div>
 	);
 };
