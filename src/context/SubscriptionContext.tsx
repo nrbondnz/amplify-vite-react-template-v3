@@ -1,7 +1,7 @@
 ﻿import React, { createContext, useContext, useState, useEffect, ReactNode } from 'react';
 import { generateClient } from 'aws-amplify/data';
 import type { Schema } from '@amplify-data/resource';
-import { AppEvent, AppStatePage } from '@shared/types/types';
+import { AppEvent, AppStatePage, EntityTypes } from '@shared/types/types';
 
 // Define the interface for the SubscriptionContext
 interface SubscriptionContextProps {
@@ -9,6 +9,7 @@ interface SubscriptionContextProps {
 	lastEvent: AppEvent | null; // Most recent event
 	addCustomEvent: (event: AppEvent) => void; // Method to add a custom event
 	currentSelectedEntity: { entity: string; entityId: number } | null; // Current selected entity
+	getSelectedEntity: (entity: EntityTypes, action: string) => number | null; // Method to find an entityId by type and action
 }
 
 // Create the context
@@ -27,6 +28,14 @@ export const SubscriptionProvider: React.FC<{ children: ReactNode }> = ({ childr
 			const updatedHistory = [event, ...prev]; // Add event as the most recent
 			return updatedHistory.slice(0, 10); // Keep only the last 10 events
 		});
+	};
+
+	// Method to get the selected entity by type and action
+	const getSelectedEntity = (entity: EntityTypes, action: string): number | null => {
+		const matchingEvent = eventHistory.find(
+			(event) => event.entity === entity && event.actionType === action
+		);
+		return matchingEvent?.entityId ?? null; // Return the matching entityId or null if not found
 	};
 
 	// Exposed current selected entity:
@@ -117,6 +126,7 @@ export const SubscriptionProvider: React.FC<{ children: ReactNode }> = ({ childr
 				lastEvent: eventHistory[0] || null, // The most recent event (or null if no events exist)
 				addCustomEvent,
 				currentSelectedEntity, // The current selected entity (or null if no valid entity is found)
+				getSelectedEntity, // Exposing new method
 			}}
 		>
 			{children}

@@ -13,6 +13,7 @@ const withEntityData =
 				refreshEntities: () => void;
 				loading: boolean;
 				error: string | null;
+
 			};
 		}>) =>
 			(props: any) => {

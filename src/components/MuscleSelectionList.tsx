@@ -26,11 +26,14 @@ const MuscleSelectionList: React.FC<MuscleSelectionListProps> = ({
   // React handler for exercise selection (connect this in D3 logic)
   const handleExerciseClick = (exerciseId: number | null) => {
     console.log("Selected exercise id:", exerciseId);
+    const dataMap: Map<string, number> = new Map();
+    dataMap.set("idMachine", selectedMachineId || 0);
     const event: AppEvent = {
       entity: "exercises",
       entityId: exerciseId || 0,
       actionType: "ADD",
       pageType: "BUILDER",
+        entityData: dataMap as unknown as any,
     };
     addCustomEvent(event);
     setSelectedExerciseId((prev) => (prev === exerciseId ? null : exerciseId));

@@ -1,7 +1,10 @@
-﻿import { useDataContext } from "@context/DataContext";
+﻿
+
 import { useState, ChangeEvent, useEffect } from "react";
 import "../../index.css";
 import FileLoader from "@components/utils/FileLoader";
+import ShowPicture from "@components/utils/ShowPicture";
+import { useDataContext } from "@context/DataContext";
 import { useSubscription } from "@context/SubscriptionContext";
 import {
 	AppEvent,
@@ -10,8 +13,8 @@ import {
 	WithId,
 	WithIdAndDisplayNum,
 } from "@shared/types/types";
-import { requiredDisplayNamesMap } from "@shared/types/types";
-import ShowPicture from "@components/utils/ShowPicture";
+import { requiredDisplayNamesMap } from "@shared/types/types";// Independent
+// user service
 
 interface EditEntityProps<T> {
 	pEntity: T;
@@ -34,12 +37,19 @@ const EditEntity = <T extends WithId>({
 	const [entityName] = useState<string | null>(pEntityName);
 	const { addCustomEvent } = useSubscription();
 	const dataContext = useDataContext();
+
+
 	// Fetch locations
 	const {
 		entities: locations,
 		loading: locationsLoading,
 		error: locationsError,
 	} = dataContext.lM;
+
+	// Fetch user details
+	const [currentUser] = useState<{ id: string; name?: string } | null>(null);
+
+	// Use an independent service to fetch the current user
 
 	// Add missing fields from the default entity to ensure the form can render all fields
 	useEffect(() => {
@@ -80,6 +90,7 @@ const EditEntity = <T extends WithId>({
 		}
 	}, [locations, updatedEntity]);
 
+	// Change handlers
 	const handleChange = (key: keyof T, value: T[keyof T]) => {
 		if (!updatedEntity) return;
 		const newEntity = { ...updatedEntity, [key]: value };
@@ -125,17 +136,14 @@ const EditEntity = <T extends WithId>({
 		addCustomEvent(event);
 	};
 
-	/*const isBasicType = (value: unknown): value is string | number | boolean => {
-		return ["string", "number", "boolean"].includes(typeof value) || value === null;
-	};*/
+	// Required fields mapping
+	const requiredFieldsMap = requiredDisplayNamesMap[pEntityName as EntityTypes] || {};
 
-	const entityType = pEntityName as EntityTypes;
-	const requiredFieldsMap = requiredDisplayNamesMap[entityType] || {};
-
-	const renderField = (key: string, value: unknown) => {
+	const renderField = (key: string, value: unknown): React.ReactNode => {
 		const fieldInfo = requiredFieldsMap[key];
+
 		if (!fieldInfo) {
-			// If there's no mapping in requiredFieldMap, skip rendering.
+			// If there's no mapping in the requiredFieldMap, skip rendering.
 			return null;
 		}
 
@@ -164,6 +172,24 @@ const EditEntity = <T extends WithId>({
 								</option>
 							))}
 						</select>
+					</td>
+				</tr>
+			);
+		}
+
+		// Special case for 'idUser'
+		if (key === "idUser") {
+			return (
+				<tr key={key}>
+					<td>
+						<label>{displayName}:</label>
+					</td>
+					<td>
+						{currentUser ? (
+							<span>{currentUser.name}</span>
+						) : (
+							<span>Loading user...</span>
+						)}
 					</td>
 				</tr>
 			);
@@ -220,6 +246,7 @@ const EditEntity = <T extends WithId>({
 		return displayNum;
 	};
 
+	// Validate if entity is WithIdAndDisplayNum
 	const isWithIdAndDisplayNum = (entity: any): entity is WithIdAndDisplayNum => {
 		return "displayNum" in entity && "id" in entity;
 	};
@@ -251,7 +278,7 @@ const EditEntity = <T extends WithId>({
 					)}
 				{updatedEntity &&
 					Object.keys(
-						getEntityDefault(entityType).defaultEntity
+						getEntityDefault(pEntityName as EntityTypes).defaultEntity
 					).map((key) => {
 						const value = updatedEntity[key as keyof T];
 						return renderField(key, value);

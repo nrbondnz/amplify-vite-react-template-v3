@@ -1,4 +1,9 @@
-﻿import React, { useEffect } from "react";
+﻿
+
+import { useDataContext } from "@context/DataContext";
+import { IWorkoutExercise } from "@shared/types/types";
+import { client } from "@shared/utils/client";
+import React, { useEffect, useMemo } from "react";
 import { useSubscription } from "@context/SubscriptionContext";
 import { useNavigate } from "react-router-dom";
 import { Amplify } from "aws-amplify";
@@ -9,6 +14,11 @@ Amplify.configure(outputs);
 const AppContent: React.FC = () => {
 	const { lastEvent } = useSubscription();
 	const navigate = useNavigate();
+	const { weM, eM } = useDataContext();
+
+	const entitySelections = useMemo(() => new Map<string, number>(), []);
+
+
 
 	console.log("AppContent", lastEvent);
 
@@ -58,6 +68,7 @@ const AppContent: React.FC = () => {
 					if (actionType === "CANCEL_REQUEST") {
 						navigate(`/`);
 					} else if (actionType === "EDIT_REQUEST") {
+						entitySelections.set(lastEvent.entity, lastEvent.entityId);
 						navigate(`/${lastEvent.entity}/${lastEvent.entityId}`);
 					} else if (actionType === "NEW_REQUEST") {
 						// use history to work out workout id
@@ -90,9 +101,35 @@ const AppContent: React.FC = () => {
 					break;
 				case "BUILDER":
 					if (actionType === "ADD") {
-						// update current workout, if none selectedLis
+						const workoutId = entitySelections.get("workouts");
+						if (workoutId) {
+							try {
+								let entityData = lastEvent.entityData as unknown as Map<string, number>;
+								let idMachine = entityData.get("idMachine")!;
+								let exerciseName = eM.entities.find(e => e.id === +(lastEvent.entityId ?? 0))?.entityName!;
+								const newWorkoutExercise: IWorkoutExercise = {
+									id: weM.getNextId(), // Assign a unique ID
+									idWorkout: workoutId,
+									entityName: exerciseName,
+									idExercise: +(lastEvent.entityId ?? 0),
+									idUser: "1",
+									idMachine: +idMachine,
+									max: "default", // Assign a default or calculated value for `max`
+								}
+								//newEntity.id = weM.getNextId(); // Use
+								// `getNextId` to assign ID
+								client.models.workoutExercises.create(newWorkoutExercise); // Save new entity
+								weM.refreshEntities(); // Refresh data after
+								// saving
+								console.log("Saving entity:", newWorkoutExercise);
+								navigate("/workouts/" + workoutId); // Navigate back
+								// after saving
+							} catch (error) {
+								console.error("Failed to save the entity:", error);
+							}
+						}
 						// going back to search page
-						navigate(`/app/find/${lastEvent.entity}-selection/${lastEvent.entity}/${lastEvent.entityId}`);
+						//navigate(`/app/find/${lastEvent.entity}-selection/${lastEvent.entity}/${lastEvent.entityId}`);
 					} else {
 						console.error(`Unknown action type: ${actionType} for pageType: LIST`);
 						navigate(`/`);
@@ -102,6 +139,8 @@ const AppContent: React.FC = () => {
 					// Handle generic cases for unknown pageType or common actions
 					switch (actionType) {
 						case "EDIT_REQUEST":
+							// todo
+							entitySelections.set(lastEvent.entity, lastEvent.entityId);
 							navigate(`/${lastEvent.entity}/${lastEvent.entityId}`);
 							break;
 						case "NEW_REQUEST":

@@ -67,7 +67,7 @@ export type AppstateCommand = typeof appstate_command[keyof typeof appstate_comm
 export interface AppEvent {
 	entity: string;
 	actionType: string;
-	entityId?: number;
+	entityId: number;
 	pageType?: string;
 	entityData?: never;
 	// Optional field for specific entity
@@ -390,7 +390,7 @@ export const requiredDisplayNamesMap: {
 			displayName: 'Name'
 		},
 		idUser: {
-			displayName: 'User ID'
+			displayName: 'User'
 		},
 		description: {
 			displayName: 'Description',

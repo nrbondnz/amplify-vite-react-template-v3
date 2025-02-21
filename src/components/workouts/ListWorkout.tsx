@@ -11,6 +11,8 @@ interface ListWorkoutProps {
 		refreshEntities: () => void; // Refresh list of entities
 		loading: boolean; // Loading state
 		error: string | null; // Error state
+		//setCurrentEntity: (entity: IWorkout | null) => void;
+		//getCurrentEntity: () => IWorkout | null;
 	};
 }
 

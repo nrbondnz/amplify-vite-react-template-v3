@@ -1,9 +1,9 @@
-﻿import { useSubscription } from "@context/SubscriptionContext";
-import { AppEvent } from "@shared/types/types";
+﻿//import { useSubscription } from "@context/SubscriptionContext";
+//import { AppEvent } from "@shared/types/types";
 import React from "react";
 import { useParams } from "react-router-dom";
 import { useDataContext } from "@context/DataContext";
-const { addCustomEvent } = useSubscription();
+//const { addCustomEvent } = useSubscription();
 const MuscleSelection: React.FC = () => {
 	const { entityType, entityId } = useParams<{ entityType: string; entityId: string }>();
 //	const navigate = useNavigate();
@@ -48,24 +48,26 @@ const MuscleSelection: React.FC = () => {
 
 	// Navigate back to the FindExerciseCombo page
 	const navigateBack = () => {
-		const event: AppEvent = {
+		/*const event: AppEvent = {
 			entity: entityType!,
 			entityId: 0,
 			actionType: "FIND_REQUEST",
 			pageType: "APPHOME",
-		};
-		addCustomEvent(event); // This assumes the combo page is under `/app/find`
+		};*/
+		// todo fix with visible cancel button
+		//addCustomEvent(event); // This assumes the combo page is under
+		// `/app/find`
 	};
 
 	return (
 		<div>
 			{/* Back Button */}
 			<div style={{ marginBottom: "20px" }}>
-				<button
+				<button type="button"
 					style={{
 						padding: "10px 20px",
 						backgroundColor: "#007BFF",
-						color: "white",
+						color: "black",
 						border: "none",
 						borderRadius: "5px",
 						cursor: "pointer",
