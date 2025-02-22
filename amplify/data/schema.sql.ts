@@ -8,19 +8,9 @@ export const schema = configure({
     database: {
         identifier: "ID0a3F1CxY6MivZQnZHByfbA",
         engine: "mysql",
-        connectionUri: secret("SQL_CONNECTION_STRING"),
+        connectionUri: secret("SQL_CONNECTION_STRING")
     }
 }).schema({
-    "userDetails": a.model({
-        id: a.integer().required(),
-        name: a.string().required(),
-        email: a.string().required(),
-        phoneNumber: a.string(),
-        idLocation: a.integer().required(),
-        roles: a.json().required()
-    }).identifier([
-        "id"
-    ]),
     "actionStates": a.model({
         id: a.integer().required(),
         LOADED: a.string().required(),
@@ -30,34 +20,6 @@ export const schema = configure({
         entityName: a.string(),
         parentId: a.integer(),
         parentName: a.string()
-    }).identifier([
-        "id"
-    ]),
-    "muscles": a.model({
-        id: a.integer().required(),
-        entityName: a.string().required(),
-        description: a.string().required(),
-        displayNum: a.integer().required(),
-        muscleFunction: a.string(),
-        idParent: a.integer(),
-        parentName: a.string()
-    }).identifier([
-        "id"
-    ]),
-    "settings": a.model({
-        id: a.integer().required(),
-        value: a.string(),
-        entityId: a.integer(),
-        entityType: a.string(),
-        entityName: a.string()
-    }).identifier([
-        "id"
-    ]),
-    "sessionWorkoutExercises": a.model({
-        id: a.integer().required(),
-        idSessionWorkout: a.integer().required(),
-        idExercise: a.integer(),
-        entityName: a.string()
     }).identifier([
         "id"
     ]),
@@ -98,14 +60,22 @@ export const schema = configure({
     }).identifier([
         "id"
     ]),
-    "workoutExercises": a.model({
+    "muscles": a.model({
         id: a.integer().required(),
         entityName: a.string().required(),
-        idUser: a.string().required(),
-        idWorkout: a.integer().required(),
-        idMachine: a.integer().required(),
-        idExercise: a.integer().required(),
-        max: a.string().required()
+        description: a.string().required(),
+        displayNum: a.integer().required(),
+        muscleFunction: a.string(),
+        idParent: a.integer(),
+        parentName: a.string()
+    }).identifier([
+        "id"
+    ]),
+    "sessionWorkoutExercises": a.model({
+        id: a.integer().required(),
+        idSessionWorkout: a.integer().required(),
+        idExercise: a.integer(),
+        entityName: a.string()
     }).identifier([
         "id"
     ]),
@@ -115,6 +85,39 @@ export const schema = configure({
         idWorkout: a.integer().required(),
         complete: a.integer(),
         entityName: a.string()
+    }).identifier([
+        "id"
+    ]),
+    "settings": a.model({
+        id: a.integer().required(),
+        value: a.string(),
+        entityId: a.integer(),
+        entityType: a.string(),
+        entityName: a.string()
+    }).identifier([
+        "id"
+    ]),
+    "userDetails": a.model({
+        id: a.integer().required(),
+        name: a.string().required(),
+        email: a.string().required(),
+        phoneNumber: a.string(),
+        idLocation: a.integer().required(),
+        roles: a.json().required()
+    }).identifier([
+        "id"
+    ]),
+    "workoutExercises": a.model({
+        id: a.integer().required(),
+        entityName: a.string().required(),
+        idUser: a.string().required(),
+        idWorkout: a.integer().required(),
+        idMachine: a.integer().required(),
+        idExercise: a.integer().required(),
+        max: a.string().required(),
+        ordinal: a.integer().required(),
+        setDetails: a.string(),
+        setCount: a.integer()
     }).identifier([
         "id"
     ]),

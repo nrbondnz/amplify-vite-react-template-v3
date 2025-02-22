@@ -85,6 +85,7 @@ const ListEntity = <T extends WithId>({
 	const handleNewClick = () => {
 		const event: AppEvent = {
 			entity: entityDBName,
+			entityId: 0,
 			actionType: "NEW_REQUEST",
 			pageType: "LIST",
 		};
@@ -94,6 +95,7 @@ const ListEntity = <T extends WithId>({
 	const handleCancelClick = () => {
 		const event: AppEvent = {
 			entity: entityDBName,
+			entityId: 0,
 			actionType: "CANCEL_REQUEST",
 			pageType: "LIST",
 		};

@@ -14,6 +14,7 @@ const AppHomePage: React.FC = () => {
 	const handleWorkout = () => {
 		const event: AppEvent = {
 			entity: "workouts",
+			entityId: 0,
 			actionType: 'LIST_REQUEST',
 			pageType: 'APPHOME'
 		};
@@ -23,6 +24,7 @@ const AppHomePage: React.FC = () => {
 	const handleTodaysWorkout = () => {
 		const event: AppEvent = {
 			entity: "todaysWorkout",
+			entityId: 0,
 			actionType: 'START_WORKOUT',
 			pageType: 'APPHOME'
 		};
@@ -32,6 +34,7 @@ const AppHomePage: React.FC = () => {
 	const handleFindExercises = () => {
 		const event: AppEvent = {
 			entity: "not set",
+			entityId: 0,
 			actionType: 'FIND_REQUEST',
 			pageType: 'APPHOME'
 		};
@@ -41,6 +44,7 @@ const AppHomePage: React.FC = () => {
 	function handleHome() {
 		const event: AppEvent = {
 			entity: "not set",
+			entityId: 0,
 			actionType: 'LIST_REQUEST',
 			pageType: 'APPHOME'
 		};

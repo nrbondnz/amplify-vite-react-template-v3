@@ -109,14 +109,20 @@ const AppContent: React.FC = () => {
 								let entityData = lastEvent.entityData as unknown as Map<string, number>;
 								let idMachine = entityData.get("idMachine")!;
 								let exerciseName = eM.entities.find(e => e.id === +(lastEvent.entityId ?? 0))?.entityName!;
+								let id = weM.getNextId();
 								const newWorkoutExercise: IWorkoutExercise = {
-									id: weM.getNextId(), // Assign a unique ID
+									id: id, // Assign a unique ID
 									idWorkout: +workoutId,
 									entityName: exerciseName,
 									idExercise: +(lastEvent.entityId ?? 0),
 									idUser: "1",
 									idMachine: +idMachine,
-									max: "default", // Assign a default or calculated value for `max`
+									max: "not set",
+									ordinal: id,
+									setCount: 1,
+									setDescription: ""
+									// Assign a default or
+									// calculated value for `max`
 								}
 								//newEntity.id = weM.getNextId(); // Use
 								// `getNextId` to assign ID

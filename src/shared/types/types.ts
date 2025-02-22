@@ -114,6 +114,9 @@ export interface IWorkoutExercise extends WithId {
 	idMachine: number;
 	idExercise: number;
 	max: string;
+	ordinal: number;
+	setCount?: number;
+	setDescription?: string;
 	settings?: Record<string, number>;  // Optional
 	// Removed ordinal field
 }
@@ -126,6 +129,7 @@ export const defaultWorkoutExercise: IWorkoutExercise = {
 	idMachine: 0,
 	idExercise: 0,
 	max: 'Max not set',
+	ordinal: 0,
 	settings: {},
 };
 
@@ -165,6 +169,7 @@ export const defaultUserWorkEx: IWorkoutExercise = {
 	idMachine: 0,
 	idExercise: 0,
 	max: 'Max not set',
+	ordinal: 0,
 	settings: {},
 };
 

@@ -129,7 +129,7 @@ const EditEntity = <T extends WithId>({
 		onCancel();
 		const event: AppEvent = {
 			entity: pEntityName,
-			entityId: updatedEntity?.id,
+			entityId: updatedEntity?.id ?? 0,
 			actionType: "CANCEL_REQUEST",
 			pageType: "EDIT",
 		};

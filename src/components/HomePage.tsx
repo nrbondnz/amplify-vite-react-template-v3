@@ -15,6 +15,7 @@ const HomePage: React.FC = () => {
 	const handleGotoPage = (page: EntityTypes) => () => {
 		const event: AppEvent = {
 			entity: page,
+			entityId: 0,
 			actionType: 'LIST_REQUEST',
 			pageType: 'HOME'
 		};
@@ -24,6 +25,7 @@ const HomePage: React.FC = () => {
 	const handleGotoApp = () => {
 		const event: AppEvent = {
 			entity: 'not set22',
+			entityId: 0,
 			actionType: 'APP_REQUEST',
 			pageType: 'CONTROL'
 		};

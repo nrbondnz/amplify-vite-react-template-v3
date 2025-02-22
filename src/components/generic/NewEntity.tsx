@@ -117,6 +117,7 @@ const NewEntity = <T extends WithId>({ entity, entityName, onSave, onCancel, onE
 		if (done && done.length > 0) {
 			const event: AppEvent = {
 				entity: entityName,
+				entityId: 0,
 				actionType: 'CANCEL_REQUEST',
 				pageType: done // not top level
 			};
