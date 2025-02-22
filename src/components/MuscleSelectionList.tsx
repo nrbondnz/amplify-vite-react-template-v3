@@ -23,14 +23,26 @@ const MuscleSelectionList: React.FC<MuscleSelectionListProps> = ({
       null
   );
 
-  // React handler for exercise selection (connect this in D3 logic)
+    const handleCancelClick = () => {
+        // Placeholder for cancel functionality
+        const event: AppEvent = {
+            entity: "exercises",
+            entityId: 0,
+            actionType: "CANCEL_REQUEST",
+            pageType: "BUILDER",
+        };
+        addCustomEvent(event);
+    };
+
+
+    // React handler for exercise selection (connect this in D3 logic)
   const handleExerciseClick = (exerciseId: number | null) => {
     console.log("Selected exercise id:", exerciseId);
     const dataMap: Map<string, number> = new Map();
     dataMap.set("idMachine", selectedMachineId || 0);
     const event: AppEvent = {
       entity: "exercises",
-      entityId: exerciseId || 0,
+      entityId: exerciseId ?? 0,
       actionType: "ADD",
       pageType: "BUILDER",
         entityData: dataMap as unknown as any,
@@ -295,11 +307,18 @@ const MuscleSelectionList: React.FC<MuscleSelectionListProps> = ({
           {muM.entities.find((muscle) => muscle.id === muscleId)?.entityName ||
               "No Muscle Selected"}
         </h3>
+          <h4>Select a machine to see exercises</h4>
+          <h4>Select an exercise to add it to the workout</h4>
         <svg
             ref={svgRef}
             width={800}
             style={{ border: "1px solid #ccc" }}
         />
+          <p>
+          <button onClick={() => handleCancelClick()} style={{ marginTop: "20px", backgroundColor: "blue", color: "white" }}>
+              Cancel
+          </button>
+          </p>
       </div>
   );
 };

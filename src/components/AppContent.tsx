@@ -16,16 +16,17 @@ const AppContent: React.FC = () => {
 	const navigate = useNavigate();
 	const { weM, eM } = useDataContext();
 
-	const entitySelections = useMemo(() => new Map<string, number>(), []);
+	const entitySelections = useMemo(() => new Map<string, string>(), []);
 
 
 
 	console.log("AppContent", lastEvent);
 
 	useEffect(() => {
+		entitySelections.set("baseURI", "/");
 		if (!lastEvent?.actionType) {
 			console.error("No last event or actionType");
-			navigate('/');
+			navigate(entitySelections.get("baseURI")!);
 			return;
 		}
 
@@ -68,7 +69,7 @@ const AppContent: React.FC = () => {
 					if (actionType === "CANCEL_REQUEST") {
 						navigate(`/`);
 					} else if (actionType === "EDIT_REQUEST") {
-						entitySelections.set(lastEvent.entity, lastEvent.entityId);
+						entitySelections.set(lastEvent.entity, String(lastEvent.entityId));
 						navigate(`/${lastEvent.entity}/${lastEvent.entityId}`);
 					} else if (actionType === "NEW_REQUEST") {
 						// use history to work out workout id
@@ -100,8 +101,9 @@ const AppContent: React.FC = () => {
 					}
 					break;
 				case "BUILDER":
+					const workoutId = entitySelections.get("workouts");
 					if (actionType === "ADD") {
-						const workoutId = entitySelections.get("workouts");
+
 						if (workoutId) {
 							try {
 								let entityData = lastEvent.entityData as unknown as Map<string, number>;
@@ -109,7 +111,7 @@ const AppContent: React.FC = () => {
 								let exerciseName = eM.entities.find(e => e.id === +(lastEvent.entityId ?? 0))?.entityName!;
 								const newWorkoutExercise: IWorkoutExercise = {
 									id: weM.getNextId(), // Assign a unique ID
-									idWorkout: workoutId,
+									idWorkout: +workoutId,
 									entityName: exerciseName,
 									idExercise: +(lastEvent.entityId ?? 0),
 									idUser: "1",
@@ -130,6 +132,8 @@ const AppContent: React.FC = () => {
 						}
 						// going back to search page
 						//navigate(`/app/find/${lastEvent.entity}-selection/${lastEvent.entity}/${lastEvent.entityId}`);
+					} else if (actionType === "CANCEL_REQUEST") {
+						navigate("/workouts/" + workoutId);
 					} else {
 						console.error(`Unknown action type: ${actionType} for pageType: LIST`);
 						navigate(`/`);
@@ -139,8 +143,7 @@ const AppContent: React.FC = () => {
 					// Handle generic cases for unknown pageType or common actions
 					switch (actionType) {
 						case "EDIT_REQUEST":
-							// todo
-							entitySelections.set(lastEvent.entity, lastEvent.entityId);
+							entitySelections.set(lastEvent.entity, String(lastEvent.entityId));
 							navigate(`/${lastEvent.entity}/${lastEvent.entityId}`);
 							break;
 						case "NEW_REQUEST":
