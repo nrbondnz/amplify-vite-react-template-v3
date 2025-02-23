@@ -5,38 +5,46 @@ import { Amplify } from "aws-amplify";
 import { useCallback, useEffect, useState } from "react";
 import outputs from "../../amplify_outputs.json";
 
+// Configure Amplify with predefined outputs
 Amplify.configure(outputs);
+
+// Hook to manage and provide entity data functionality for a given entity type
 export const useEntityData = <T extends WithId,>(entityType: EntityTypes): IEntityManager<T> => {
-	const [entities, setEntities] = useState<T[]>([]);
-	const [, setError] = useState<string | null>(null);
-	const [, setLoading] = useState<boolean>(true);
+	const [entities, setEntities] = useState<T[]>([]); // State to store the list of entities
+	const [error, setError] = useState<string | null>(null); // State to store potential error messages
+	const [loading, setLoading] = useState<boolean>(true); // State to manage loading state
 
-	// Fetch all data in paginated manner
+	// Fetch all data for a given entity type, handling paginated responses
 	const fetchAllEntityData = async (fetchFunction: (options?: any) => Promise<any>) => {
-		let allData: T[] = [];
-		let nextToken: string | null | undefined = null;
+		let allData: T[] = []; // Array to accumulate all fetched entities
+		let nextToken: string | null | undefined = null; // Token for pagination tracking
 
-		// Paginated fetching
+		// Loop to continue fetching data as long as there is a valid nextToken
 		do {
 			try {
-				console.log(`Fetching data for ${entityType}...`);
-				const response = await fetchFunction({ limit: 1000, nextToken });
-				console.log(`Fetched response for ${entityType}:`, response);
+				console.log(`Fetching data for ${entityType}...`); // Debug log for fetch initiation
+				const response = await fetchFunction({ limit: 1000, nextToken }); // Fetch paginated data
+				console.log(`Fetched response for ${entityType}:`, response); // Debug log for received response
+
+				// Concatenate valid fetched entities to the accumulated list
 				allData = allData.concat(response.data.filter((entry: WithId) => entry.id !== -1));
+
+				// Update nextToken to proceed with fetching the next page
 				nextToken = response.nextToken;
 			} catch (err: any) {
+				// Log and throw an error if fetching fails
 				console.error(
 					`Error fetching paginated data for ${entityType}:`,
 					err.message || err
 				);
 				throw new Error(`Failed to fetch all data for ${entityType}`);
 			}
-		} while (nextToken);
+		} while (nextToken); // Continue if there is more data to fetch
 
-		return allData;
+		return allData; // Return the aggregated data after completion
 	};
 
-	// Map entity type to API response fetchers
+	// Map a given entity type to its corresponding API fetcher
 	const getResponseByModel = async (entity: EntityTypes): Promise<T[]> => {
 		try {
 			switch (entity) {
@@ -71,96 +79,136 @@ export const useEntityData = <T extends WithId,>(entityType: EntityTypes): IEnti
 						client.models.entityRelationships.list(opts)
 					);
 				default:
+					// Throw an error if the provided entity type is not recognized
 					throw new Error(`Unknown entity type: ${entity}`);
 			}
 		} catch (err: any) {
-			throw new Error(
-				`Error fetching data for entity type ${entity}: ${err.message || "unknown error"}`
-			);
+			console.error(`Error fetching data for ${entity}:`, err.message || err);
+			throw new Error(err.message || "Error fetching data");
 		}
 	};
 
-	// Fetch entities (used for initial load or data refresh)
-	const fetchEntities = async () => {
+	// Update a given entity based on entity type
+	const updateEntityByModel = async (entity: EntityTypes, updatedEntity: T): Promise<void> => {
 		try {
-			setLoading(true);
-			setEntities([]); // Clear entities to ensure React detects changes to the state
-			const responseData = await getResponseByModel(entityType);
-
-			// Ensure valid data
-			const validData = responseData.map((item) => {
-				if (!item?.id) {
-					throw new Error("API returned item without an id");
-				}
-				return item;
-			});
-
-			setEntities(validData); // Update entities state
+			switch (entity) {
+				case EntityTypes.Location:
+					await client.models.locations.update(updatedEntity);
+					break;
+				case EntityTypes.User:
+					await client.models.userDetails.update(updatedEntity);
+					break;
+				case EntityTypes.Machine:
+					await client.models.machines.update(updatedEntity);
+					break;
+				case EntityTypes.Muscle:
+					await client.models.muscles.update(updatedEntity);
+					break;
+				case EntityTypes.Setting:
+					await client.models.settings.update(updatedEntity);
+					break;
+				case EntityTypes.Workout:
+					await client.models.workouts.update(updatedEntity);
+					break;
+				case EntityTypes.WorkoutExercise:
+					await client.models.workoutExercises.update(updatedEntity);
+					break;
+				case EntityTypes.Exercise:
+					await client.models.exercises.update(updatedEntity);
+					break;
+				case EntityTypes.SessionWorkout:
+					await client.models.sessionWorkouts.update(updatedEntity);
+					break;
+				case EntityTypes.SessionWorkoutExercise:
+					await client.models.sessionWorkoutExercises.update(updatedEntity);
+					break;
+				case EntityTypes.EntityRelationship:
+					await client.models.entityRelationships.update(updatedEntity);
+					break;
+				default:
+					throw new Error(`Unknown entity type: ${entity}`);
+			}
 		} catch (err: any) {
-			console.error(`Error during fetchEntities for ${entityType}:`, err.message || err);
-			setError(err.message || "Unknown error occurred while fetching entities.");
-		} finally {
-			setLoading(false); // Ensure loading is off after fetch process
+			console.error(`Error updating entity for ${entity}:`, err.message || err);
+			throw new Error(`Failed to update entity for ${entity}: ${err.message || "unknown error"}`);
 		}
 	};
 
-	// Refresh entity list by calling the fetchEntities method
+	// Fetch entities and synchronize state
+	const fetchEntities = useCallback(async () => {
+		setLoading(true);
+		setError(null);
+
+		try {
+			const data = await getResponseByModel(entityType);
+			setEntities(data);
+		} catch (err: any) {
+			setError(err.message || "Failed to fetch entities");
+		} finally {
+			setLoading(false);
+		}
+	}, [entityType]);
+
+	// Refresh entities manually
 	const refreshEntities = () => {
-		console.log(`Refreshing entities for ${entityType}...`);
-		fetchEntities().then(r => console.log("r : ",r));
+		fetchEntities();
 	};
 
 	// Filter entities by ID
-	const filterById = (id: number | string): T[] => {
-		const numericId = typeof id === "string" ? parseInt(id) : id;
-		return entities.filter((entity) => entity.id === numericId);
+	const filterById = (id: string | number): T[] => {
+		return entities.filter((entity) => entity.id === id);
 	};
 
 	// Filter entities by a specific field
-	const filterByField = (fieldName: keyof T, fieldValue: number | string): T[] => {
-		return entities.filter(
-			(entity) => entity[fieldName] === fieldValue && entity[fieldName] !== -1
-		);
+	const filterByField = (fieldName: keyof T, fieldValue: string | number): T[] => {
+		return entities.filter((entity) => entity[fieldName] === fieldValue);
 	};
 
-	// Retrieve a specific entity by ID
-	const getEntityById = useCallback(
-		(id: number | string): T | null => {
-			const numericId = typeof id === "string" ? parseInt(id) : id;
-			return entities.find((entity) => entity.id === numericId) || null;
-		},
-		[entities]
-	);
+	// Get the next available ID
+	const getNextId = (): number => {
+		if (!entities || entities.length === 0) return 1;
+		return Math.max(...entities.map((entity) => Number(entity.id))) + 1;
+	};
 
-	// Retrieve the next available ID (for new entities)
-	const getNextId = useCallback((): number => {
-		const maxId = entities.reduce((max, entity) => (entity.id > max ? entity.id : max), 0);
-		return maxId + 1;
-	}, [entities]);
+	// Get a single entity by ID
+	const getEntityById = (id: string): T | null => {
+		return entities.find((entity) => entity.id === Number(id)) || null;
+	};
 
-	// Effect to fetch initial entities on hook call
+	// Update the entity
+	const updateEntity = async (updatedEntity: T): Promise<void> => {
+		try {
+			await updateEntityByModel(entityType, updatedEntity); // Call the update logic
+
+			// Update local state to reflect updated entity
+			setEntities((prevEntities) =>
+				prevEntities.map((entity) =>
+					entity.id === updatedEntity.id ? { ...entity, ...updatedEntity } : entity
+				)
+			);
+		} catch (err: any) {
+			setError(err.message || "Failed to update entity");
+			console.error(`Error in updateEntity: ${err.message || err}`);
+		}
+	};
+
+	// Effect to fetch entities on mount
 	useEffect(() => {
-		fetchEntities(); // Fetch entities when hook is initialized
-	}, [entityType]);
+		fetchEntities();
+	}, [fetchEntities]);
 
-	//const entities: T[] = []; // Replace with your actual entities
-
+	// Return the entity manager object
 	return {
 		entities,
-		setEntities: () => {},
-		error: null,
-		loading: false,
-		refreshEntities: () => { return refreshEntities()},
-		fetchEntities: async () => {},
-		filterById: (id: string | number) => {
-			// Example implementation
-			return filterById(id as number)
-		},
-		filterByField: (fieldName , fieldValue: string | number) => {
-			// Example implementation
-			return filterByField(fieldName as keyof T, fieldValue)
-		},
-		getNextId: () => getNextId(),
-		getEntityById: (id: string | number) => getEntityById(id),
+		setEntities,
+		error,
+		loading,
+		refreshEntities,
+		fetchEntities,
+		filterById,
+		filterByField,
+		getNextId,
+		getEntityById,
+		updateEntity, // Expose updateEntity
 	};
 };

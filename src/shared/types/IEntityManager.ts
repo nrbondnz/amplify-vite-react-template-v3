@@ -18,6 +18,7 @@ export interface IEntityManager<T> {
   filterByField: (fieldName: keyof T, fieldValue: string | number) => T[]; // Adjusted signature
   getNextId: () => number;
   getEntityById: (id: string) => T | null;
+  updateEntity: (updatedEntity: T) => void;
 }
 
 // This is now the manager type for IEntityRelationship

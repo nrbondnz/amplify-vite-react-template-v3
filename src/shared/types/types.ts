@@ -102,11 +102,13 @@ export const initialState: AppData = {
 
 export interface WithId { id: number; entityName: string }
 
+export interface WithOrdinal { ordinal: number; }
+
 export interface WithIdAndDisplayNum extends WithId {
 	displayNum: number;
 }
 
-export interface IWorkoutExercise extends WithId {
+export interface IWorkoutExercise extends WithId, WithOrdinal {
 	id: number;
 	entityName: string;
 	idUser: string;

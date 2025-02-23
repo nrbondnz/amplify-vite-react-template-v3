@@ -1,16 +1,21 @@
 ﻿import React, { useState, useEffect } from "react";
 import { IEntityManager } from "@shared/types/IEntityManager";
 import { useSubscription } from "@context/SubscriptionContext";
-import { WithId, AppEvent, EntityTypes } from "@shared/types/types";
+import {
+	WithId,
+	AppEvent,
+	EntityTypes,
+	WithOrdinal
+} from "@shared/types/types";
 import { useDataContext } from "@context/DataContext";
 import "./ListEntity.css";
 
-const ListEntity = <T extends WithId>({
-										  title,
-										  entityDBName,
-										  entities = [],
-										  getName = (entity: T) => (entity as any).entityName || "Unnamed", // Updated to use entityName
-									  }: {
+const ListEntity = <T extends WithId & WithOrdinal>({
+														title,
+														entityDBName,
+														entities = [],
+														getName = (entity: T) => (entity as any).entityName || "Unnamed", // Extracting entity name
+													}: {
 	title: string;
 	entityDBName: string;
 	entities?: T[];
@@ -21,6 +26,9 @@ const ListEntity = <T extends WithId>({
 
 	const [, setEntityManager] = useState<IEntityManager<T> | undefined>(undefined);
 	const [displayEntities, setDisplayEntities] = useState<T[]>(entities);
+
+	// Track the index of the row being dragged
+	const [draggedIndex, setDraggedIndex] = useState<number | null>(null);
 
 	useEffect(() => {
 		const manager = getManagerByType(entityDBName as EntityTypes);
@@ -34,8 +42,20 @@ const ListEntity = <T extends WithId>({
 
 		const fetchEntities = async () => {
 			try {
-				const fetchedEntities = manager.entities || [];
-				setDisplayEntities(fetchedEntities as T[]);
+				let fetchedEntities: T[] = manager.entities || [];
+
+				// Sort by ordinal if applicable
+				if (
+					fetchedEntities.length > 0 &&
+					typeof (fetchedEntities[0] as WithOrdinal).ordinal === "number"
+				) {
+					fetchedEntities = fetchedEntities.sort(
+						(a, b) =>
+							(a as WithOrdinal).ordinal - (b as WithOrdinal).ordinal
+					);
+				}
+
+				setDisplayEntities(fetchedEntities);
 			} catch (err) {
 				console.error(`Error fetching entities for ${entityDBName}:`, err);
 				setDisplayEntities([]);
@@ -78,7 +98,6 @@ const ListEntity = <T extends WithId>({
 		addCustomEvent(event);
 	};
 
-	// todo fix this method to feed up to parent and then send an event
 	const handleRemoveClick = (id: number, e: React.MouseEvent) => {
 		e.stopPropagation(); // Prevent row click from also triggering
 		setDisplayEntities((prev) => prev.filter((entity) => entity.id !== id));
@@ -92,6 +111,50 @@ const ListEntity = <T extends WithId>({
 		addCustomEvent(event);
 
 		console.log(`Entity with ID ${id} removed.`);
+	};
+
+	// Handle drag start
+	const handleDragStart = (index: number) => {
+		setDraggedIndex(index);
+	};
+
+	// Handle drag over (required to allow dropping)
+	const handleDragOver = (e: React.DragEvent<HTMLTableRowElement>) => {
+		e.preventDefault();
+	};
+
+	function saveEntityOrdinalSwap(sourceEntity: T, targetEntity: T) {
+		console.log("Saving entity ordinal swap:", sourceEntity, targetEntity);
+		const manager = getManagerByType(entityDBName as EntityTypes);
+		manager?.updateEntity(sourceEntity);
+		manager?.updateEntity(targetEntity);
+	}
+
+	// Handle dropping the dragged row
+	const handleDrop = (targetIndex: number) => {
+		if (draggedIndex === null || draggedIndex === targetIndex) return;
+
+		setDisplayEntities((prevEntities) => {
+			const updatedEntities = [...prevEntities];
+			const sourceEntity = updatedEntities[draggedIndex];
+			const targetEntity = updatedEntities[targetIndex];
+
+			// Swap ordinal values only
+			const tempOrdinal = sourceEntity.ordinal;
+			sourceEntity.ordinal = targetEntity.ordinal;
+			targetEntity.ordinal = tempOrdinal;
+			// todo save changes to DB
+			saveEntityOrdinalSwap(sourceEntity, targetEntity);
+			// Sort the array to maintain ordered display
+			return updatedEntities.sort((a, b) => a.ordinal - b.ordinal);
+		});
+
+		setDraggedIndex(null); // Reset draggedIndex
+	};
+
+	// Handle drag end
+	const handleDragEnd = () => {
+		setDraggedIndex(null);
 	};
 
 	console.log("About to render ListEntity with:", displayEntities);
@@ -121,14 +184,19 @@ const ListEntity = <T extends WithId>({
 					{displayEntities.map((entity, index) => (
 						<tr
 							key={entity.id}
-							onClick={() => handleEditClick(entity.id)} // Re-added row click functionality
-							className={`entity-row ${index % 2 === 0 ? "even" : "odd"}`}
+							draggable
+							onDragStart={() => handleDragStart(index)}
+							onDragOver={handleDragOver}
+							onDrop={() => handleDrop(index)}
+							onDragEnd={handleDragEnd}
+							onClick={() => handleEditClick(entity.id)} // Row click invokes edit
+							className={`entity-row ${
+								index % 2 === 0 ? "even" : "odd"
+							}`}
 						>
 							<td>{entity.id}</td>
-							{/* Use the provided getName function to extract the entity name */}
 							<td>{getName(entity)}</td>
 							<td>
-								{/* Stop event propagation to prevent row click */}
 								<button
 									className="button-red"
 									onClick={(e) => handleRemoveClick(entity.id, e)}
