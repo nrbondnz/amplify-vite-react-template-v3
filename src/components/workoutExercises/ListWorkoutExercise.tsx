@@ -7,6 +7,7 @@ const ListWorkoutExercise = withEntityData<IWorkoutExercise>(EntityTypes.Workout
 		title="Workout Exercises"
 		entities={entityManager.entities} // Use `entities` from `entityManager`
 		entityDBName="workoutExercises"
+		sortable={true}
 	/>
 ));
 
