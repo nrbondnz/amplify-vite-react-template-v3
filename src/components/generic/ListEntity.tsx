@@ -202,9 +202,9 @@ const ListEntity = <T extends WithId>({
 				<table>
 					<thead>
 					<tr>
-						<th>ID</th>
+
 						<th>Name</th>
-						{sortable && <th>Ordinal</th>}
+
 						<th>Actions</th>
 					</tr>
 					</thead>
@@ -218,12 +218,18 @@ const ListEntity = <T extends WithId>({
 							onDrop={() => sortable && handleDrop(index)}
 						>
 							{/* Populate table columns */}
-							<td>{entity.id}</td>
-							<td>{(entity as any).entityName || "N/A"}</td>
-							{sortable && <td>{(entity as unknown as WithOrdinal).ordinal}</td>}
-							<td>
+
+							<td
+								onClick={() => handleEditClick(entity.id)} // Trigger edit on name click
+								style={{ cursor: "pointer", textDecoration: "underline", width:200 }} // Optional styling for indication
+							>
+								{(entity as any).entityName || "N/A"}
+							</td>
+
+
+							<td style={{width:100}}>
 								{/* Attach actions */}
-								<button onClick={() => handleEditClick(entity.id)}>Edit</button>
+
 								<button onClick={(e) => handleRemoveClick(entity.id, e)}>Remove</button>
 							</td>
 						</tr>
