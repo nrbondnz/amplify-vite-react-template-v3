@@ -36,15 +36,15 @@ const EditWorkout: React.FC<EditWorkoutProps> = ({ entityManager }) => {
 				setError(null);
 
 				// Fetch exercises for the workout using `weM`
-				const exercisesArray = await weM
-					.filterByField("idWorkout", id!)
-					.entries();
+				const exercisesArray = weM
+					.filterByField("idWorkout", +id!);
 
 				// Convert the iterator into an array
-				const exercises = Array.from(exercisesArray);
+				//const exercises = Array.from(exercisesArray);
 
 				// Set the exercises in state
-				setWorkoutExercises(exercises);
+				setWorkoutExercises(exercisesArray);
+				console.log("Workout exercises:", exercisesArray);
 			} catch (error) {
 				console.error("Failed to load workout exercises:", error);
 				setError("Failed to load workout exercises.");
@@ -115,6 +115,7 @@ const EditWorkout: React.FC<EditWorkoutProps> = ({ entityManager }) => {
 					title={`Workout Exercises for ${entity.entityName}`}
 					entities={workoutExercises} // Pass fetched data
 					entityDBName="workoutExercises"
+					sortable={true}
 				/>
 			)}
 		</div>

@@ -103,15 +103,15 @@ const AppContent: React.FC = () => {
 				case "BUILDER":
 					const workoutId = entitySelections.get("workouts");
 					if (actionType === "ADD") {
-
 						if (workoutId) {
 							try {
-								let entityData = lastEvent.entityData as unknown as Map<string, number>;
-								let idMachine = entityData.get("idMachine")!;
-								let exerciseName = eM.entities.find(e => e.id === +(lastEvent.entityId ?? 0))?.entityName!;
-								let id = weM.getNextId();
+								const entityData = lastEvent.entityData as unknown as Map<string, number>;
+								const idMachine = entityData.get("idMachine")!;
+								const exerciseName = eM.entities.find(e => e.id === +(lastEvent.entityId ?? 0))?.entityName!;
+								const id = weM.getNextId();
+
 								const newWorkoutExercise: IWorkoutExercise = {
-									id: id, // Assign a unique ID
+									id: id,
 									idWorkout: +workoutId,
 									entityName: exerciseName,
 									idExercise: +(lastEvent.entityId ?? 0),
@@ -120,29 +120,22 @@ const AppContent: React.FC = () => {
 									max: "not set",
 									ordinal: id,
 									setCount: 1,
-									setDescription: ""
-									// Assign a default or
-									// calculated value for `max`
-								}
-								//newEntity.id = weM.getNextId(); // Use
-								// `getNextId` to assign ID
-								client.models.workoutExercises.create(newWorkoutExercise); // Save new entity
-								weM.refreshEntities(); // Refresh data after
-								// saving
-								console.log("Saving entity:", newWorkoutExercise);
-								navigate("/workouts/" + workoutId); // Navigate back
-								// after saving
+									setDetails: ""
+								};
+
+								// Use an async IIFE to handle the await
+								(async () => {
+									const result = await client.models.workoutExercises.create(newWorkoutExercise);
+									console.log("Entity created successfully:", result);
+								})();
+								navigate(`/workouts/${workoutId}`);
+
 							} catch (error) {
-								console.error("Failed to save the entity:", error);
+								console.error("Error occurred while adding a new entity:", error);
 							}
 						}
-						// going back to search page
-						//navigate(`/app/find/${lastEvent.entity}-selection/${lastEvent.entity}/${lastEvent.entityId}`);
 					} else if (actionType === "CANCEL_REQUEST") {
-						navigate("/workouts/" + workoutId);
-					} else {
-						console.error(`Unknown action type: ${actionType} for pageType: LIST`);
-						navigate(`/`);
+						navigate(`/workouts/${workoutId}`);
 					}
 					break;
 				default:

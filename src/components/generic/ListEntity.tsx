@@ -9,23 +9,35 @@ import {
 } from "@shared/types/types";
 import { useDataContext } from "@context/DataContext";
 import "./ListEntity.css";
+type ListEntityProps<T> = T extends WithOrdinal
+	? {
+		title: string;
+		entityDBName: string;
+		entities?: T[];
+		entitiesFiltered?: boolean;
+		sortable: true; // Required when sorting enabled
+	}
+	: {
+		title: string;
+		entityDBName: string;
+		entities?: T[];
+		entitiesFiltered?: boolean;
+		sortable?: false; // Sorting disabled
+	};
 
-const ListEntity = <T extends WithId & WithOrdinal>({
+const ListEntity = <T extends WithId>({
 														title,
 														entityDBName,
 														entities = [],
-														getName = (entity: T) => (entity as any).entityName || "Unnamed", // Extracting entity name
-													}: {
-	title: string;
-	entityDBName: string;
-	entities?: T[];
-	getName?: (entity: T) => string; // Function to extract the name
-}) => {
+														entitiesFiltered = false,
+														sortable = false,
+													}: ListEntityProps<T>) => {
 	const { addCustomEvent } = useSubscription();
 	const { getManagerByType } = useDataContext();
 
 	const [, setEntityManager] = useState<IEntityManager<T> | undefined>(undefined);
-	const [displayEntities, setDisplayEntities] = useState<T[]>(entities);
+	const [displayEntities, setDisplayEntities] = useState<T[]>(entities as T[]);
+
 
 	// Track the index of the row being dragged
 	const [draggedIndex, setDraggedIndex] = useState<number | null>(null);
@@ -42,16 +54,12 @@ const ListEntity = <T extends WithId & WithOrdinal>({
 
 		const fetchEntities = async () => {
 			try {
-				let fetchedEntities: T[] = manager.entities || [];
+				let fetchedEntities: T[] = (manager.entities || []) as T[];
 
-				// Sort by ordinal if applicable
-				if (
-					fetchedEntities.length > 0 &&
-					typeof (fetchedEntities[0] as WithOrdinal).ordinal === "number"
-				) {
-					fetchedEntities = fetchedEntities.sort(
-						(a, b) =>
-							(a as WithOrdinal).ordinal - (b as WithOrdinal).ordinal
+				// Sort by ordinal if entities implement WithOrdinal
+				if (sortable) {
+					fetchedEntities = [...fetchedEntities].sort(
+						(a, b) => (a as unknown as WithOrdinal).ordinal - (b as unknown as WithOrdinal).ordinal
 					);
 				}
 
@@ -62,10 +70,17 @@ const ListEntity = <T extends WithId & WithOrdinal>({
 			}
 		};
 
-		if (!entities.length) {
+		if (!entitiesFiltered && entities.length === 0) {
 			fetchEntities();
+		} else if (entities) {
+			// Sort entities passed via props
+			const sortedEntities = sortable
+				? [...entities].sort((a, b) => (a as unknown as WithOrdinal).ordinal - (b as unknown as WithOrdinal).ordinal)
+				: entities;
+
+			setDisplayEntities(sortedEntities as T[]);
 		}
-	}, [entityDBName, entities, getManagerByType]);
+	}, [entityDBName, sortable, entities, entitiesFiltered, getManagerByType]);
 
 	const handleEditClick = (id: number) => {
 		const event: AppEvent = {
@@ -113,52 +128,64 @@ const ListEntity = <T extends WithId & WithOrdinal>({
 		console.log(`Entity with ID ${id} removed.`);
 	};
 
-	// Handle drag start
+// Handle drag start: Store the index of the dragged item
 	const handleDragStart = (index: number) => {
 		setDraggedIndex(index);
 	};
 
-	// Handle drag over (required to allow dropping)
+// Handle drag over: Prevent default to allow dropping
 	const handleDragOver = (e: React.DragEvent<HTMLTableRowElement>) => {
 		e.preventDefault();
 	};
 
-	function saveEntityOrdinalSwap(sourceEntity: T, targetEntity: T) {
-		console.log("Saving entity ordinal swap:", sourceEntity, targetEntity);
-		const manager = getManagerByType(entityDBName as EntityTypes);
-		manager?.updateEntity(sourceEntity);
-		manager?.updateEntity(targetEntity);
-	}
+
+
 
 	// Handle dropping the dragged row
+	// Handle dropping the dragged row
 	const handleDrop = (targetIndex: number) => {
-		if (draggedIndex === null || draggedIndex === targetIndex) return;
+		if (draggedIndex === null || draggedIndex === targetIndex || !sortable) {
+			setDraggedIndex(null);
+			return;
+		}
 
 		setDisplayEntities((prevEntities) => {
+			// Clone the entities array
 			const updatedEntities = [...prevEntities];
-			const sourceEntity = updatedEntities[draggedIndex];
-			const targetEntity = updatedEntities[targetIndex];
 
-			// Swap ordinal values only
-			const tempOrdinal = sourceEntity.ordinal;
-			sourceEntity.ordinal = targetEntity.ordinal;
-			targetEntity.ordinal = tempOrdinal;
-			// todo save changes to DB
-			saveEntityOrdinalSwap(sourceEntity, targetEntity);
-			// Sort the array to maintain ordered display
-			return updatedEntities.sort((a, b) => a.ordinal - b.ordinal);
+			// Move the dragged entity to the target index
+			const [draggedEntity] = updatedEntities.splice(draggedIndex, 1);
+			updatedEntities.splice(targetIndex, 0, draggedEntity);
+
+			// If sortable (i.e., T extends WithOrdinal), update ordinals
+			if (sortable) {
+				(updatedEntities as unknown as WithOrdinal[]).forEach((entity, index) => {
+					entity.ordinal = index; // Update ordinal to match new index
+				});
+			}
+
+			// Save changes back to the manager
+			saveEntityOrder(updatedEntities);
+
+			return updatedEntities;
 		});
 
-		setDraggedIndex(null); // Reset draggedIndex
-	};
-
-	// Handle drag end
-	const handleDragEnd = () => {
+		// Reset dragged index
 		setDraggedIndex(null);
 	};
 
-	console.log("About to render ListEntity with:", displayEntities);
+// Save the updated order back to the manager
+	function saveEntityOrder(updatedEntities: T[]) {
+		if (sortable) {
+			const manager = getManagerByType(entityDBName as EntityTypes);
+			if (manager) {
+				updatedEntities.forEach((entity) => manager.updateEntity(entity));
+			}
+		}
+	}
 
+	console.log("About to render ListEntity with:", displayEntities);
+	console.log("Draggable: ", sortable ? "true" : "false")
 	return (
 		<div>
 			<h1>{title}</h1>
@@ -172,11 +199,12 @@ const ListEntity = <T extends WithId & WithOrdinal>({
 			</div>
 
 			{displayEntities.length > 0 ? (
-				<table className="styled-table">
+				<table>
 					<thead>
 					<tr>
 						<th>ID</th>
 						<th>Name</th>
+						{sortable && <th>Ordinal</th>}
 						<th>Actions</th>
 					</tr>
 					</thead>
@@ -184,25 +212,19 @@ const ListEntity = <T extends WithId & WithOrdinal>({
 					{displayEntities.map((entity, index) => (
 						<tr
 							key={entity.id}
-							draggable
-							onDragStart={() => handleDragStart(index)}
-							onDragOver={handleDragOver}
-							onDrop={() => handleDrop(index)}
-							onDragEnd={handleDragEnd}
-							onClick={() => handleEditClick(entity.id)} // Row click invokes edit
-							className={`entity-row ${
-								index % 2 === 0 ? "even" : "odd"
-							}`}
+							draggable={sortable} // Enable dragging only if sortable
+							onDragStart={() => sortable && handleDragStart(index)}
+							onDragOver={(e) => sortable && handleDragOver(e)}
+							onDrop={() => sortable && handleDrop(index)}
 						>
+							{/* Populate table columns */}
 							<td>{entity.id}</td>
-							<td>{getName(entity)}</td>
+							<td>{(entity as any).entityName || "N/A"}</td>
+							{sortable && <td>{(entity as unknown as WithOrdinal).ordinal}</td>}
 							<td>
-								<button
-									className="button-red"
-									onClick={(e) => handleRemoveClick(entity.id, e)}
-								>
-									Remove
-								</button>
+								{/* Attach actions */}
+								<button onClick={() => handleEditClick(entity.id)}>Edit</button>
+								<button onClick={(e) => handleRemoveClick(entity.id, e)}>Remove</button>
 							</td>
 						</tr>
 					))}

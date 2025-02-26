@@ -118,7 +118,7 @@ export interface IWorkoutExercise extends WithId, WithOrdinal {
 	max: string;
 	ordinal: number;
 	setCount?: number;
-	setDescription?: string;
+	setDetails?: string;
 	settings?: Record<string, number>;  // Optional
 	// Removed ordinal field
 }
